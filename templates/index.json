@@ -13,6 +13,7 @@
       "type": "sb-mood",
       "settings": {
         "color_scheme": "scheme-1",
+        "columns": "2",
         "ratio": "4 / 5",
         "gap": true
       },
@@ -20,27 +21,57 @@
         "t1": {
           "type": "tile",
           "settings": {
-            "fallback": "sb-life-18.jpg",
+            "image": "shopify://shop_images/sunboy-ian-can-closeup.jpg",
+            "focus": "center",
             "eyebrow": "Real coconut water. Real fruit. Really spiked.",
             "title": "The world's first spiked coconut water",
-            "link_label": "Find it near you",
-            "link": "/pages/find-us"
+            "link_label": "Meet the lineup",
+            "link": "/#flavors",
+            "fallback": ""
           }
         },
         "t2": {
           "type": "tile",
           "settings": {
-            "fallback": "sb-life-19.jpg",
-            "eyebrow": "5% ABV \u00b7 0g added sugar",
+            "image": "shopify://shop_images/sunboy-ian-stoop.jpg",
+            "focus": "center",
+            "eyebrow": "Most drinks make you choose",
             "title": "You'll thank us tomorrow morning.",
-            "link_label": "Meet the lineup",
-            "link": "/#flavors"
+            "link_label": "Our story",
+            "link": "/pages/about-us",
+            "fallback": ""
+          }
+        },
+        "t3": {
+          "type": "tile",
+          "settings": {
+            "image": "shopify://shop_images/sunboy-ian-target.jpg",
+            "focus": "center",
+            "eyebrow": "In thousands of stores",
+            "title": "On your next grocery run",
+            "link_label": "Find it near you",
+            "link": "/pages/find-us",
+            "fallback": ""
+          }
+        },
+        "t4": {
+          "type": "tile",
+          "settings": {
+            "image": "shopify://shop_images/sunboy-ian-cheers.jpg",
+            "focus": "center",
+            "eyebrow": "Flip before you sip",
+            "title": "From our palms to yours.",
+            "link_label": "Why it's different",
+            "link": "/#truths",
+            "fallback": ""
           }
         }
       },
       "block_order": [
         "t1",
-        "t2"
+        "t2",
+        "t3",
+        "t4"
       ]
     },
     "statement": {
@@ -59,10 +90,11 @@
       "type": "sb-flavor-lineup",
       "settings": {
         "color_scheme": "scheme-1",
-        "eyebrow": "Seven flavors",
+        "eyebrow": "A hydrating coconut water with a splash of real fruit juice",
         "heading": "Meet the lineup",
         "link_label": "Find SUNBOY near you",
-        "link": "/pages/find-us"
+        "link": "/pages/find-us",
+        "anchor": "flavors"
       },
       "blocks": {
         "f1": {
@@ -128,21 +160,115 @@
         "placeholder": "Your ZIP code",
         "button_label": "Search",
         "finder_url": "/pages/find-us",
-        "retailers": "Target, H-E-B, Whole Foods Market, Trader Joe's, Total Wine & More, Harris Teeter, Kroger, Lowes Foods",
-        "art_fallback": "sb-sunman-loungechair.png"
-      }
+        "art_fallback": "sb-sunman-loungechair.png",
+        "retail_label": "Or grab it at"
+      },
+      "blocks": {
+        "r1": {
+          "type": "retailer",
+          "settings": {
+            "name": "Target",
+            "link": "https://www.target.com/s?searchTerm=sunboy",
+            "logo": "shopify://shop_images/retailer-target.png"
+          }
+        },
+        "r2": {
+          "type": "retailer",
+          "settings": {
+            "name": "Kroger",
+            "link": "https://www.kroger.com/search?query=sunboy",
+            "logo": "shopify://shop_images/retailer-kroger.png"
+          }
+        },
+        "r3": {
+          "type": "retailer",
+          "settings": {
+            "name": "Whole Foods Market",
+            "link": "https://www.wholefoodsmarket.com/search?text=sunboy",
+            "logo": "shopify://shop_images/retailer-whole-foods.png"
+          }
+        },
+        "r4": {
+          "type": "retailer",
+          "settings": {
+            "name": "Trader Joe's",
+            "link": "/pages/find-us",
+            "logo": "shopify://shop_images/retailer-trader-joes.png"
+          }
+        },
+        "r5": {
+          "type": "retailer",
+          "settings": {
+            "name": "H-E-B",
+            "link": "https://www.heb.com/search?q=sunboy",
+            "logo": "shopify://shop_images/retailer-heb.png"
+          }
+        },
+        "r6": {
+          "type": "retailer",
+          "settings": {
+            "name": "Total Wine & More",
+            "link": "https://www.totalwine.com/search/all?text=sunboy",
+            "logo": "shopify://shop_images/retailer-total-wine.png"
+          }
+        },
+        "r7": {
+          "type": "retailer",
+          "settings": {
+            "name": "Harris Teeter",
+            "link": "https://www.harristeeter.com/search?query=sunboy",
+            "logo": "shopify://shop_images/retailer-harris-teeter.png"
+          }
+        },
+        "r8": {
+          "type": "retailer",
+          "settings": {
+            "name": "Lowes Foods",
+            "link": "https://www.lowesfoods.com/search?q=sunboy",
+            "logo": "shopify://shop_images/retailer-lowes-foods.png"
+          }
+        },
+        "r9": {
+          "type": "retailer",
+          "settings": {
+            "name": "Publix",
+            "link": "https://www.publix.com/search?searchTerm=sunboy",
+            "logo": "shopify://shop_images/retailer-publix.png"
+          }
+        },
+        "r10": {
+          "type": "retailer",
+          "settings": {
+            "name": "Ralphs",
+            "link": "https://www.ralphs.com/search?query=sunboy"
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9",
+        "r10"
+      ]
     },
     "origin": {
       "type": "sb-split",
       "settings": {
         "color_scheme": "scheme-5",
-        "fallback": "sb-life-1.jpg",
+        "fallback": "",
         "flip": false,
         "eyebrow": "Spread joy with coconuts",
         "heading": "It started with a bike cart on the Brooklyn Bridge.",
-        "body": "<p>In the early 2010s, Luke McKenna and Yair Tygiel built a bicycle-powered coconut cart and started throwing tropical parties in the streets of New York. Within a few years CoCo & Co was serving fresh coconut cocktails for Bacardi, Diageo, and Pernod Ricard.</p><p>People who drank coconut cocktails all day felt fine the next morning. So we put that in a can. Same premise as the bike cart: coconuts make people happy, and the good part of the night should not cost you the morning.</p>",
-        "button_label": "Read our story",
-        "button_link": "/pages/about-us"
+        "body": "<p>In the early 2010s, Luke McKenna and Yair Tygiel built a bicycle-powered coconut cart and started throwing tropical parties in the streets of New York. A decade of coconut cocktails later, they put it in a can.</p>",
+        "button_label": "Read the whole story",
+        "button_link": "/pages/about-us",
+        "image": "shopify://shop_images/sunboy-ian-rooftop.jpg"
       }
     },
     "truths": {
@@ -184,6 +310,7 @@
       "type": "sb-mood",
       "settings": {
         "color_scheme": "scheme-1",
+        "columns": "1",
         "ratio": "21 / 9",
         "gap": false
       },
@@ -191,11 +318,13 @@
         "t1": {
           "type": "tile",
           "settings": {
-            "fallback": "sb-life-6.jpg",
+            "image": "shopify://shop_images/sunboy-ian-citibike.jpg",
+            "focus": "center",
             "eyebrow": "SUNBOY goods",
-            "title": "From our palms to yours.",
+            "title": "Spread joy with coconuts.",
             "link_label": "Shop the goods",
-            "link": "/collections/sunboy-swag"
+            "link": "/collections/sunboy-swag",
+            "fallback": ""
           }
         }
       },
@@ -347,8 +476,8 @@
     "statement",
     "lineup",
     "find",
-    "origin",
     "truths",
+    "origin",
     "palms",
     "goods",
     "press"

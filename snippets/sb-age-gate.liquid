@@ -1,0 +1,42 @@
+{%- comment -%}
+  One-tap age gate. Turn on/off and edit words in Theme settings → SUNBOY age gate & signup.
+  Remembers "yes" on this device for the number of days set there. Hidden in the theme editor.
+{%- endcomment -%}
+{%- if settings.sb_age_enable and request.design_mode == false -%}
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('sbAgeOk');
+        if (!t || Date.now() - parseInt(t, 10) > {{ settings.sb_age_days | default: 30 }} * 864e5) document.documentElement.classList.add('sb-age-pending');
+      } catch (e) {
+        if (document.cookie.indexOf('sbAgeOk=1') === -1) document.documentElement.classList.add('sb-age-pending');
+      }
+    })();
+  </script>
+  <div class="sb-age" id="sb-age" role="dialog" aria-modal="true" aria-labelledby="sb-age-q">
+    {%- if settings.sb_age_image != blank -%}
+      {{ settings.sb_age_image | image_url: width: 2048 | image_tag: class: 'sb-age__bg', alt: '', loading: 'eager' }}
+    {%- endif -%}
+    <div class="sb-age__inner">
+      <img class="sb-age__logo" src="{{ 'sunboy-lockup.svg' | asset_url }}" alt="{{ shop.name | escape }}" width="300" height="160">
+      <p class="sb-age__q" id="sb-age-q">{{ settings.sb_age_question }}</p>
+      <button class="sb-btn sb-btn--yellow sb-age__yes" type="button" id="sb-age-yes">{{ settings.sb_age_yes }}</button>
+      <button class="sb-age__no" type="button" id="sb-age-no">{{ settings.sb_age_no }}</button>
+      <p class="sb-age__sorry">{{ settings.sb_age_sorry }}</p>
+      <p class="sb-age__fine">{{ settings.sb_age_fine }}</p>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var gate = document.getElementById('sb-age');
+      document.getElementById('sb-age-yes').addEventListener('click', function () {
+        try { localStorage.setItem('sbAgeOk', String(Date.now())); } catch (e) {}
+        document.cookie = 'sbAgeOk=1; path=/; max-age=' + ({{ settings.sb_age_days | default: 30 }} * 86400) + '; samesite=lax';
+        document.documentElement.classList.remove('sb-age-pending');
+        document.dispatchEvent(new CustomEvent('sb:age-ok'));
+      });
+      document.getElementById('sb-age-no').addEventListener('click', function () { gate.classList.add('is-under'); });
+      if (document.documentElement.classList.contains('sb-age-pending')) document.getElementById('sb-age-yes').focus();
+    })();
+  </script>
+{%- endif -%}

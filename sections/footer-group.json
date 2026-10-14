@@ -15,13 +15,13 @@
       "type": "footer",
       "settings": {
         "color_scheme": "scheme-4",
-        "newsletter_enable": true,
+        "newsletter_enable": false,
         "newsletter_heading": "Get the good news first",
         "enable_follow_on_shop": false,
         "show_social": true,
         "enable_country_selector": false,
         "enable_language_selector": false,
-        "payment_enable": true,
+        "payment_enable": false,
         "show_policy": true,
         "margin_top": 0,
         "padding_top": 36,
@@ -35,9 +35,20 @@
         "show_mark": true,
         "text": "Please enjoy responsibly. Must be 21+."
       }
+    },
+    "newsletter": {
+      "type": "sb-newsletter",
+      "settings": {
+        "color_scheme": "scheme-5",
+        "line": "Join the Coconut Club for new flavors, merch drops, parties and where to find us:",
+        "placeholder": "you@sunshine.com",
+        "fine": "Must be 21+. Unsubscribe anytime.",
+        "success": "You're in. Welcome to the club."
+      }
     }
   },
   "order": [
+    "newsletter",
     "footer",
     "legal"
   ]

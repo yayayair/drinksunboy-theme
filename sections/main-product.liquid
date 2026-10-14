@@ -1,3 +1,5 @@
+{%- comment -%} SUNBOY: flavor products (with a SUNBOY hero line) use the flavor sections instead. {%- endcomment -%}
+{%- unless product.metafields.sunboy.hero_line != blank -%}
 <product-info
   id="MainProduct-{{ section.id }}"
   class="section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}"
@@ -753,6 +755,7 @@
   </product-component>
 </product-info>
 
+{%- endunless -%}
 {% schema %}
 {
   "name": "t:sections.main-product.name",

@@ -1,0 +1,60 @@
+{%- comment -%}
+  Nutrition facts + transparency (flavor products only).
+  Numbers come from the product's "Nutrition facts" metafield (Content → Metaobjects → Nutrition facts).
+{%- endcomment -%}
+{%- assign n = product.metafields.sunboy.nutrition.value -%}
+{%- if product.metafields.sunboy.hero_line != blank and n != blank -%}
+{%- assign c_main = product.metafields.sunboy.color_main.value | default: '#0BB89B' -%}
+<section class="color-{{ section.settings.color_scheme }} gradient" id="nutrition" style="--flavor-b: {{ c_main }};">
+  <div class="sb-wrap sb-nutri">
+    <div class="sb-nutri__grid">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+        <h2 class="sb-display sb-nutri__title">{{ section.settings.heading }}</h2>
+        <div class="sb-nutri__body">{{ section.settings.body }}</div>
+        <div class="sb-nutri__stats">
+          <div class="sb-stat"><span class="sb-stat__num">{{ n.calories }}</span><span class="sb-stat__label">Calories</span></div>
+          <div class="sb-stat"><span class="sb-stat__num">{{ n.added_sugars | default: '0g' }}</span><span class="sb-stat__label">Added sugar</span></div>
+          <div class="sb-stat"><span class="sb-stat__num">{{ n.abv | default: '5%' }}</span><span class="sb-stat__label">ABV</span></div>
+          {%- if n.potassium != blank -%}<div class="sb-stat"><span class="sb-stat__num">{{ n.potassium }}</span><span class="sb-stat__label">Potassium</span></div>{%- endif -%}
+        </div>
+      </div>
+      <div>
+        <div class="sb-label" role="table" aria-label="Nutrition facts for {{ product.title | escape }}">
+          <p class="sb-label__title">Nutrition Facts</p>
+          <div class="sb-label__row" style="border-top:0"><span>1 serving per container</span></div>
+          <div class="sb-label__row"><b>Serving size</b><b>{{ n.serving_size | default: '12 fl oz (355 mL)' }}</b></div>
+          <div class="sb-label__row sb-label__row--thick" style="font-size:1.2rem"><b>Amount per serving</b></div>
+          <div class="sb-label__cal"><span>Calories</span><span>{{ n.calories }}</span></div>
+          <div class="sb-label__row sb-label__row--mid" style="justify-content:flex-end;font-size:1.2rem"><b>% Daily Value*</b></div>
+          <div class="sb-label__row"><span><b>Total Fat</b> {{ n.total_fat | default: '0g' }}</span><b>0%</b></div>
+          <div class="sb-label__row"><span><b>Sodium</b> {{ n.sodium }}</span><b>{{ n.sodium_dv }}</b></div>
+          <div class="sb-label__row"><span><b>Total Carbohydrate</b> {{ n.total_carbs }}</span><b>{{ n.total_carbs_dv }}</b></div>
+          <div class="sb-label__row sb-label__row--indent"><span>Dietary Fiber {{ n.dietary_fiber | default: '0g' }}</span><b>0%</b></div>
+          <div class="sb-label__row sb-label__row--indent"><span>Total Sugars {{ n.total_sugars }}</span><span></span></div>
+          <div class="sb-label__row sb-label__row--indent2"><span>Includes {{ n.added_sugars | default: '0g' }} Added Sugars</span><b>0%</b></div>
+          <div class="sb-label__row"><span><b>Protein</b> {{ n.protein | default: '0g' }}</span><span></span></div>
+          <div class="sb-label__row sb-label__row--thick"><span>Calcium {{ n.calcium }}</span><span>{{ n.calcium_dv }}</span></div>
+          <div class="sb-label__row"><span>Potassium {{ n.potassium }}</span><span>{{ n.potassium_dv }}</span></div>
+          <p class="sb-label__note">* The % Daily Value (DV) tells you how much a nutrient in a serving of food contributes to a daily diet. 2,000 calories a day is used for general nutrition advice.</p>
+          {%- if n.ingredients != blank -%}<p class="sb-label__note"><b>Ingredients:</b> {{ n.ingredients }}</p>{%- endif -%}
+          <p class="sb-label__abv">{{ n.abv | default: '5%' }} alc/vol · Gluten-free · Contains alcohol</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "SUNBOY nutrition",
+  "settings": [
+    { "type": "paragraph", "content": "Only shows on flavor products. Numbers live in Content → Metaobjects → Nutrition facts." },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-5" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Radical transparency" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Nothing to hide. Literally." },
+    { "type": "richtext", "id": "body", "label": "Text", "default": "<p>We put every number on the can and every number right here. Real coconut water, real fruit, zero added sugar and a clean 5% alcohol base. No artificial flavors, no mystery syrups, no fine print.</p>" }
+  ]
+}
+{% endschema %}

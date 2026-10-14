@@ -1,25 +1,41 @@
 {%- comment -%}
-  Find Us band. The zip form sends shoppers to the Find Us page (?zip=12345);
-  "Use my location" sends ?lat=..&lng=.. . The full finder lives on that page.
+  Find Us band. ZIP form → Find Us page (?zip=12345); "Use my location" → ?lat=..&lng=..
+  Retailer blocks: logo + link to that retailer's SUNBOY page (opens in a new tab).
 {%- endcomment -%}
+{%- assign finder = section.settings.finder_url | default: '/pages/find-us' -%}
 <section class="color-{{ section.settings.color_scheme }} gradient" id="find-us-{{ section.id }}">
   <div class="sb-wrap sb-find">
     {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
     <h2 class="sb-display sb-find__title">{{ section.settings.heading }}</h2>
     {%- if section.settings.subheading != blank -%}<p class="sb-find__sub">{{ section.settings.subheading }}</p>{%- endif -%}
-    <form class="sb-find__form" action="{{ section.settings.finder_url | default: '/pages/find-us' }}" method="get" role="search">
-      {%- if product and template.name == 'product' -%}<input type="hidden" name="flavor" value="{{ product.handle | remove_first: 'sunboy-' }}">{%- endif -%}
+    <form class="sb-find__form" action="{{ finder }}" method="get" role="search">
+      {%- if template.name == 'product' and product.metafields.sunboy.hero_line != blank -%}<input type="hidden" name="flavor" value="{{ product.handle | remove_first: 'sunboy-' }}">{%- endif -%}
       <label class="visually-hidden" for="sb-zip-{{ section.id }}">ZIP code</label>
       <input class="sb-find__input" id="sb-zip-{{ section.id }}" name="zip" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" placeholder="{{ section.settings.placeholder | escape }}" required>
       <button class="sb-btn sb-btn--yellow" type="submit">{{ section.settings.button_label }}</button>
     </form>
-    <button class="sb-find__geo" type="button" data-sb-geo="{{ section.settings.finder_url | default: '/pages/find-us' }}">Use my location</button>
-    {%- if section.settings.retailers != blank -%}
-      <p class="sb-find__retailers">
-        {%- assign names = section.settings.retailers | split: ',' -%}
-        {%- for n in names -%}<span>{{ n | strip }}</span>{%- endfor -%}
-      </p>
+    <button class="sb-find__geo" type="button" data-sb-geo="{{ finder }}">Use my location</button>
+
+    {%- if section.blocks.size > 0 -%}
+      {%- if section.settings.retail_label != blank -%}<p class="sb-eyebrow sb-find__retail-label">{{ section.settings.retail_label }}</p>{%- endif -%}
+      <div class="sb-retailers">
+        {%- for block in section.blocks -%}
+          {%- if block.settings.link != blank -%}
+            <a class="sb-retailer" href="{{ block.settings.link }}" target="_blank" rel="noopener" aria-label="SUNBOY at {{ block.settings.name | escape }} (opens in a new tab)" {{ block.shopify_attributes }}>
+          {%- else -%}
+            <div class="sb-retailer" {{ block.shopify_attributes }}>
+          {%- endif -%}
+            {%- if block.settings.logo != blank -%}
+              {{ block.settings.logo | image_url: width: 480 | image_tag: loading: 'lazy', alt: block.settings.name }}
+            {%- else -%}
+              <span class="sb-retailer__name">{{ block.settings.name }}</span>
+            {%- endif -%}
+            {%- if block.settings.link != blank -%}<span class="sb-retailer__go" aria-hidden="true">↗</span>{%- endif -%}
+          {%- if block.settings.link != blank -%}</a>{%- else -%}</div>{%- endif -%}
+        {%- endfor -%}
+      </div>
     {%- endif -%}
+
     {%- if section.settings.art != blank -%}
       {{ section.settings.art | image_url: width: 500 | image_tag: class: 'sb-find__art', loading: 'lazy', alt: '' }}
     {%- elsif section.settings.art_fallback != blank -%}
@@ -29,6 +45,7 @@
 </section>
 <script>
   document.querySelectorAll('[data-sb-geo]').forEach(function (btn) {
+    if (btn.dataset.bound) return; btn.dataset.bound = 1;
     if (!('geolocation' in navigator)) { btn.hidden = true; return; }
     btn.addEventListener('click', function () {
       btn.textContent = 'Finding you…';
@@ -55,9 +72,20 @@
     { "type": "text", "id": "placeholder", "label": "ZIP placeholder", "default": "Your ZIP code" },
     { "type": "text", "id": "button_label", "label": "Button", "default": "Search" },
     { "type": "url", "id": "finder_url", "label": "Find Us page" },
-    { "type": "textarea", "id": "retailers", "label": "Retailers (comma separated)", "default": "Target, H-E-B, Whole Foods Market, Trader Joe's, Total Wine & More, Harris Teeter, Kroger, Lowes Foods" },
+    { "type": "text", "id": "retail_label", "label": "Retailer row label", "default": "Or grab it at" },
     { "type": "image_picker", "id": "art", "label": "Illustration (optional)" },
     { "type": "text", "id": "art_fallback", "label": "Fallback theme image" }
+  ],
+  "blocks": [
+    {
+      "type": "retailer",
+      "name": "Retailer",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Retailer name", "default": "Retailer" },
+        { "type": "image_picker", "id": "logo", "label": "Logo", "info": "Transparent PNG or a logo on white." },
+        { "type": "url", "id": "link", "label": "Link to SUNBOY on their site" }
+      ]
+    }
   ],
   "presets": [ { "name": "SUNBOY find us" } ]
 }

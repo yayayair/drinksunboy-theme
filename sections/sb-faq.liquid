@@ -1,0 +1,70 @@
+{%- comment -%}
+  FAQ. Default questions are the blocks below (edit in the theme editor).
+  To give one product its own questions: Products → that product → Metafields → FAQs.
+  "Show on" decides which products use this section (flavors, goods, or everything).
+{%- endcomment -%}
+{%- liquid
+  assign is_flavor = false
+  if product.metafields.sunboy.hero_line != blank
+    assign is_flavor = true
+  endif
+  assign show = true
+  if template.name == 'product'
+    if section.settings.show_on == 'flavors' and is_flavor == false
+      assign show = false
+    endif
+    if section.settings.show_on == 'goods' and is_flavor
+      assign show = false
+    endif
+  endif
+  assign custom = product.metafields.sunboy.faqs.value
+-%}
+{%- if show -%}
+<section class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="sb-wrap sb-faq">
+    <div class="sb-faq__grid">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+        <h2 class="sb-display sb-faq__title">{{ section.settings.heading }}</h2>
+        {%- if section.settings.intro != blank -%}<div class="sb-faq__intro">{{ section.settings.intro }}</div>{%- endif -%}
+      </div>
+      <div>
+        {%- if custom != blank and template.name == 'product' -%}
+          {%- for item in custom -%}
+            <details class="sb-faq__item"><summary class="sb-faq__q">{{ item.question }}</summary><div class="sb-faq__a">{{ item.answer | newline_to_br }}</div></details>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for block in section.blocks -%}
+            <details class="sb-faq__item" {{ block.shopify_attributes }}><summary class="sb-faq__q">{{ block.settings.question }}</summary><div class="sb-faq__a">{{ block.settings.answer }}</div></details>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "SUNBOY FAQ",
+  "settings": [
+    { "type": "select", "id": "show_on", "label": "Show on (product pages)", "default": "all",
+      "options": [ { "value": "all", "label": "All products" }, { "value": "flavors", "label": "Flavors only" }, { "value": "goods", "label": "Goods only" } ] },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Good questions" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Asked & answered" },
+    { "type": "richtext", "id": "intro", "label": "Intro" }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "Why do I flip it?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>Real fruit juice settles. A gentle flip brings it all back together.</p>" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "SUNBOY FAQ", "blocks": [ { "type": "question" } ] } ]
+}
+{% endschema %}

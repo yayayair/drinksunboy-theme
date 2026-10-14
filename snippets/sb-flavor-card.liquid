@@ -1,19 +1,20 @@
 {%- comment -%}
-  Flavor card. Pass: flavor (product), image (optional image override).
-  Colours, hero line come from the product's SUNBOY metafields (Products > flavor > Metafields).
+  Flavor card. Pass: flavor (product), image (optional can override), current (true on that flavor's own page).
+  Colours + hero line come from the product's SUNBOY metafields; the leaf band is the Brand Kit pattern.
 {%- endcomment -%}
 {%- if flavor != blank -%}
   {%- assign slug = flavor.handle | remove_first: 'sunboy-' -%}
   {%- assign c_main = flavor.metafields.sunboy.color_main.value | default: '#0BB89B' -%}
   {%- assign c_accent = flavor.metafields.sunboy.color_accent.value | default: '#F9ED25' -%}
-  {%- assign pattern = 'sb-leaf-' | append: slug | append: '.jpg' -%}
-  <a class="sb-flavor-card" href="{{ flavor.url }}" style="--flavor-a: {{ c_accent }}; --flavor-b: {{ c_main }};">
-    <span class="sb-flavor-card__pattern" style="background-image:url('{{ pattern | asset_url }}')"></span>
+  {%- assign band = 'sb-band-' | append: slug | append: '.webp' -%}
+  <a class="sb-flavor-card{% if current %} is-current{% endif %}" href="{{ flavor.url }}" style="--flavor-a: {{ c_accent }}; --flavor-b: {{ c_main }};"{% if current %} aria-current="page"{% endif %}>
+    {%- if current -%}<span class="sb-flavor-card__here">You're here</span>{%- endif -%}
+    <span class="sb-flavor-card__pattern" style="background-image:url('{{ band | asset_url }}')"></span>
     {%- if image != blank -%}
-      {{ image | image_url: width: 600 | image_tag: class: 'sb-flavor-card__can', loading: 'lazy', alt: flavor.title }}
+      {{ image | image_url: width: 700 | image_tag: class: 'sb-flavor-card__can', loading: 'lazy', alt: flavor.title }}
     {%- else -%}
       {%- assign can = 'sb-can-' | append: slug | append: '.webp' -%}
-      <img class="sb-flavor-card__can" src="{{ can | asset_url }}" alt="{{ flavor.title | escape }} can" width="385" height="1000" loading="lazy">
+      <img class="sb-flavor-card__can" src="{{ can | asset_url }}" alt="{{ flavor.title | escape }} can" width="693" height="1800" loading="lazy">
     {%- endif -%}
     <h3 class="sb-flavor-card__name">{{ flavor.title }}</h3>
     {%- if flavor.metafields.sunboy.hero_line != blank -%}

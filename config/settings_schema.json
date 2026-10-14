@@ -8,6 +8,120 @@
     "theme_support_url": "https://support.shopify.com/"
   },
   {
+    "name": "SUNBOY age gate & signup",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Age gate"
+      },
+      {
+        "type": "checkbox",
+        "id": "sb_age_enable",
+        "label": "Show age gate",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "sb_age_question",
+        "label": "Question",
+        "default": "Are you 21 or older?"
+      },
+      {
+        "type": "text",
+        "id": "sb_age_yes",
+        "label": "Yes button",
+        "default": "Yes, let's go"
+      },
+      {
+        "type": "text",
+        "id": "sb_age_no",
+        "label": "No link",
+        "default": "Not yet"
+      },
+      {
+        "type": "text",
+        "id": "sb_age_sorry",
+        "label": "Message for under 21",
+        "default": "Come back on your 21st. We'll save you a cold one."
+      },
+      {
+        "type": "text",
+        "id": "sb_age_fine",
+        "label": "Small print",
+        "default": "Please enjoy responsibly."
+      },
+      {
+        "type": "image_picker",
+        "id": "sb_age_image",
+        "label": "Background photo (optional)"
+      },
+      {
+        "type": "range",
+        "id": "sb_age_days",
+        "label": "Remember 'yes' for (days)",
+        "min": 1,
+        "max": 90,
+        "step": 1,
+        "default": 30
+      },
+      {
+        "type": "header",
+        "content": "Signup popup"
+      },
+      {
+        "type": "checkbox",
+        "id": "sb_pop_enable",
+        "label": "Show signup popup (once per visitor)",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "sb_pop_delay",
+        "label": "Seconds before it appears",
+        "min": 2,
+        "max": 60,
+        "step": 1,
+        "default": 8
+      },
+      {
+        "type": "text",
+        "id": "sb_pop_kicker",
+        "label": "Small headline",
+        "default": "Join the"
+      },
+      {
+        "type": "text",
+        "id": "sb_pop_big",
+        "label": "Big headline",
+        "default": "Coconut Club"
+      },
+      {
+        "type": "textarea",
+        "id": "sb_pop_sub",
+        "label": "Text",
+        "default": "+ first dibs on new flavors, merch drops, parties, playlists and where to find us next."
+      },
+      {
+        "type": "text",
+        "id": "sb_pop_button",
+        "label": "Button",
+        "default": "Count me in"
+      },
+      {
+        "type": "text",
+        "id": "sb_pop_fine",
+        "label": "Small print",
+        "default": "Must be 21+. Unsubscribe anytime."
+      },
+      {
+        "type": "text",
+        "id": "sb_pop_success",
+        "label": "Thank-you message",
+        "default": "You're in!"
+      }
+    ]
+  },
+  {
     "name": "t:settings_schema.logo.name",
     "settings": [
       {

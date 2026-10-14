@@ -1,3 +1,4 @@
+{%- unless template.name == 'product' and product.metafields.sunboy.hero_line == blank -%}
 <section class="color-{{ section.settings.color_scheme }} gradient">
   <div class="sb-wrap sb-flip">
     {%- if section.settings.art != blank -%}
@@ -12,6 +13,7 @@
   </div>
 </section>
 
+{%- endunless -%}
 {% schema %}
 {
   "name": "SUNBOY note",
