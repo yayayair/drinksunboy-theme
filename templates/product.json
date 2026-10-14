@@ -210,7 +210,7 @@
           "type": "question",
           "settings": {
             "question": "Will this make me cooler?",
-            "answer": "<p>Statistically, yes.* <br><small>*Not a real statistic.</small></p>"
+            "answer": "<p>Statistically, yes.* <br><em>*Not a real statistic.</em></p>"
           }
         },
         "q5": {
