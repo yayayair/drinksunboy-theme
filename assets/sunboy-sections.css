@@ -339,6 +339,11 @@ form.is-done .sb-mc-done { display: block; }
 .sb-seg button span { text-transform: none; letter-spacing: 0; font-weight: 400; }
 .sb-seg button.is-on { background: var(--sb-yellow); color: var(--sb-brown); }
 .sb-finder__opts { align-items: center; }
+@media (max-width: 749px) {
+  .sb-seg { display: grid; grid-template-columns: .7fr 1fr 1fr; width: 100%; border-radius: 1.6rem; }
+  .sb-seg button { padding: .8rem .6rem; border-radius: 1.2rem; line-height: 1.25; letter-spacing: .06em; }
+  .sb-seg button span { display: block; font-size: 1.1rem; }
+}
 .sb-finder__geo.is-busy { text-decoration: none; opacity: .85; cursor: progress; }
 .sb-finder__geo .sb-finder__spin { width: 1.2rem; height: 1.2rem; }
 .sb-finder__peek { margin-top: 1.2rem; }

@@ -122,6 +122,7 @@
       var t = /SNGL|19\.2/i.test(p) ? '19.2oz cans' : /4PK/i.test(p) ? '4-packs' : /8PK/i.test(p) ? '8-packs' : '';
       if (t && sizes.indexOf(t) < 0) sizes.push(t);
     });
+    if (sizes.join() === '8-packs' && s.brands.every(function (b) { return /pack/i.test(b); })) sizes = [];
     return '<p class="sb-store__has">' + items.join('') + '</p>' + (sizes.length ? '<p class="sb-store__sizes">In ' + sizes.join(', ') + '</p>' : '');
   }
 
