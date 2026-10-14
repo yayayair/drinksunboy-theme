@@ -18,7 +18,7 @@
         "heading": "Most drinks make you choose. SUNBOY doesn't.",
         "body": "<p>Real hydrating coconut water, real fruit, playfully spiked and sparkled. 5% ABV, never bloaty. Flip before you sip.</p>",
         "button_label": "Our story",
-        "button_link": "/pages/about"
+        "button_link": "/pages/about-us"
       }
     },
     "lineup": {
@@ -59,7 +59,7 @@
         "heading": "It started with a bike cart on the Brooklyn Bridge.",
         "body": "<p>In the early 2010s, Luke McKenna and Yair Tygiel built a bicycle-powered coconut cart and started throwing tropical parties in the streets of New York. Within a few years CoCo & Co was serving fresh coconut cocktails for Bacardi, Diageo, and Pernod Ricard.</p><p>People who drank coconut cocktails all day felt fine the next morning. So we put that in a can. Same premise as the bike cart: coconuts make people happy, and the good part of the night should not cost you the morning.</p>",
         "button_label": "Read our story",
-        "button_link": "/pages/about"
+        "button_link": "/pages/about-us"
       }
     },
     "truths": {
@@ -76,13 +76,13 @@
       "type": "sb-mood",
       "settings": { "color_scheme": "scheme-1", "ratio": "21 / 9", "gap": false },
       "blocks": {
-        "t1": { "type": "tile", "settings": { "fallback": "sb-life-6.jpg", "eyebrow": "SUNBOY goods", "title": "From our palms to yours.", "link_label": "Shop the goods", "link": "/collections/all" } }
+        "t1": { "type": "tile", "settings": { "fallback": "sb-life-6.jpg", "eyebrow": "SUNBOY goods", "title": "From our palms to yours.", "link_label": "Shop the goods", "link": "/collections/sunboy-swag" } }
       },
       "block_order": ["t1"]
     },
     "goods": {
       "type": "sb-goods",
-      "settings": { "color_scheme": "scheme-1", "eyebrow": "SUNBOY goods", "heading": "Gear for golden hour", "link_label": "Shop all", "link": "/collections/all" },
+      "settings": { "color_scheme": "scheme-1", "eyebrow": "SUNBOY goods", "heading": "Gear for golden hour", "link_label": "Shop all", "link": "/collections/sunboy-swag" },
       "blocks": {
         "g1": { "type": "item", "settings": { "product": "sunboy-corduroy-hat" } },
         "g2": { "type": "item", "settings": { "product": "sunboy-retro-cooler" } },
