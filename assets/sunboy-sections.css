@@ -199,3 +199,4 @@ html { scroll-behavior: smooth; }
 .sb-badge { text-transform: none; letter-spacing: .04em; font-size: 1.35rem; }
 @media (min-width: 990px) { .sb-fhero__can { height: min(64rem, 72vh); } .sb-fhero__stage { min-height: calc(100svh - 12rem); } }
 @media (max-width: 749px) { .sb-lineup__grid, .sb-goods__grid { margin-right: -2rem; padding-right: 2rem; } }
+@media (max-width: 989px) { .sb-fhero__stage { min-height: 42rem; } .sb-fhero__can { height: 36rem; } .sb-fhero__text { padding-top: 4rem; } }
