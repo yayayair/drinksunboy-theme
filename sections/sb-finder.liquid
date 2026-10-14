@@ -1,0 +1,232 @@
+{%- comment -%}
+  SUNBOY store finder. Live data from VIP/SRS (stores that bought SUNBOY recently) via the
+  sunboy-finder service on Vercel, plus store hours from Google. Map: Leaflet + CARTO tiles.
+  URL params: ?zip=10003 | ?lat=..&lng=..  &flavor=coconut  &miles=25
+{%- endcomment -%}
+{{ 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css' | stylesheet_tag }}
+<section class="sb-finder" id="sb-finder" data-api="{{ section.settings.api_base | default: 'https://sunboy-finder.vercel.app' }}" data-days="{{ section.settings.days }}">
+  <div class="sb-finder__top color-{{ section.settings.color_scheme }} gradient">
+    <div class="sb-wrap">
+      {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h1 class="sb-display sb-finder__title">{{ section.settings.heading }}</h1>
+      <form class="sb-finder__form" data-sb-finder-form>
+        <label class="visually-hidden" for="sb-finder-zip">ZIP code</label>
+        <input class="sb-find__input" id="sb-finder-zip" name="zip" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" placeholder="Your ZIP code">
+        <button class="sb-btn sb-btn--yellow" type="submit">Search</button>
+        <button class="sb-finder__geo" type="button" data-sb-finder-geo>⌖ Use my location</button>
+      </form>
+      <div class="sb-finder__filters">
+        <div class="sb-finder__chips" role="radiogroup" aria-label="Flavor">
+          <button type="button" class="sb-chip is-on" data-flavor="" role="radio" aria-checked="true">All flavors</button>
+          {%- for block in section.blocks -%}
+            {%- assign f = block.settings.product -%}
+            {%- if f == blank -%}{%- continue -%}{%- endif -%}
+            <button type="button" class="sb-chip" data-flavor="{{ f.handle | remove_first: 'sunboy-' }}" role="radio" aria-checked="false" style="--chip: {{ f.metafields.sunboy.color_main.value | default: '#523B18' }}" {{ block.shopify_attributes }}>{{ f.title | capitalize }}</button>
+          {%- endfor -%}
+        </div>
+        <div class="sb-finder__opts">
+          <label>Within
+            <select data-sb-miles>
+              <option value="5">5 miles</option><option value="10">10 miles</option><option value="25" selected>25 miles</option><option value="50">50 miles</option>
+            </select>
+          </label>
+          <label>Show
+            <select data-sb-type>
+              <option value="all">Stores, bars & restaurants</option><option value="off">Stores (take home)</option><option value="on">Bars & restaurants</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-finder__body">
+    <div class="sb-finder__status" data-sb-status aria-live="polite">{{ section.settings.intro }}</div>
+    <div class="sb-finder__grid">
+      <ol class="sb-finder__list" data-sb-list></ol>
+      <div class="sb-finder__mapwrap"><div class="sb-finder__map" data-sb-map></div></div>
+    </div>
+    <button type="button" class="sb-finder__maptoggle sb-btn sb-btn--solid" data-sb-maptoggle hidden>Map</button>
+    <div class="sb-finder__online" data-sb-online hidden></div>
+    <p class="sb-finder__note">{{ section.settings.note }}</p>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+<script>
+(function () {
+  var root = document.getElementById('sb-finder');
+  var API = root.dataset.api.replace(/\/$/, ''), DAYS = parseInt(root.dataset.days || '60', 10);
+  var form = root.querySelector('[data-sb-finder-form]'), zipEl = form.querySelector('[name=zip]');
+  var listEl = root.querySelector('[data-sb-list]'), statusEl = root.querySelector('[data-sb-status]');
+  var milesEl = root.querySelector('[data-sb-miles]'), typeEl = root.querySelector('[data-sb-type]');
+  var onlineEl = root.querySelector('[data-sb-online]'), mapToggle = root.querySelector('[data-sb-maptoggle]');
+  var state = { zip: '', lat: null, lng: null, flavor: '', miles: 25, type: 'all', data: null };
+  var map, layer, markers = {};
+  var params = new URLSearchParams(location.search);
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function setStatus(t) { statusEl.innerHTML = t; }
+  function chip(flavor) {
+    root.querySelectorAll('.sb-chip').forEach(function (c) { var on = c.dataset.flavor === flavor; c.classList.toggle('is-on', on); c.setAttribute('aria-checked', on); });
+  }
+  function syncUrl() {
+    var p = new URLSearchParams();
+    if (state.zip) p.set('zip', state.zip); else if (state.lat !== null) { p.set('lat', state.lat.toFixed(4)); p.set('lng', state.lng.toFixed(4)); }
+    if (state.flavor) p.set('flavor', state.flavor);
+    if (state.miles !== 25) p.set('miles', state.miles);
+    history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : '') + location.hash);
+  }
+
+  function search() {
+    if (!state.zip && state.lat === null) { setStatus('Pop in your ZIP to see coolers near you.'); return; }
+    syncUrl();
+    setStatus('<span class="sb-finder__spin"></span> Looking in every cooler near you…');
+    listEl.innerHTML = '';
+    var q = new URLSearchParams({ miles: state.miles, days: DAYS });
+    if (state.zip) q.set('zip', state.zip); else { q.set('lat', state.lat); q.set('lng', state.lng); }
+    if (state.flavor) q.set('flavor', state.flavor);
+    fetch(API + '/api/stores?' + q).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.error) { setStatus(esc(d.error)); return; }
+      state.data = d; render();
+    }).catch(function () { setStatus('The store finder is taking a breather. Try again in a minute.'); });
+  }
+
+  function render() {
+    var d = state.data; if (!d) return;
+    var stores = d.stores.filter(function (s) { return state.type === 'all' || (state.type === 'on' ? s.onPremise : !s.onPremise); });
+    var flav = state.flavor ? root.querySelector('.sb-chip[data-flavor="' + state.flavor + '"]').textContent : 'SUNBOY';
+    if (!stores.length) {
+      setStatus('No ' + esc(flav) + ' within ' + state.miles + ' miles yet. Try a bigger radius' + (state.flavor ? ' or all flavors' : '') + '.');
+    } else {
+      setStatus('<b>' + stores.length + (stores.length === 60 ? '+' : '') + '</b> spots with ' + esc(flav) + ' within ' + state.miles + ' miles' + (d.widened ? ' <span class="sb-finder__muted">(including spots that last stocked it a little while ago)</span>' : '') + '.');
+    }
+    listEl.innerHTML = stores.map(function (s, i) {
+      var addr = s.street + ', ' + s.city + ', ' + s.state + ' ' + s.zip;
+      var fresh = s.daysAgo !== null && s.daysAgo <= 14 ? '<span class="sb-tag sb-tag--fresh">Recently stocked</span>' : '';
+      var kind = '<span class="sb-tag">' + (s.onPremise ? 'Bar &amp; restaurant' : 'Store') + '</span>';
+      var dir = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(s.name + ', ' + addr);
+      return '<li class="sb-store" id="store-' + i + '" data-i="' + i + '">' +
+        '<div class="sb-store__num">' + (i + 1) + '</div>' +
+        '<div class="sb-store__main">' +
+          '<h3 class="sb-store__name">' + esc(s.name) + '</h3>' +
+          '<p class="sb-store__addr">' + esc(addr) + '</p>' +
+          '<p class="sb-store__meta"><span class="sb-store__dist">' + (s.distance < 0.1 ? 'Right here' : s.distance.toFixed(1) + ' mi') + '</span>' + kind + fresh + '</p>' +
+          '<p class="sb-store__hours" data-hours>&nbsp;</p>' +
+          '<p class="sb-store__actions"><a href="' + dir + '" target="_blank" rel="noopener">Directions</a>' + (s.phone ? '<a href="tel:' + esc(s.phone.replace(/[^\d+]/g, '')) + '">Call</a>' : '') + '</p>' +
+        '</div></li>';
+    }).join('');
+    online(d.online || []);
+    drawMap(stores);
+    watchHours(stores);
+  }
+
+  function online(list) {
+    if (!list.length) { onlineEl.hidden = true; return; }
+    onlineEl.hidden = false;
+    onlineEl.innerHTML = '<p class="sb-eyebrow">Or get it delivered</p>' + list.map(function (v) { return '<a class="sb-btn" href="' + esc(v.url) + '" target="_blank" rel="noopener">' + esc(v.name) + '</a>'; }).join('');
+  }
+
+  // Hours: only fetched when a card scrolls into view (keeps Google costs tiny; cached for a day).
+  var io;
+  function watchHours(stores) {
+    if (io) io.disconnect();
+    io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return; io.unobserve(e.target);
+        var s = stores[e.target.dataset.i], el = e.target.querySelector('[data-hours]');
+        var q = new URLSearchParams({ name: s.name, address: s.street + ', ' + s.city + ', ' + s.state + ' ' + s.zip, lat: s.lat, lng: s.lng });
+        fetch(API + '/api/hours?' + q).then(function (r) { return r.json(); }).then(function (h) {
+          if (h.closed) { el.textContent = 'May be closed. Call ahead.'; return; }
+          var line = today(h); el.innerHTML = line ? '<b>Today</b> ' + esc(line) : '';
+          if (h.mapsUrl) { var a = e.target.querySelector('.sb-store__actions a'); if (a) a.href = h.mapsUrl; }
+        }).catch(function () {});
+      });
+    }, { rootMargin: '200px' });
+    listEl.querySelectorAll('.sb-store').forEach(function (li) { io.observe(li); });
+  }
+  function today(h) {
+    if (!h.week || !h.week.length) return '';
+    var now = new Date(), local = h.utcOffset != null ? new Date(now.getTime() + (h.utcOffset + now.getTimezoneOffset()) * 60000) : now;
+    var name = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][local.getDay()];
+    var line = h.week.find(function (l) { return l.indexOf(name) === 0; }) || '';
+    return line.replace(name + ': ', '').replace(/ | /g, ' ');
+  }
+
+  function drawMap(stores) {
+    if (!window.L) { window.addEventListener('load', function () { drawMap(stores); }, { once: true }); return; }
+    var el = root.querySelector('[data-sb-map]');
+    if (!map) {
+      map = L.map(el, { scrollWheelZoom: false, zoomControl: true });
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap &copy; CARTO' }).addTo(map);
+      layer = L.layerGroup().addTo(map);
+    }
+    layer.clearLayers(); markers = {};
+    var pts = [];
+    stores.forEach(function (s, i) {
+      if (!isFinite(s.lat) || !isFinite(s.lng)) return;
+      var icon = L.divIcon({ className: 'sb-pin' + (s.onPremise ? ' sb-pin--on' : ''), html: '<span>' + (i + 1) + '</span>', iconSize: [30, 30], iconAnchor: [15, 15] });
+      var m = L.marker([s.lat, s.lng], { icon: icon }).addTo(layer);
+      m.on('click', function () { var li = document.getElementById('store-' + i); if (li) { li.scrollIntoView({ behavior: 'smooth', block: 'center' }); li.classList.add('is-hl'); setTimeout(function () { li.classList.remove('is-hl'); }, 1500); } });
+      markers[i] = m; pts.push([s.lat, s.lng]);
+    });
+    if (pts.length) map.fitBounds(pts.slice(0, 15), { padding: [30, 30], maxZoom: 14 });
+    setTimeout(function () { map.invalidateSize(); }, 50);
+    mapToggle.hidden = !pts.length;
+  }
+  listEl.addEventListener('mouseover', function (e) {
+    var li = e.target.closest('.sb-store'); if (!li || !markers[li.dataset.i]) return;
+    var el = markers[li.dataset.i].getElement(); if (el) { root.querySelectorAll('.sb-pin.is-hl').forEach(function (p) { p.classList.remove('is-hl'); }); el.classList.add('is-hl'); }
+  });
+  mapToggle.addEventListener('click', function () {
+    var on = root.classList.toggle('show-map'); mapToggle.textContent = on ? 'List' : 'Map';
+    if (map) setTimeout(function () { map.invalidateSize(); }, 50);
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var z = zipEl.value.trim();
+    if (!/^\d{5}$/.test(z)) { setStatus('That ZIP looks off. Try 5 digits.'); return; }
+    state.zip = z; state.lat = state.lng = null; search();
+  });
+  root.querySelector('[data-sb-finder-geo]').addEventListener('click', function (e) {
+    var b = e.currentTarget;
+    if (!navigator.geolocation) { setStatus('Your browser can’t share location. Try your ZIP.'); return; }
+    b.textContent = 'Finding you…';
+    navigator.geolocation.getCurrentPosition(function (p) {
+      b.textContent = '⌖ Use my location';
+      state.lat = p.coords.latitude; state.lng = p.coords.longitude; state.zip = ''; zipEl.value = ''; search();
+    }, function () { b.textContent = '⌖ Use my location'; setStatus('No worries. Pop in your ZIP instead.'); });
+  });
+  root.querySelectorAll('.sb-chip').forEach(function (c) {
+    c.addEventListener('click', function () { state.flavor = c.dataset.flavor; chip(state.flavor); search(); });
+  });
+  milesEl.addEventListener('change', function () { state.miles = parseInt(milesEl.value, 10); search(); });
+  typeEl.addEventListener('change', function () { state.type = typeEl.value; render(); });
+
+  // Start from the URL (links from the homepage and flavor pages pass zip / lat,lng / flavor)
+  if (params.get('flavor')) { state.flavor = params.get('flavor'); chip(state.flavor); }
+  if (params.get('miles')) { state.miles = parseInt(params.get('miles'), 10) || 25; milesEl.value = String(state.miles); }
+  if (/^\d{5}$/.test(params.get('zip') || '')) { state.zip = params.get('zip'); zipEl.value = state.zip; search(); }
+  else if (params.get('lat') && params.get('lng')) { state.lat = parseFloat(params.get('lat')); state.lng = parseFloat(params.get('lng')); search(); }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "SUNBOY store finder",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme (top)", "default": "scheme-2" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Thousands of stores nationwide" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Find SUNBOY" },
+    { "type": "text", "id": "intro", "label": "Before searching", "default": "Pop in your ZIP to see coolers near you." },
+    { "type": "text", "id": "note", "label": "Small print", "default": "Stores update as shelves restock. Call ahead to check your flavor is in." },
+    { "type": "range", "id": "days", "label": "Show spots that stocked SUNBOY in the last (days)", "min": 14, "max": 90, "step": 1, "default": 60 },
+    { "type": "text", "id": "api_base", "label": "Finder service URL", "default": "https://sunboy-finder.vercel.app" }
+  ],
+  "blocks": [
+    { "type": "flavor", "name": "Flavor filter", "settings": [ { "type": "product", "id": "product", "label": "Flavor product" } ] }
+  ],
+  "presets": [ { "name": "SUNBOY store finder" } ]
+}
+{% endschema %}
