@@ -1,0 +1,136 @@
+{
+  "sections": {
+    "finder": {
+      "type": "sb-finder",
+      "blocks": {
+        "f1": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-passion-fruit"
+          }
+        },
+        "f2": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-pineapple"
+          }
+        },
+        "f3": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-tangerine"
+          }
+        },
+        "f4": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-mango"
+          }
+        },
+        "f5": {
+          "type": "flavor",
+          "settings": {
+            "product": "coconut"
+          }
+        },
+        "f6": {
+          "type": "flavor",
+          "settings": {
+            "product": "peach"
+          }
+        },
+        "f7": {
+          "type": "flavor",
+          "settings": {
+            "product": "guava"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f7"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2",
+        "eyebrow": "Thousands of stores nationwide",
+        "heading": "Find SUNBOY",
+        "intro": "Pop in your ZIP to see coolers near you.",
+        "note": "Stores update as shelves restock. Call ahead to check your flavor is in.",
+        "days": 60,
+        "api_base": "https://sunboy-finder.vercel.app"
+      }
+    },
+    "lineup": {
+      "type": "sb-flavor-lineup",
+      "blocks": {
+        "f1": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-passion-fruit"
+          }
+        },
+        "f2": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-pineapple"
+          }
+        },
+        "f3": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-tangerine"
+          }
+        },
+        "f4": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-mango"
+          }
+        },
+        "f5": {
+          "type": "flavor",
+          "settings": {
+            "product": "coconut"
+          }
+        },
+        "f6": {
+          "type": "flavor",
+          "settings": {
+            "product": "peach"
+          }
+        },
+        "f7": {
+          "type": "flavor",
+          "settings": {
+            "product": "guava"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f7"
+      ],
+      "settings": {
+        "color_scheme": "scheme-5",
+        "eyebrow": "A hydrating coconut water with a splash of real fruit juice",
+        "heading": "Know what you're looking for",
+        "link_label": "",
+        "anchor": "lineup"
+      }
+    }
+  },
+  "order": [
+    "finder",
+    "lineup"
+  ]
+}
