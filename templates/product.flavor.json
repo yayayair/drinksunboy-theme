@@ -3,7 +3,7 @@
     "hero": {
       "type": "sb-flavor-hero",
       "settings": {
-        "eyebrow": "Spiked coconut water · 5% ABV",
+        "eyebrow": "Spiked coconut water \u00b7 5% ABV",
         "badges": "5% ABV, 0g added sugar, Gluten-free, Real coconut water",
         "finder_url": "/pages/find-us",
         "secondary_label": "See all flavors",
@@ -35,18 +35,72 @@
     },
     "more": {
       "type": "sb-flavor-lineup",
-      "settings": { "color_scheme": "scheme-5", "eyebrow": "Keep exploring", "heading": "The rest of the lineup", "link_label": "", "link": "/pages/find-us" },
-      "blocks": {
-        "f1": { "type": "flavor", "settings": { "product": "sunboy-passion-fruit" } },
-        "f2": { "type": "flavor", "settings": { "product": "sunboy-pineapple" } },
-        "f3": { "type": "flavor", "settings": { "product": "sunboy-tangerine" } },
-        "f4": { "type": "flavor", "settings": { "product": "sunboy-mango" } },
-        "f5": { "type": "flavor", "settings": { "product": "coconut" } },
-        "f6": { "type": "flavor", "settings": { "product": "peach" } },
-        "f7": { "type": "flavor", "settings": { "product": "guava" } }
+      "settings": {
+        "color_scheme": "scheme-5",
+        "eyebrow": "Keep exploring",
+        "heading": "The rest of the lineup",
+        "link_label": "",
+        "link": "/pages/find-us"
       },
-      "block_order": ["f1", "f2", "f3", "f4", "f5", "f6", "f7"]
+      "blocks": {
+        "f1": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-passion-fruit"
+          }
+        },
+        "f2": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-pineapple"
+          }
+        },
+        "f3": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-tangerine"
+          }
+        },
+        "f4": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-mango"
+          }
+        },
+        "f5": {
+          "type": "flavor",
+          "settings": {
+            "product": "coconut"
+          }
+        },
+        "f6": {
+          "type": "flavor",
+          "settings": {
+            "product": "peach"
+          }
+        },
+        "f7": {
+          "type": "flavor",
+          "settings": {
+            "product": "guava"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f7"
+      ]
     }
   },
-  "order": ["hero", "flip", "find", "more"]
+  "order": [
+    "hero",
+    "flip",
+    "find",
+    "more"
+  ]
 }
