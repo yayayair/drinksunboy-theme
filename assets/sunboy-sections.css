@@ -253,3 +253,5 @@ html.sb-age-pending body { overflow: hidden; }
 .sb-legal { font-size: 1.2rem; letter-spacing: .08em; text-transform: uppercase; opacity: .85; text-align: center; padding: 1.6rem 2rem 2.4rem; margin: 0; }
 .sb-footer-mark { display: block; width: min(92%, 140rem); margin: 0 auto; padding: 4rem 0 1rem; }
 .sb-footer-mark img { width: 100%; height: auto; display: block; }
+@media (min-width: 750px) { .sb-mood--cols-2 .sb-mood__tile { max-height: calc(100svh - 10rem); } }
+.sb-retailer img { max-height: 6rem; }
