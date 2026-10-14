@@ -1,0 +1,143 @@
+{
+  "sections": {
+    "pack": {
+      "type": "sb-pack",
+      "blocks": {
+        "f1": {
+          "type": "flavor",
+          "settings": {
+            "product": "coconut"
+          }
+        },
+        "f2": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-pineapple"
+          }
+        },
+        "f3": {
+          "type": "flavor",
+          "settings": {
+            "product": "peach"
+          }
+        },
+        "f4": {
+          "type": "flavor",
+          "settings": {
+            "product": "guava"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "settings": {
+        "eyebrow": "8 × 12oz cans · 5% ABV",
+        "title": "Refresher Variety Pack",
+        "short_name": "Refresher pack",
+        "tagline": "The softer side of the sun.",
+        "body": "<p>This lovely bunch is lush and golden. Velvety Coconut, crisp Pineapple, nectar-sweet Peach and floral Guava: the pack for long afternoons that never end.</p>",
+        "details": "2 Coconut · 2 Pineapple · 2 Peach · 2 Guava",
+        "image_fallback": "sb-pack-refresher.webp",
+        "bg": "#F79359",
+        "fg": "#523B18",
+        "finder_url": "/pages/find-us"
+      }
+    },
+    "flip": {
+      "type": "sb-flip",
+      "settings": {
+        "color_scheme": "scheme-3",
+        "art_fallback": "sb-sunman-floaty.png",
+        "heading": "Flip before you sip.",
+        "body": "<p>Real fruit juice settles. Give each can a gentle flip before opening and everything comes back together.</p>"
+      }
+    },
+    "find": {
+      "type": "sb-find-us",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "eyebrow": "Thousands of stores nationwide",
+        "heading": "Find the Refresher pack",
+        "subheading": "Pop in your ZIP and we'll point you to the nearest cooler.",
+        "placeholder": "Your ZIP code",
+        "button_label": "Search",
+        "finder_url": "/pages/find-us",
+        "retail_label": "",
+        "art_fallback": "sb-sunman-loungechair.png"
+      }
+    },
+    "lineup": {
+      "type": "sb-flavor-lineup",
+      "blocks": {
+        "f1": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-passion-fruit"
+          }
+        },
+        "f2": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-pineapple"
+          }
+        },
+        "f3": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-tangerine"
+          }
+        },
+        "f4": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-mango"
+          }
+        },
+        "f5": {
+          "type": "flavor",
+          "settings": {
+            "product": "coconut"
+          }
+        },
+        "f6": {
+          "type": "flavor",
+          "settings": {
+            "product": "peach"
+          }
+        },
+        "f7": {
+          "type": "flavor",
+          "settings": {
+            "product": "guava"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f7"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "eyebrow": "A hydrating coconut water with a splash of real fruit juice",
+        "heading": "The whole lineup",
+        "link_label": "",
+        "anchor": "lineup"
+      }
+    }
+  },
+  "order": [
+    "pack",
+    "flip",
+    "find",
+    "lineup"
+  ]
+}

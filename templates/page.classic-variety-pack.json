@@ -1,0 +1,143 @@
+{
+  "sections": {
+    "pack": {
+      "type": "sb-pack",
+      "blocks": {
+        "f1": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-passion-fruit"
+          }
+        },
+        "f2": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-pineapple"
+          }
+        },
+        "f3": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-tangerine"
+          }
+        },
+        "f4": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-mango"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "settings": {
+        "eyebrow": "8 × 12oz cans · 5% ABV",
+        "title": "Classic Variety Pack",
+        "short_name": "Classic pack",
+        "tagline": "The four that started it all.",
+        "body": "<p>A tropical fruit platter made for sharing! Our original lineup, and still the fastest way to figure out who you are. Tart Passion Fruit, crisp Pineapple, zesty Tangerine and lush Mango: four real fruits, one real coconut water, and eight chances to find your flavor.</p>",
+        "details": "2 Passion Fruit · 2 Pineapple · 2 Tangerine · 2 Mango",
+        "image_fallback": "sb-pack-classic.webp",
+        "bg": "#0BB89B",
+        "fg": "#FFFFFF",
+        "finder_url": "/pages/find-us"
+      }
+    },
+    "flip": {
+      "type": "sb-flip",
+      "settings": {
+        "color_scheme": "scheme-3",
+        "art_fallback": "sb-sunman-floaty.png",
+        "heading": "Flip before you sip.",
+        "body": "<p>Real fruit juice settles. Give each can a gentle flip before opening and everything comes back together.</p>"
+      }
+    },
+    "find": {
+      "type": "sb-find-us",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "eyebrow": "Thousands of stores nationwide",
+        "heading": "Find the Classic pack",
+        "subheading": "Pop in your ZIP and we'll point you to the nearest cooler.",
+        "placeholder": "Your ZIP code",
+        "button_label": "Search",
+        "finder_url": "/pages/find-us",
+        "retail_label": "",
+        "art_fallback": "sb-sunman-loungechair.png"
+      }
+    },
+    "lineup": {
+      "type": "sb-flavor-lineup",
+      "blocks": {
+        "f1": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-passion-fruit"
+          }
+        },
+        "f2": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-pineapple"
+          }
+        },
+        "f3": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-tangerine"
+          }
+        },
+        "f4": {
+          "type": "flavor",
+          "settings": {
+            "product": "sunboy-mango"
+          }
+        },
+        "f5": {
+          "type": "flavor",
+          "settings": {
+            "product": "coconut"
+          }
+        },
+        "f6": {
+          "type": "flavor",
+          "settings": {
+            "product": "peach"
+          }
+        },
+        "f7": {
+          "type": "flavor",
+          "settings": {
+            "product": "guava"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5",
+        "f6",
+        "f7"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "eyebrow": "A hydrating coconut water with a splash of real fruit juice",
+        "heading": "The whole lineup",
+        "link_label": "",
+        "anchor": "lineup"
+      }
+    }
+  },
+  "order": [
+    "pack",
+    "flip",
+    "find",
+    "lineup"
+  ]
+}

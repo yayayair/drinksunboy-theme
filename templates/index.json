@@ -168,79 +168,67 @@
           "type": "retailer",
           "settings": {
             "name": "Target",
-            "link": "https://www.target.com/s?searchTerm=sunboy",
-            "logo": "shopify://shop_images/retailer-target.png"
+            "logo": "shopify://shop_images/retailer-target.png",
+            "link": "https://www.target.com/s?searchTerm=sunboy+spiked+coconut+water"
           }
         },
         "r2": {
           "type": "retailer",
           "settings": {
-            "name": "Kroger",
-            "link": "https://www.kroger.com/search?query=sunboy",
-            "logo": "shopify://shop_images/retailer-kroger.png"
+            "name": "Whole Foods Market",
+            "logo": "shopify://shop_images/retailer-whole-foods.png",
+            "link": "https://www.wholefoodsmarket.com/search?text=sunboy%20spiked%20coconut%20water"
           }
         },
         "r3": {
           "type": "retailer",
           "settings": {
-            "name": "Whole Foods Market",
-            "link": "https://www.wholefoodsmarket.com/search?text=sunboy",
-            "logo": "shopify://shop_images/retailer-whole-foods.png"
+            "name": "Trader Joe's",
+            "logo": "shopify://shop_images/retailer-trader-joes.png"
           }
         },
         "r4": {
           "type": "retailer",
           "settings": {
-            "name": "Trader Joe's",
-            "link": "/pages/find-us",
-            "logo": "shopify://shop_images/retailer-trader-joes.png"
+            "name": "Kroger",
+            "logo": "shopify://shop_images/retailer-kroger.png"
           }
         },
         "r5": {
           "type": "retailer",
           "settings": {
             "name": "H-E-B",
-            "link": "https://www.heb.com/search?q=sunboy",
             "logo": "shopify://shop_images/retailer-heb.png"
           }
         },
         "r6": {
           "type": "retailer",
           "settings": {
-            "name": "Total Wine & More",
-            "link": "https://www.totalwine.com/search/all?text=sunboy",
-            "logo": "shopify://shop_images/retailer-total-wine.png"
+            "name": "Total Wine & More"
           }
         },
         "r7": {
           "type": "retailer",
           "settings": {
-            "name": "Harris Teeter",
-            "link": "https://www.harristeeter.com/search?query=sunboy",
-            "logo": "shopify://shop_images/retailer-harris-teeter.png"
+            "name": "Harris Teeter"
           }
         },
         "r8": {
           "type": "retailer",
           "settings": {
-            "name": "Lowes Foods",
-            "link": "https://www.lowesfoods.com/search?q=sunboy",
-            "logo": "shopify://shop_images/retailer-lowes-foods.png"
+            "name": "Lowes Foods"
           }
         },
         "r9": {
           "type": "retailer",
           "settings": {
-            "name": "Publix",
-            "link": "https://www.publix.com/search?searchTerm=sunboy",
-            "logo": "shopify://shop_images/retailer-publix.png"
+            "name": "Publix"
           }
         },
         "r10": {
           "type": "retailer",
           "settings": {
-            "name": "Ralphs",
-            "link": "https://www.ralphs.com/search?query=sunboy"
+            "name": "Ralphs"
           }
         }
       },
