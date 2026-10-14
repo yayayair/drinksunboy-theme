@@ -325,7 +325,28 @@ form.is-done .sb-mc-done { display: block; }
 @media (min-width: 990px) { .sb-finder__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: start; } }
 .sb-finder__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.2rem; }
 .sb-store { display: flex; gap: 1.4rem; background: var(--sb-cream); border-radius: 1.6rem; padding: 1.8rem 2rem; transition: box-shadow .2s, transform .2s; scroll-margin-top: 12rem; }
-.sb-store.is-hl, .sb-store:hover { box-shadow: 0 0 0 3px var(--sb-teal); }
+.sb-store { cursor: pointer; }
+.sb-store:hover { box-shadow: 0 0 0 2px var(--sb-teal); }
+.sb-store.is-sel { box-shadow: 0 0 0 3px var(--sb-brown); background: #fff8d6; }
+.sb-store.is-sel .sb-store__num { background: var(--sb-yellow); color: var(--sb-brown); }
+.sb-store__has { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; margin: 0 0 .4rem; font-size: 1.35rem; font-weight: 700; }
+.sb-has { display: inline-flex; align-items: center; gap: .5rem; }
+.sb-has::before { content: ""; width: .9rem; height: .9rem; border-radius: 50%; background: var(--dot, var(--sb-teal)); }
+.sb-has--pack::before { border-radius: .2rem; background: none; border: 2px solid currentColor; width: .7rem; height: .7rem; }
+.sb-store__sizes { margin: 0 0 .8rem; font-size: 1.3rem; opacity: .75; }
+.sb-seg { display: inline-flex; border: 2px solid currentColor; border-radius: 999px; padding: .3rem; gap: .2rem; flex-wrap: wrap; justify-content: center; }
+.sb-seg button { background: none; border: 0; color: inherit; font: inherit; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: 1.2rem; padding: .7rem 1.4rem; border-radius: 999px; cursor: pointer; }
+.sb-seg button span { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.sb-seg button.is-on { background: var(--sb-yellow); color: var(--sb-brown); }
+.sb-finder__opts { align-items: center; }
+.sb-finder__geo.is-busy { text-decoration: none; opacity: .85; cursor: progress; }
+.sb-finder__geo .sb-finder__spin { width: 1.2rem; height: 1.2rem; }
+.sb-finder__peek { margin-top: 1.2rem; }
+.sb-finder__peek .sb-store { cursor: default; }
+@media (max-width: 989px) {
+  .sb-finder.show-map .sb-finder__map { height: 58svh; min-height: 32rem; }
+  .sb-finder__body { padding-bottom: 9rem; }
+}
 .sb-store__num { flex: none; width: 3.2rem; height: 3.2rem; border-radius: 50%; background: var(--sb-teal); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
 .sb-store__name { font-family: var(--font-heading-family); font-weight: 700; text-transform: uppercase; font-size: 2.4rem; line-height: 1; margin: .2rem 0 .6rem; }
 .sb-store__addr { margin: 0 0 .8rem; font-size: 1.5rem; }
@@ -343,9 +364,11 @@ form.is-done .sb-mc-done { display: block; }
 .sb-finder.show-map .sb-finder__list { display: none; }
 .sb-finder__maptoggle { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 5; box-shadow: 0 8px 20px rgba(0,0,0,.2); }
 @media (min-width: 990px) { .sb-finder__maptoggle { display: none !important; } }
-.sb-pin { background: var(--sb-teal); color: #fff; border: 2px solid #fff; border-radius: 50%; display: flex !important; align-items: center; justify-content: center; font: 700 1.2rem/1 var(--font-body-family); box-shadow: 0 2px 6px rgba(0,0,0,.3); }
-.sb-pin--on { background: #EC5624; }
-.sb-pin.is-hl { background: var(--sb-yellow); color: var(--sb-brown); transform: scale(1.25); z-index: 1000 !important; }
+.sb-pin { background: none; border: 0; }
+.sb-pin span { width: 100%; height: 100%; background: var(--sb-teal); color: #fff; border: 2px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 700 1.2rem/1 var(--font-body-family); box-shadow: 0 2px 6px rgba(0,0,0,.3); transition: transform .15s, background .15s; box-sizing: border-box; }
+.sb-pin--on span { background: #EC5624; }
+.sb-pin.is-hl span { transform: scale(1.15); }
+.sb-pin.is-sel span { background: var(--sb-yellow); color: var(--sb-brown); border-color: var(--sb-brown); transform: scale(1.3); }
 .sb-finder__online { margin-top: 4rem; text-align: center; }
 .sb-finder__online .sb-btn { margin: .4rem; color: var(--sb-brown); }
 .sb-finder__note { text-align: center; font-size: 1.3rem; opacity: .7; margin-top: 3.2rem; }

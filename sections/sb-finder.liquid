@@ -1,7 +1,7 @@
 {%- comment -%}
   SUNBOY store finder. Live data from VIP/SRS (stores that bought SUNBOY recently) via the
-  sunboy-finder service on Vercel, plus store hours from Google. Map: Leaflet + CARTO tiles.
-  URL params: ?zip=10003 | ?lat=..&lng=..  &flavor=coconut  &miles=25
+  sunboy-finder service on Vercel, plus store hours from Google. Map: Leaflet + OpenStreetMap tiles.
+  URL params: ?zip=10003 | ?lat=..&lng=..  &flavor=coconut  &miles=25  &type=on|off
 {%- endcomment -%}
 {{ 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css' | stylesheet_tag }}
 <section class="sb-finder" id="sb-finder" data-api="{{ section.settings.api_base | default: 'https://sunboy-finder.vercel.app' }}" data-days="{{ section.settings.days }}">
@@ -21,18 +21,18 @@
           {%- for block in section.blocks -%}
             {%- assign f = block.settings.product -%}
             {%- if f == blank -%}{%- continue -%}{%- endif -%}
-            <button type="button" class="sb-chip" data-flavor="{{ f.handle | remove_first: 'sunboy-' }}" role="radio" aria-checked="false" style="--chip: {{ f.metafields.sunboy.color_main.value | default: '#523B18' }}" {{ block.shopify_attributes }}>{{ f.title | capitalize }}</button>
+            <button type="button" class="sb-chip" data-flavor="{{ f.handle | remove_first: 'sunboy-' }}" data-name="{{ f.title | capitalize | escape }}" role="radio" aria-checked="false" style="--chip: {{ f.metafields.sunboy.color_main.value | default: '#523B18' }}" {{ block.shopify_attributes }}>{{ f.title | capitalize }}</button>
           {%- endfor -%}
         </div>
         <div class="sb-finder__opts">
+          <div class="sb-seg" role="radiogroup" aria-label="Type of spot">
+            <button type="button" class="is-on" data-type="all" role="radio" aria-checked="true">All</button>
+            <button type="button" data-type="off" role="radio" aria-checked="false">Stores <span>(take home)</span></button>
+            <button type="button" data-type="on" role="radio" aria-checked="false">Bars &amp; restaurants</button>
+          </div>
           <label>Within
             <select data-sb-miles>
-              <option value="5">5 miles</option><option value="10">10 miles</option><option value="25" selected>25 miles</option><option value="50">50 miles</option>
-            </select>
-          </label>
-          <label>Show
-            <select data-sb-type>
-              <option value="all">Stores, bars & restaurants</option><option value="off">Stores (take home)</option><option value="on">Bars & restaurants</option>
+              <option value="1">1 mile</option><option value="5">5 miles</option><option value="10">10 miles</option><option value="25" selected>25 miles</option><option value="50">50 miles</option>
             </select>
           </label>
         </div>
@@ -40,13 +40,16 @@
     </div>
   </div>
 
-  <div class="sb-finder__body">
+  <div class="sb-finder__body" data-sb-body>
     <div class="sb-finder__status" data-sb-status aria-live="polite">{{ section.settings.intro }}</div>
     <div class="sb-finder__grid">
       <ol class="sb-finder__list" data-sb-list></ol>
-      <div class="sb-finder__mapwrap"><div class="sb-finder__map" data-sb-map></div></div>
+      <div class="sb-finder__mapwrap">
+        <div class="sb-finder__map" data-sb-map></div>
+        <div class="sb-finder__peek" data-sb-peek hidden></div>
+      </div>
     </div>
-    <button type="button" class="sb-finder__maptoggle sb-btn sb-btn--solid" data-sb-maptoggle hidden>Map</button>
+    <button type="button" class="sb-finder__maptoggle sb-btn sb-btn--solid" data-sb-maptoggle hidden>List</button>
     <div class="sb-finder__online" data-sb-online hidden></div>
     <p class="sb-finder__note">{{ section.settings.note }}</p>
   </div>
@@ -58,67 +61,102 @@
   var root = document.getElementById('sb-finder');
   var API = root.dataset.api.replace(/\/$/, ''), DAYS = parseInt(root.dataset.days || '60', 10);
   var form = root.querySelector('[data-sb-finder-form]'), zipEl = form.querySelector('[name=zip]');
+  var geoBtn = root.querySelector('[data-sb-finder-geo]'), GEO_LABEL = geoBtn.innerHTML;
   var listEl = root.querySelector('[data-sb-list]'), statusEl = root.querySelector('[data-sb-status]');
-  var milesEl = root.querySelector('[data-sb-miles]'), typeEl = root.querySelector('[data-sb-type]');
+  var milesEl = root.querySelector('[data-sb-miles]'), bodyEl = root.querySelector('[data-sb-body]');
   var onlineEl = root.querySelector('[data-sb-online]'), mapToggle = root.querySelector('[data-sb-maptoggle]');
-  var state = { zip: '', lat: null, lng: null, flavor: '', miles: 25, type: 'all', data: null };
-  var map, layer, markers = {};
+  var peekEl = root.querySelector('[data-sb-peek]');
+  var mobile = window.matchMedia('(max-width: 989px)');
+  var state = { zip: '', lat: null, lng: null, flavor: '', miles: 25, type: 'all', data: null, stores: [], sel: null };
+  var map, layer, markers = {}, hoursCache = {};
   var params = new URLSearchParams(location.search);
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var COLORS = {}, NAMES = {};
+  root.querySelectorAll('.sb-chip[data-flavor]').forEach(function (c) { if (c.dataset.flavor) { COLORS[c.dataset.flavor] = c.style.getPropertyValue('--chip'); NAMES[c.dataset.flavor] = c.dataset.name; } });
+
+  // Phones open on the map
+  if (mobile.matches) root.classList.add('show-map');
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function setStatus(t) { statusEl.innerHTML = t; }
-  function chip(flavor) {
-    root.querySelectorAll('.sb-chip').forEach(function (c) { var on = c.dataset.flavor === flavor; c.classList.toggle('is-on', on); c.setAttribute('aria-checked', on); });
+  function group(sel, attr, val) {
+    root.querySelectorAll(sel).forEach(function (c) { var on = c.dataset[attr] === val; c.classList.toggle('is-on', on); c.setAttribute('aria-checked', on); });
   }
   function syncUrl() {
     var p = new URLSearchParams();
     if (state.zip) p.set('zip', state.zip); else if (state.lat !== null) { p.set('lat', state.lat.toFixed(4)); p.set('lng', state.lng.toFixed(4)); }
     if (state.flavor) p.set('flavor', state.flavor);
     if (state.miles !== 25) p.set('miles', state.miles);
+    if (state.type !== 'all') p.set('type', state.type);
     history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : '') + location.hash);
   }
+  function mi(n) { return n + (n === 1 ? ' mile' : ' miles'); }
 
-  function search() {
+  function search(opts) {
     if (!state.zip && state.lat === null) { setStatus('Pop in your ZIP to see coolers near you.'); return; }
     syncUrl();
     setStatus('<span class="sb-finder__spin"></span> Looking in every cooler near you…');
-    listEl.innerHTML = '';
+    if (opts && opts.scroll) bodyEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     var q = new URLSearchParams({ miles: state.miles, days: DAYS });
     if (state.zip) q.set('zip', state.zip); else { q.set('lat', state.lat); q.set('lng', state.lng); }
     if (state.flavor) q.set('flavor', state.flavor);
+    if (state.type !== 'all') q.set('type', state.type);
     fetch(API + '/api/stores?' + q).then(function (r) { return r.json(); }).then(function (d) {
       if (d.error) { setStatus(esc(d.error)); return; }
       state.data = d; render();
     }).catch(function () { setStatus('The store finder is taking a breather. Try again in a minute.'); });
   }
 
+  function when(iso) { var p = iso.split('-'); return MONTHS[+p[1] - 1] + ' ' + (+p[2]); }
+  function slugOf(b) { return b.toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, ''); }
+  function carries(s) {
+    if (!s.brands || !s.brands.length) return '';
+    var items = s.brands.slice().sort(function (a, b) { return /pack/i.test(a) - /pack/i.test(b) || a.localeCompare(b); }).map(function (b) {
+      if (/classic/i.test(b)) return '<span class="sb-has sb-has--pack">Classic Variety 8pk</span>';
+      if (/refresh/i.test(b)) return '<span class="sb-has sb-has--pack">Refresher Variety 8pk</span>';
+      var k = slugOf(b);
+      return '<span class="sb-has" style="--dot:' + esc(COLORS[k] || '#0BB89B') + '">' + esc(NAMES[k] || b) + '</span>';
+    });
+    var sizes = [];
+    (s.packages || []).forEach(function (p) {
+      var t = /SNGL|19\.2/i.test(p) ? '19.2oz cans' : /4PK/i.test(p) ? '4-packs' : /8PK/i.test(p) ? '8-packs' : '';
+      if (t && sizes.indexOf(t) < 0) sizes.push(t);
+    });
+    return '<p class="sb-store__has">' + items.join('') + '</p>' + (sizes.length ? '<p class="sb-store__sizes">In ' + sizes.join(', ') + '</p>' : '');
+  }
+
+  function card(s, i) {
+    var addr = s.street + ', ' + s.city + ', ' + s.state + ' ' + s.zip;
+    var stocked = s.lastSold ? '<span class="sb-tag' + (s.daysAgo <= 14 ? ' sb-tag--fresh' : '') + '">Stocked ' + when(s.lastSold) + '</span>' : '';
+    var kind = '<span class="sb-tag">' + (s.onPremise ? 'Bar &amp; restaurant' : 'Store') + '</span>';
+    var h = hoursCache[i];
+    var dir = (h && h.mapsUrl) || 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(s.name + ', ' + addr);
+    return '<div class="sb-store__num">' + (i + 1) + '</div>' +
+      '<div class="sb-store__main">' +
+        '<h3 class="sb-store__name">' + esc(s.name) + '</h3>' +
+        '<p class="sb-store__addr">' + esc(addr) + '</p>' +
+        '<p class="sb-store__meta"><span class="sb-store__dist">' + (s.distance < 0.1 ? 'Right here' : s.distance.toFixed(1) + ' mi') + '</span>' + kind + stocked + '</p>' +
+        carries(s) +
+        '<p class="sb-store__hours" data-hours>' + hoursLine(h) + '</p>' +
+        '<p class="sb-store__actions"><a href="' + esc(dir) + '" target="_blank" rel="noopener" data-dir>Directions</a>' + (s.phone ? '<a href="tel:' + esc(s.phone.replace(/[^\d+]/g, '')) + '">Call</a>' : '') + '</p>' +
+      '</div>';
+  }
+
   function render() {
     var d = state.data; if (!d) return;
-    var stores = d.stores.filter(function (s) { return state.type === 'all' || (state.type === 'on' ? s.onPremise : !s.onPremise); });
-    var flav = state.flavor ? root.querySelector('.sb-chip[data-flavor="' + state.flavor + '"]').textContent : 'SUNBOY';
+    var stores = state.stores = d.stores;
+    state.sel = null; peekEl.hidden = true; hoursCache = {};
+    var flav = state.flavor ? (NAMES[state.flavor] || state.flavor) : 'SUNBOY';
+    var kind = state.type === 'off' ? 'stores' : state.type === 'on' ? 'bars & restaurants' : 'spots';
     if (!stores.length) {
-      setStatus('No ' + esc(flav) + ' within ' + state.miles + ' miles yet. Try a bigger radius' + (state.flavor ? ' or all flavors' : '') + '.');
+      setStatus('No ' + esc(kind === 'spots' ? '' : kind + ' with ') + esc(flav) + ' within ' + mi(state.miles) + ' yet. Try a bigger radius' + (state.flavor ? ' or all flavors' : '') + '.');
     } else {
-      setStatus('<b>' + stores.length + (stores.length === 60 ? '+' : '') + '</b> spots with ' + esc(flav) + ' within ' + state.miles + ' miles' + (d.widened ? ' <span class="sb-finder__muted">(including spots that last stocked it a little while ago)</span>' : '') + '.');
+      setStatus('<b>' + stores.length + (stores.length === 60 ? '+' : '') + '</b> ' + esc(kind) + ' with ' + esc(flav) + ' within ' + mi(state.miles) + (d.widened ? ' <span class="sb-finder__muted">(including spots that last stocked it a little while ago)</span>' : '') + '.');
     }
-    listEl.innerHTML = stores.map(function (s, i) {
-      var addr = s.street + ', ' + s.city + ', ' + s.state + ' ' + s.zip;
-      var fresh = s.daysAgo !== null && s.daysAgo <= 14 ? '<span class="sb-tag sb-tag--fresh">Recently stocked</span>' : '';
-      var kind = '<span class="sb-tag">' + (s.onPremise ? 'Bar &amp; restaurant' : 'Store') + '</span>';
-      var dir = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(s.name + ', ' + addr);
-      return '<li class="sb-store" id="store-' + i + '" data-i="' + i + '">' +
-        '<div class="sb-store__num">' + (i + 1) + '</div>' +
-        '<div class="sb-store__main">' +
-          '<h3 class="sb-store__name">' + esc(s.name) + '</h3>' +
-          '<p class="sb-store__addr">' + esc(addr) + '</p>' +
-          '<p class="sb-store__meta"><span class="sb-store__dist">' + (s.distance < 0.1 ? 'Right here' : s.distance.toFixed(1) + ' mi') + '</span>' + kind + fresh + '</p>' +
-          '<p class="sb-store__hours" data-hours>&nbsp;</p>' +
-          '<p class="sb-store__actions"><a href="' + dir + '" target="_blank" rel="noopener">Directions</a>' + (s.phone ? '<a href="tel:' + esc(s.phone.replace(/[^\d+]/g, '')) + '">Call</a>' : '') + '</p>' +
-        '</div></li>';
-    }).join('');
+    listEl.innerHTML = stores.map(function (s, i) { return '<li class="sb-store" id="store-' + i + '" data-i="' + i + '">' + card(s, i) + '</li>'; }).join('');
     online(d.online || []);
     drawMap(stores);
-    watchHours(stores);
+    watchHours();
   }
 
   function online(list) {
@@ -127,20 +165,29 @@
     onlineEl.innerHTML = '<p class="sb-eyebrow">Or get it delivered</p>' + list.map(function (v) { return '<a class="sb-btn" href="' + esc(v.url) + '" target="_blank" rel="noopener">' + esc(v.name) + '</a>'; }).join('');
   }
 
-  // Hours: only fetched when a card scrolls into view (keeps Google costs tiny; cached for a day).
+  // Hours: fetched only when a card is seen (keeps Google costs tiny; cached for a day).
+  function hoursLine(h) {
+    if (!h) return '&nbsp;';
+    if (h.closed) return 'May be closed. Call ahead.';
+    var line = today(h); return line ? '<b>Today</b> ' + esc(line) : '';
+  }
+  function loadHours(i, done) {
+    if (hoursCache[i]) { done(hoursCache[i]); return; }
+    var s = state.stores[i];
+    var q = new URLSearchParams({ name: s.name, address: s.street + ', ' + s.city + ', ' + s.state + ' ' + s.zip, lat: s.lat, lng: s.lng });
+    fetch(API + '/api/hours?' + q).then(function (r) { return r.json(); }).then(function (h) { hoursCache[i] = h; done(h); }).catch(function () {});
+  }
+  function paintHours(el, h) {
+    var hl = el.querySelector('[data-hours]'); if (hl) hl.innerHTML = hoursLine(h);
+    var a = el.querySelector('[data-dir]'); if (a && h.mapsUrl) a.href = h.mapsUrl;
+  }
   var io;
-  function watchHours(stores) {
+  function watchHours() {
     if (io) io.disconnect();
     io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (!e.isIntersecting) return; io.unobserve(e.target);
-        var s = stores[e.target.dataset.i], el = e.target.querySelector('[data-hours]');
-        var q = new URLSearchParams({ name: s.name, address: s.street + ', ' + s.city + ', ' + s.state + ' ' + s.zip, lat: s.lat, lng: s.lng });
-        fetch(API + '/api/hours?' + q).then(function (r) { return r.json(); }).then(function (h) {
-          if (h.closed) { el.textContent = 'May be closed. Call ahead.'; return; }
-          var line = today(h); el.innerHTML = line ? '<b>Today</b> ' + esc(line) : '';
-          if (h.mapsUrl) { var a = e.target.querySelector('.sb-store__actions a'); if (a) a.href = h.mapsUrl; }
-        }).catch(function () {});
+        loadHours(+e.target.dataset.i, function (h) { paintHours(e.target, h); });
       });
     }, { rootMargin: '200px' });
     listEl.querySelectorAll('.sb-store').forEach(function (li) { io.observe(li); });
@@ -150,7 +197,29 @@
     var now = new Date(), local = h.utcOffset != null ? new Date(now.getTime() + (h.utcOffset + now.getTimezoneOffset()) * 60000) : now;
     var name = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][local.getDay()];
     var line = h.week.find(function (l) { return l.indexOf(name) === 0; }) || '';
-    return line.replace(name + ': ', '').replace(/ | /g, ' ');
+    return line.replace(name + ': ', '').replace(/ | /g, ' ');
+  }
+
+  // One selected spot at a time: its pin turns yellow and its card is outlined, whichever you tapped.
+  function select(i, from) {
+    state.sel = i;
+    root.querySelectorAll('.sb-pin.is-sel').forEach(function (p) { p.classList.remove('is-sel'); });
+    listEl.querySelectorAll('.sb-store.is-sel').forEach(function (c) { c.classList.remove('is-sel'); });
+    Object.keys(markers).forEach(function (k) { markers[k].setZIndexOffset(0); });
+    var m = markers[i], li = document.getElementById('store-' + i);
+    if (m) { m.setZIndexOffset(1000); var el = m.getElement(); if (el) el.classList.add('is-sel'); }
+    if (li) li.classList.add('is-sel');
+    if (from === 'pin') {
+      if (root.classList.contains('show-map') && mobile.matches) {
+        peekEl.innerHTML = '<div class="sb-store is-sel" data-i="' + i + '">' + card(state.stores[i], i) + '</div>';
+        peekEl.hidden = false;
+        loadHours(i, function (h) { if (state.sel === i) paintHours(peekEl, h); });
+      } else if (li) {
+        li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else if (m && map) {
+      if (!map.getBounds().pad(-0.1).contains(m.getLatLng())) map.panTo(m.getLatLng());
+    }
   }
 
   function drawMap(stores) {
@@ -160,52 +229,80 @@
       map = L.map(el, { scrollWheelZoom: false, zoomControl: true });
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
       layer = L.layerGroup().addTo(map);
+      map.on('click', function () { if (!peekEl.hidden) { peekEl.hidden = true; } });
     }
     layer.clearLayers(); markers = {};
     var pts = [];
     stores.forEach(function (s, i) {
       if (!isFinite(s.lat) || !isFinite(s.lng)) return;
-      var icon = L.divIcon({ className: 'sb-pin' + (s.onPremise ? ' sb-pin--on' : ''), html: '<span>' + (i + 1) + '</span>', iconSize: [30, 30], iconAnchor: [15, 15] });
-      var m = L.marker([s.lat, s.lng], { icon: icon }).addTo(layer);
-      m.on('click', function () { var li = document.getElementById('store-' + i); if (li) { li.scrollIntoView({ behavior: 'smooth', block: 'center' }); li.classList.add('is-hl'); setTimeout(function () { li.classList.remove('is-hl'); }, 1500); } });
+      var icon = L.divIcon({ className: 'sb-pin' + (s.onPremise ? ' sb-pin--on' : ''), html: '<span>' + (i + 1) + '</span>', iconSize: [34, 34], iconAnchor: [17, 17] });
+      var m = L.marker([s.lat, s.lng], { icon: icon, keyboard: true, title: s.name }).addTo(layer);
+      m.on('click', function () { select(i, 'pin'); });
       markers[i] = m; pts.push([s.lat, s.lng]);
     });
-    if (pts.length) map.fitBounds(pts.slice(0, 15), { padding: [30, 30], maxZoom: 14 });
+    if (pts.length) map.fitBounds(pts.slice(0, 15), { padding: [30, 30], maxZoom: 15 });
     setTimeout(function () { map.invalidateSize(); }, 50);
     mapToggle.hidden = !pts.length;
   }
+  listEl.addEventListener('click', function (e) {
+    if (e.target.closest('a')) return;
+    var li = e.target.closest('.sb-store'); if (li) select(+li.dataset.i, 'card');
+  });
   listEl.addEventListener('mouseover', function (e) {
-    var li = e.target.closest('.sb-store'); if (!li || !markers[li.dataset.i]) return;
-    var el = markers[li.dataset.i].getElement(); if (el) { root.querySelectorAll('.sb-pin.is-hl').forEach(function (p) { p.classList.remove('is-hl'); }); el.classList.add('is-hl'); }
+    var li = e.target.closest('.sb-store'); root.querySelectorAll('.sb-pin.is-hl').forEach(function (p) { p.classList.remove('is-hl'); });
+    if (!li || !markers[li.dataset.i]) return;
+    var el = markers[li.dataset.i].getElement(); if (el) el.classList.add('is-hl');
   });
-  mapToggle.addEventListener('click', function () {
-    var on = root.classList.toggle('show-map'); mapToggle.textContent = on ? 'List' : 'Map';
+  listEl.addEventListener('mouseleave', function () { root.querySelectorAll('.sb-pin.is-hl').forEach(function (p) { p.classList.remove('is-hl'); }); });
+  function setView(showMap) {
+    root.classList.toggle('show-map', showMap); mapToggle.textContent = showMap ? 'List' : 'Map';
+    if (!showMap) peekEl.hidden = true;
     if (map) setTimeout(function () { map.invalidateSize(); }, 50);
-  });
+  }
+  mapToggle.addEventListener('click', function () { setView(!root.classList.contains('show-map')); });
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var z = zipEl.value.trim();
     if (!/^\d{5}$/.test(z)) { setStatus('That ZIP looks off. Try 5 digits.'); return; }
-    state.zip = z; state.lat = state.lng = null; search();
+    zipEl.blur();
+    state.zip = z; state.lat = state.lng = null; search({ scroll: mobile.matches });
   });
-  root.querySelector('[data-sb-finder-geo]').addEventListener('click', function (e) {
-    var b = e.currentTarget;
-    if (!navigator.geolocation) { setStatus('Your browser can’t share location. Try your ZIP.'); return; }
-    b.textContent = 'Finding you…';
+
+  // Use my location: always say what's happening, and why it didn't work if it didn't.
+  function geoDone(label) { geoBtn.disabled = false; geoBtn.classList.remove('is-busy'); geoBtn.innerHTML = label || GEO_LABEL; }
+  geoBtn.addEventListener('click', function () {
+    if (!navigator.geolocation || !window.isSecureContext) { setStatus('This browser can’t share your location. Pop in your ZIP instead.'); return; }
+    geoBtn.disabled = true; geoBtn.classList.add('is-busy');
+    geoBtn.innerHTML = '<span class="sb-finder__spin"></span> Finding you…';
+    setStatus('<span class="sb-finder__spin"></span> Finding you… If your phone asks, tap <b>Allow</b>.');
     navigator.geolocation.getCurrentPosition(function (p) {
-      b.textContent = '⌖ Use my location';
-      state.lat = p.coords.latitude; state.lng = p.coords.longitude; state.zip = ''; zipEl.value = ''; search();
-    }, function () { b.textContent = '⌖ Use my location'; setStatus('No worries. Pop in your ZIP instead.'); });
+      geoDone('✓ Using your location');
+      state.lat = p.coords.latitude; state.lng = p.coords.longitude; state.zip = ''; zipEl.value = '';
+      search({ scroll: mobile.matches });
+    }, function (err) {
+      geoDone();
+      var msg = err && err.code === 1
+        ? 'Location is turned off for this site. Allow it in your browser settings (iPhone: Settings › Privacy & Security › Location Services › Safari Websites), or just pop in your ZIP.'
+        : err && err.code === 3 ? 'Finding you took too long. Try again, or pop in your ZIP.'
+        : 'We couldn’t find your location. Pop in your ZIP instead.';
+      setStatus(msg);
+    }, { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 });
   });
+  zipEl.addEventListener('input', function () { if (geoBtn.innerHTML !== GEO_LABEL && !geoBtn.disabled) geoDone(); });
+
   root.querySelectorAll('.sb-chip').forEach(function (c) {
-    c.addEventListener('click', function () { state.flavor = c.dataset.flavor; chip(state.flavor); search(); });
+    c.addEventListener('click', function () { state.flavor = c.dataset.flavor; group('.sb-chip', 'flavor', state.flavor); search(); });
+  });
+  root.querySelectorAll('.sb-seg button').forEach(function (b) {
+    b.addEventListener('click', function () { state.type = b.dataset.type; group('.sb-seg button', 'type', state.type); search(); });
   });
   milesEl.addEventListener('change', function () { state.miles = parseInt(milesEl.value, 10); search(); });
-  typeEl.addEventListener('change', function () { state.type = typeEl.value; render(); });
+  mobile.addEventListener('change', function () { if (!mobile.matches) setView(false); });
 
   // Start from the URL (links from the homepage and flavor pages pass zip / lat,lng / flavor)
-  if (params.get('flavor')) { state.flavor = params.get('flavor'); chip(state.flavor); }
+  if (params.get('flavor')) { state.flavor = params.get('flavor'); group('.sb-chip', 'flavor', state.flavor); }
+  if (/^(on|off)$/.test(params.get('type') || '')) { state.type = params.get('type'); group('.sb-seg button', 'type', state.type); }
   if (params.get('miles')) { state.miles = parseInt(params.get('miles'), 10) || 25; milesEl.value = String(state.miles); }
   if (/^\d{5}$/.test(params.get('zip') || '')) { state.zip = params.get('zip'); zipEl.value = state.zip; search(); }
   else if (params.get('lat') && params.get('lng')) { state.lat = parseFloat(params.get('lat')); state.lng = parseFloat(params.get('lng')); search(); }

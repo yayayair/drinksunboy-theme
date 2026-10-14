@@ -1,4 +1,4 @@
-// GET /api/stores?zip=12345 | lat=..&lng=.. [&flavor=coconut] [&miles=25] [&days=60]
+// GET /api/stores?zip=12345 | lat=..&lng=.. [&flavor=coconut] [&miles=25] [&days=60] [&type=on|off]
 import { guard, clientIp, isZip, num, titleCase } from '../lib/common.js';
 import { vip, brands } from '../lib/vip.js';
 import { brandsFor, FLAVORS } from '../lib/flavors.js';
@@ -14,8 +14,9 @@ export default async function handler(req, res) {
   const miles = Math.round(num(q.miles, 1, 100) || 25);
   const days = Math.round(num(q.days, 7, 365) || 60);
   const flavor = FLAVORS[q.flavor] ? q.flavor : '';
+  const type = q.type === 'on' || q.type === 'off' ? q.type : '';
 
-  const key = [zip, lat?.toFixed(3), lng?.toFixed(3), miles, days, flavor].join('|');
+  const key = [zip, lat?.toFixed(3), lng?.toFixed(3), miles, days, flavor, type].join('|');
   const hit = cache.get(key);
   if (hit && Date.now() - hit.at < 10 * 60 * 1000) return res.status(200).json(hit.body);
 
@@ -27,6 +28,7 @@ export default async function handler(req, res) {
     }
     const params = [['action', 'results'], ['format', 'json']];
     if (brandParam) params.push(['brand', brandParam]);
+    if (type) params.push(['storeType', type]);
     if (zip) params.push(['zip', zip]);
     if (lat !== null && lng !== null) { params.push(['lat', lat.toFixed(6)]); params.push(['long', lng.toFixed(6)]); }
     params.push(['miles', miles], ['page', 0], ['pagesize', 100]);
@@ -43,14 +45,17 @@ export default async function handler(req, res) {
         name: titleCase(l.dba), street: titleCase(l.street), city: titleCase(l.city), state: l.state, zip: l.zip,
         lat: Number(l.lat), lng: Number(l.long), phone: l.phoneFormatted || l.phone || '',
         distance: Number(l.distance), onPremise: l.storeTypeRollup === 'on',
-        daysAgo: soldAt ? Math.max(0, Math.round((now - soldAt) / 864e5)) : null
+        daysAgo: soldAt ? Math.max(0, Math.round((now - soldAt) / 864e5)) : null,
+        lastSold: soldAt ? new Date(soldAt).toISOString().slice(0, 10) : null,
+        brands: [].concat(l.otherBrand || l.otherBrands || []).map(String),
+        packages: [].concat(l.package || l.packages || []).map(String)
       };
     });
     let stores = all.filter(s => s.daysAgo === null || s.daysAgo <= days);
     let widened = false;
     if (stores.length < 5 && all.length > stores.length) { stores = all; widened = true; }
     const body = {
-      stores: stores.slice(0, 60), total: stores.length, widened, days, miles, flavor,
+      stores: stores.slice(0, 60), total: stores.length, widened, days, miles, flavor, type,
       online: (d.onlineVendor || []).map(v => ({ name: v.dba, url: v.url }))
     };
     cache.set(key, { at: Date.now(), body });
