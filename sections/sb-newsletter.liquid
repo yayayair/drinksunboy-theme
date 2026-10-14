@@ -1,24 +1,21 @@
 {%- comment -%}
-  Sabah-style inline signup: one line of copy, one big underlined email field.
-  Signs people up as Shopify customers with email marketing consent (tag: newsletter).
+  Sabah-style inline signup → your Mailchimp audience (URL set in Theme settings).
 {%- endcomment -%}
 <section class="color-{{ section.settings.color_scheme }} gradient">
   <div class="sb-wrap sb-news">
-    {%- form 'customer', class: 'sb-news__form', id: 'sb-news-form' -%}
-      <input type="hidden" name="contact[tags]" value="newsletter">
-      {%- if form.posted_successfully? -%}
-        <p class="sb-news__ok">{{ section.settings.success }}</p>
-      {%- else -%}
+    <form class="sb-news__form" data-sb-mc novalidate>
+      <div class="sb-mc-form">
         <p class="sb-news__line">{{ section.settings.line }}</p>
         <div class="sb-news__field">
-          <label class="visually-hidden" for="sb-news-email">Email</label>
-          <input class="sb-news__input" id="sb-news-email" type="email" name="contact[email]" placeholder="{{ section.settings.placeholder | escape }}" autocomplete="email" required>
+          <label class="visually-hidden" for="sb-news-email-{{ section.id }}">Email</label>
+          <input class="sb-news__input" id="sb-news-email-{{ section.id }}" type="email" name="EMAIL" placeholder="{{ section.settings.placeholder | escape }}" autocomplete="email" required>
+          <input type="text" tabindex="-1" autocomplete="off" aria-hidden="true" data-sb-mc-hp style="position:absolute;left:-5000px">
           <button class="sb-news__submit" type="submit" aria-label="Sign up">→</button>
         </div>
-        {%- if form.errors -%}<p class="sb-news__fine">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</p>{%- endif -%}
-        {%- if section.settings.fine != blank -%}<p class="sb-news__fine">{{ section.settings.fine }}</p>{%- endif -%}
-      {%- endif -%}
-    {%- endform -%}
+        <p class="sb-news__fine" data-sb-mc-msg aria-live="polite">{{ section.settings.fine }}</p>
+      </div>
+      <p class="sb-news__ok sb-mc-done">{{ section.settings.success }}</p>
+    </form>
   </div>
 </section>
 
@@ -26,8 +23,9 @@
 {
   "name": "SUNBOY newsletter",
   "settings": [
+    { "type": "paragraph", "content": "Signups go to your Mailchimp audience (Theme settings → SUNBOY age gate & signup)." },
     { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-5" },
-    { "type": "text", "id": "line", "label": "Line", "default": "Join the Coconut Club for new flavors, merch drops, parties and where to find us:" },
+    { "type": "text", "id": "line", "label": "Line", "default": "Join the Anti-Hustle Coconut Club for new flavors, merch drops, parties and where to find us:" },
     { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "you@sunshine.com" },
     { "type": "text", "id": "fine", "label": "Small print", "default": "Must be 21+. Unsubscribe anytime." },
     { "type": "text", "id": "success", "label": "Thank-you message", "default": "You're in. Welcome to the club." }

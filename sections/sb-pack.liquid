@@ -1,0 +1,88 @@
+{%- comment -%}
+  Variety pack page: pack hero, then one row per flavor in the pack (can, story, nutrition, link).
+  Flavor words/nutrition come from each flavor product's SUNBOY metafields.
+{%- endcomment -%}
+{%- liquid
+  assign pack_img = section.settings.image
+  assign c_bg = section.settings.bg | default: '#0BB89B'
+  assign c_fg = section.settings.fg | default: '#FFFFFF'
+-%}
+<section class="sb-pack" style="--pack-bg: {{ c_bg }}; --pack-fg: {{ c_fg }};">
+  <div class="sb-pack__hero">
+    <div class="sb-pack__media">
+      {%- if pack_img != blank -%}
+        {{ pack_img | image_url: width: 1800 | image_tag: class: 'sb-pack__img', widths: '600, 900, 1200, 1800', sizes: '(min-width: 990px) 50vw, 100vw', fetchpriority: 'high', alt: section.settings.title }}
+      {%- elsif section.settings.image_fallback != blank -%}
+        <img class="sb-pack__img" src="{{ section.settings.image_fallback | asset_url }}" alt="{{ section.settings.title | escape }}" width="1672" height="1412" fetchpriority="high">
+      {%- endif -%}
+    </div>
+    <div class="sb-pack__text">
+      {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h1 class="sb-display sb-pack__title">{{ section.settings.title }}</h1>
+      {%- if section.settings.tagline != blank -%}<p class="sb-pack__tagline">{{ section.settings.tagline }}</p>{%- endif -%}
+      <div class="sb-pack__body">{{ section.settings.body }}</div>
+      {%- if section.settings.details != blank -%}<p class="sb-pack__details">{{ section.settings.details }}</p>{%- endif -%}
+      <div class="sb-pack__chips">
+        {%- for block in section.blocks -%}
+          {%- assign f = block.settings.product -%}
+          {%- if f == blank -%}{%- continue -%}{%- endif -%}
+          <a class="sb-pack__chip" href="#pack-{{ f.handle }}" style="background: {{ f.metafields.sunboy.color_main.value | default: '#0BB89B' }}">{{ f.title }}</a>
+        {%- endfor -%}
+      </div>
+      <p style="margin-top:2.8rem"><a class="sb-btn sb-btn--yellow" href="{{ section.settings.finder_url | default: '/pages/find-us' }}">Find the {{ section.settings.short_name | default: 'pack' }} near you</a></p>
+    </div>
+  </div>
+
+  {%- for block in section.blocks -%}
+    {%- assign f = block.settings.product -%}
+    {%- if f == blank -%}{%- continue -%}{%- endif -%}
+    {%- liquid
+      assign slug = f.handle | remove_first: 'sunboy-'
+      assign mf = f.metafields.sunboy
+      assign c_main = mf.color_main.value | default: '#0BB89B'
+      assign c_accent = mf.color_accent.value | default: '#F9ED25'
+      assign band = 'sb-band-' | append: slug | append: '.webp'
+      assign can = 'sb-can-' | append: slug | append: '.webp'
+    -%}
+    <article class="sb-packflavor{% cycle '', ' sb-packflavor--flip' %}" id="pack-{{ f.handle }}" style="--flavor-a: {{ c_accent }}; --flavor-b: {{ c_main }};" {{ block.shopify_attributes }}>
+      <div class="sb-packflavor__stage">
+        <span class="sb-packflavor__pattern" style="background-image:url('{{ band | asset_url }}')"></span>
+        <img class="sb-packflavor__can" src="{{ can | asset_url }}" alt="{{ f.title | escape }} can" width="693" height="1800" loading="lazy">
+      </div>
+      <div class="sb-packflavor__text">
+        <p class="sb-eyebrow">{{ forloop.index }} of {{ section.blocks.size }}</p>
+        <h2 class="sb-display sb-packflavor__name">{{ f.title }}</h2>
+        <p class="sb-packflavor__hero">{{ mf.hero_line }}</p>
+        {%- if mf.short_romance != blank -%}<p class="sb-packflavor__romance">{{ mf.short_romance }}</p>{%- endif -%}
+        {%- if mf.tasting_notes != blank -%}<p class="sb-packflavor__notes"><b>Tasting notes</b> {{ mf.tasting_notes }}</p>{%- endif -%}
+        <p><a class="sb-link-arrow" href="{{ f.url }}">All about {{ f.title | capitalize }}</a></p>
+      </div>
+      <div class="sb-packflavor__label">
+        {% render 'sb-nutrition-label', n: mf.nutrition.value, title: f.title, compact: true %}
+      </div>
+    </article>
+  {%- endfor -%}
+</section>
+
+{% schema %}
+{
+  "name": "SUNBOY variety pack",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "8 × 12oz cans · 5% ABV" },
+    { "type": "text", "id": "title", "label": "Pack name", "default": "Classic Variety Pack" },
+    { "type": "text", "id": "short_name", "label": "Short name for the button", "default": "Classic pack" },
+    { "type": "text", "id": "tagline", "label": "Tagline" },
+    { "type": "richtext", "id": "body", "label": "Text" },
+    { "type": "text", "id": "details", "label": "What's inside line" },
+    { "type": "image_picker", "id": "image", "label": "Pack image (transparent PNG)" },
+    { "type": "text", "id": "image_fallback", "label": "Fallback theme image" },
+    { "type": "color", "id": "bg", "label": "Hero background", "default": "#0BB89B" },
+    { "type": "color", "id": "fg", "label": "Hero text", "default": "#FFFFFF" },
+    { "type": "url", "id": "finder_url", "label": "Find Us page" }
+  ],
+  "blocks": [
+    { "type": "flavor", "name": "Flavor in the pack", "settings": [ { "type": "product", "id": "product", "label": "Flavor product" } ] }
+  ],
+  "presets": [ { "name": "SUNBOY variety pack" } ]
+}
+{% endschema %}

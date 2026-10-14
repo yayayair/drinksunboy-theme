@@ -1,0 +1,33 @@
+{%- comment -%}
+  Sends any form with [data-sb-mc] to the Mailchimp audience set in
+  Theme settings → SUNBOY age gate & signup → Mailchimp form URL. Stays on the page.
+{%- endcomment -%}
+<script>
+  (function () {
+    var action = {{ settings.sb_mc_url | json }};
+    if (!action) return;
+    var jsonp = action.replace('/subscribe/post?', '/subscribe/post-json?');
+    document.addEventListener('submit', function (e) {
+      var form = e.target.closest('[data-sb-mc]');
+      if (!form) return;
+      e.preventDefault();
+      var email = form.querySelector('input[type="email"]').value.trim();
+      var msg = form.querySelector('[data-sb-mc-msg]');
+      var cb = 'sbmc' + Date.now();
+      var url = jsonp + '&EMAIL=' + encodeURIComponent(email) + '&c=' + cb;
+      var hp = form.querySelector('[data-sb-mc-hp]'); if (hp && hp.value) return;
+      window[cb] = function (r) {
+        delete window[cb];
+        if (r && r.result === 'success') {
+          form.classList.add('is-done');
+          try { localStorage.setItem('sbPopDone', '1'); } catch (err) {}
+        } else if (msg) {
+          var t = (r && r.msg) || 'Something went wrong. Try again?';
+          msg.textContent = /already subscribed/i.test(t) ? "You're already in the club." : t.replace(/<[^>]+>/g, '').replace(/^\d+ - /, '');
+        }
+      };
+      var s = document.createElement('script'); s.src = url; s.onerror = function () { if (msg) msg.textContent = 'Something went wrong. Try again?'; };
+      document.body.appendChild(s);
+    });
+  })();
+</script>

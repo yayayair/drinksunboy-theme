@@ -20,19 +20,21 @@
       {%- if section.settings.retail_label != blank -%}<p class="sb-eyebrow sb-find__retail-label">{{ section.settings.retail_label }}</p>{%- endif -%}
       <div class="sb-retailers">
         {%- for block in section.blocks -%}
+          {%- if block.settings.logo == blank -%}{%- continue -%}{%- endif -%}
           {%- if block.settings.link != blank -%}
             <a class="sb-retailer" href="{{ block.settings.link }}" target="_blank" rel="noopener" aria-label="SUNBOY at {{ block.settings.name | escape }} (opens in a new tab)" {{ block.shopify_attributes }}>
           {%- else -%}
-            <div class="sb-retailer" {{ block.shopify_attributes }}>
+            <span class="sb-retailer" {{ block.shopify_attributes }}>
           {%- endif -%}
-            {%- if block.settings.logo != blank -%}
-              {{ block.settings.logo | image_url: width: 480 | image_tag: loading: 'lazy', alt: block.settings.name }}
-            {%- else -%}
-              <span class="sb-retailer__name">{{ block.settings.name }}</span>
-            {%- endif -%}
-            {%- if block.settings.link != blank -%}<span class="sb-retailer__go" aria-hidden="true">↗</span>{%- endif -%}
-          {%- if block.settings.link != blank -%}</a>{%- else -%}</div>{%- endif -%}
+            {{ block.settings.logo | image_url: width: 480 | image_tag: loading: 'lazy', alt: block.settings.name }}
+          {%- if block.settings.link != blank -%}</a>{%- else -%}</span>{%- endif -%}
         {%- endfor -%}
+        <p class="sb-retailers__names">
+          {%- for block in section.blocks -%}
+            {%- if block.settings.logo != blank -%}{%- continue -%}{%- endif -%}
+            <span {{ block.shopify_attributes }}>{%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}" target="_blank" rel="noopener">{{ block.settings.name }}</a>{%- else -%}{{ block.settings.name }}{%- endif -%}</span>
+          {%- endfor -%}
+        </p>
       </div>
     {%- endif -%}
 
@@ -82,8 +84,8 @@
       "name": "Retailer",
       "settings": [
         { "type": "text", "id": "name", "label": "Retailer name", "default": "Retailer" },
-        { "type": "image_picker", "id": "logo", "label": "Logo", "info": "Transparent PNG or a logo on white." },
-        { "type": "url", "id": "link", "label": "Link to SUNBOY on their site" }
+        { "type": "image_picker", "id": "logo", "label": "Logo (optional)", "info": "Shown in white. Leave empty to show the name as text." },
+        { "type": "url", "id": "link", "label": "Link to SUNBOY on their site (optional)" }
       ]
     }
   ],

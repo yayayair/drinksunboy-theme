@@ -1,0 +1,25 @@
+{%- comment -%}
+  Nutrition label that mirrors the can. Pass: n (a "Nutrition facts" metaobject), title (flavor name, optional), compact (true for smaller).
+{%- endcomment -%}
+{%- if n != blank -%}
+<div class="sb-label{% if compact %} sb-label--compact{% endif %}" aria-label="Nutrition facts{% if title %} for {{ title | escape }}{% endif %}">
+  {%- if n.juice_percent != blank -%}<p class="sb-label__juice">Contains alcohol &amp; {{ n.juice_percent }} juice</p>{%- endif -%}
+  <p class="sb-label__title">Nutrition Facts</p>
+  <div class="sb-label__row" style="border-top:0"><b>Serving size</b><b>{{ n.serving_size | default: '1 can (12 fl. oz.)' }}</b></div>
+  <div class="sb-label__row sb-label__row--thick" style="font-size:1.2rem"><b>Amount per serving</b></div>
+  <div class="sb-label__cal"><span>Calories</span><span>{{ n.calories }}</span></div>
+  <div class="sb-label__row sb-label__row--mid" style="justify-content:flex-end;font-size:1.2rem"><b>% Daily Value</b></div>
+  <div class="sb-label__row"><span><b>Total Fat</b> {{ n.total_fat | default: '0g' }}</span><b>0%</b></div>
+  <div class="sb-label__row"><span><b>Sodium</b> {{ n.sodium }}</span><b>{{ n.sodium_dv }}</b></div>
+  <div class="sb-label__row"><span><b>Total Carbohydrate</b> {{ n.total_carbs }}</span><b>{{ n.total_carbs_dv }}</b></div>
+  {%- if n.dietary_fiber != blank -%}<div class="sb-label__row sb-label__row--indent"><span>Dietary Fiber {{ n.dietary_fiber }}</span><b>0%</b></div>{%- endif -%}
+  <div class="sb-label__row sb-label__row--indent"><span>Total Sugars {{ n.total_sugars }}</span><span></span></div>
+  {%- if n.added_sugars != blank -%}<div class="sb-label__row sb-label__row--indent2"><span>Includes {{ n.added_sugars }} Added Sugars</span><b>0%</b></div>{%- endif -%}
+  <div class="sb-label__row"><span><b>Protein</b> {{ n.protein | default: '0g' }}</span><span></span></div>
+  <div class="sb-label__row sb-label__row--thick"><span>Potassium {{ n.potassium }}</span><span>{{ n.potassium_dv }}</span></div>
+  {%- if n.calcium != blank -%}<div class="sb-label__row"><span>Calcium {{ n.calcium }}</span><span>{{ n.calcium_dv }}</span></div>{%- endif -%}
+  {%- if n.not_significant != blank -%}<p class="sb-label__note">{{ n.not_significant }}</p>{%- endif -%}
+  {%- if n.ingredients != blank -%}<p class="sb-label__ingr"><b>Ingredients:</b> {{ n.ingredients }}</p>{%- endif -%}
+  <p class="sb-label__abv">{{ n.abv | default: '5%' }} ABV · Gluten-free · Loudly and proudly contains coconut</p>
+</div>
+{%- endif -%}

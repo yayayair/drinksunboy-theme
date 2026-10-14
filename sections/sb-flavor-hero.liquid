@@ -27,7 +27,7 @@
       <dl class="sb-fhero__facts">
         {%- if mf.tasting_notes != blank -%}<div class="sb-fhero__fact"><dt>Tasting notes</dt><dd>{{ mf.tasting_notes }}</dd></div>{%- endif -%}
         {%- if mf.in_the_can != blank -%}<div class="sb-fhero__fact"><dt>In the can</dt><dd>{{ mf.in_the_can }}</dd></div>{%- endif -%}
-        {%- if mf.available_in != blank -%}<div class="sb-fhero__fact"><dt>Available in</dt><dd>{{ mf.available_in }}</dd></div>{%- endif -%}
+        {%- if mf.available_in != blank -%}<div class="sb-fhero__fact"><dt>Available in</dt><dd>{{ mf.available_in | replace: 'Classic Variety 8pk', '<a href="/pages/classic-variety-pack">Classic Variety 8pk</a>' | replace: 'Refresher Variety 8pk', '<a href="/pages/refresher-variety-pack">Refresher Variety 8pk</a>' }}</dd></div>{%- endif -%}
       </dl>
     {%- endif -%}
     {%- if section.settings.badges != blank -%}

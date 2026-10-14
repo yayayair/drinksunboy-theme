@@ -1,5 +1,5 @@
 {%- comment -%}
-  Sabah-style signup popup. Shows once per visitor, after the age gate, after a short delay.
+  Sabah-style signup popup → Mailchimp. Shows once per visitor, after the age gate.
   Edit in Theme settings → SUNBOY age gate & signup.
 {%- endcomment -%}
 {%- if settings.sb_pop_enable and request.design_mode == false -%}
@@ -7,34 +7,31 @@
     <div class="sb-pop__card">
       <button class="sb-pop__close" type="button" aria-label="Close" data-sb-pop-close>×</button>
       <img class="sb-pop__logo" src="{{ 'sunboy-wordmark-on-teal.svg' | asset_url }}" alt="{{ shop.name | escape }}" width="160" height="47" style="background:var(--sb-teal);padding:.8rem 1.4rem;border-radius:.8rem;height:5.6rem">
-      {%- form 'customer', id: 'sb-pop-form' -%}
-        <input type="hidden" name="contact[tags]" value="newsletter,popup">
-        {%- if form.posted_successfully? -%}
-          <p class="sb-pop__big" id="sb-pop-big">{{ settings.sb_pop_success }}</p>
-          <script>try{localStorage.setItem('sbPopDone','1')}catch(e){}</script>
-        {%- else -%}
+      <form data-sb-mc novalidate>
+        <div class="sb-mc-form">
           <p class="sb-pop__kicker">{{ settings.sb_pop_kicker }}</p>
           <p class="sb-pop__big" id="sb-pop-big">{{ settings.sb_pop_big }}</p>
           <p class="sb-pop__sub">{{ settings.sb_pop_sub }}</p>
           <label class="visually-hidden" for="sb-pop-email">Email</label>
-          <input class="sb-pop__input" id="sb-pop-email" type="email" name="contact[email]" placeholder="Your email address" autocomplete="email" required>
+          <input class="sb-pop__input" id="sb-pop-email" type="email" name="EMAIL" placeholder="Your email address" autocomplete="email" required>
+          <input type="text" tabindex="-1" autocomplete="off" aria-hidden="true" data-sb-mc-hp style="position:absolute;left:-5000px">
           <button class="sb-btn sb-btn--teal" type="submit">{{ settings.sb_pop_button }}</button>
-          {%- if settings.sb_pop_fine != blank -%}<p class="sb-pop__fine">{{ settings.sb_pop_fine }}</p>{%- endif -%}
-        {%- endif -%}
-      {%- endform -%}
+          <p class="sb-pop__fine" data-sb-mc-msg aria-live="polite">{{ settings.sb_pop_fine }}</p>
+        </div>
+        <p class="sb-pop__big sb-mc-done">{{ settings.sb_pop_success }}</p>
+      </form>
     </div>
   </div>
   <script>
     (function () {
       var pop = document.getElementById('sb-pop');
-      var posted = /customer_posted=true/.test(location.search) && location.hash.indexOf('sb-pop-form') > -1;
       function close() { pop.classList.remove('is-open'); try { localStorage.setItem('sbPopDone', '1'); } catch (e) {} }
       pop.addEventListener('click', function (e) { if (e.target === pop || e.target.hasAttribute('data-sb-pop-close')) close(); });
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
-      if (posted) { pop.classList.add('is-open'); return; }
       try { if (localStorage.getItem('sbPopDone')) return; } catch (e) {}
       function arm() { setTimeout(function () { if (!document.documentElement.classList.contains('sb-age-pending')) pop.classList.add('is-open'); }, {{ settings.sb_pop_delay | default: 8 }} * 1000); }
       if (document.documentElement.classList.contains('sb-age-pending')) document.addEventListener('sb:age-ok', arm, { once: true }); else arm();
     })();
   </script>
 {%- endif -%}
+{%- render 'sb-mailchimp' -%}

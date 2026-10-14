@@ -66,6 +66,17 @@
       },
       {
         "type": "header",
+        "content": "Mailchimp"
+      },
+      {
+        "type": "text",
+        "id": "sb_mc_url",
+        "label": "Mailchimp form URL",
+        "info": "From Mailchimp → Audience → Signup forms → Embedded form (the form 'action' link). All signup forms send here.",
+        "default": "https://cocoandco.us1.list-manage.com/subscribe/post?u=eae3be5b20b6df6bfdde06c83&id=de073ea6b0&f_id=0006cee4f0"
+      },
+      {
+        "type": "header",
         "content": "Signup popup"
       },
       {
@@ -93,7 +104,7 @@
         "type": "text",
         "id": "sb_pop_big",
         "label": "Big headline",
-        "default": "Coconut Club"
+        "default": "Anti-Hustle Coconut Club"
       },
       {
         "type": "textarea",
