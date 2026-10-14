@@ -1,9 +1,18 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero": {
       "type": "sb-flavor-hero",
       "settings": {
-        "eyebrow": "Spiked coconut water \u00b7 5% ABV",
+        "eyebrow": "Spiked coconut water · 5% ABV",
         "badges": "5% ABV, 0g added sugar, Gluten-free, Real coconut water",
         "finder_url": "/pages/find-us",
         "secondary_label": "See all flavors",
