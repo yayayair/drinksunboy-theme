@@ -1,0 +1,25 @@
+/* SUNBOY brand layer: fonts and colour tokens on top of Dawn. */
+@font-face { font-family: 'Nobel'; src: url('{{ "nobel-book.woff2" | asset_url }}') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Nobel'; src: url('{{ "nobel-bold.woff2" | asset_url }}') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Nobel Condensed'; src: url('{{ "nobel-bold-condensed.woff2" | asset_url }}') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+
+:root {
+  --sb-teal: #0BB89B;
+  --sb-yellow: #F9ED25;
+  --sb-brown: #523B18;
+  --sb-peach: #F79359;
+  --sb-gold: #F5A81C;
+  --sb-purple: #9C489B;
+  --sb-pink: #EE3488;
+  --sb-orange: #EC5624;
+  --sb-green: #00A84F;
+
+  --font-body-family: 'Nobel', 'Helvetica Neue', Arial, sans-serif;
+  --font-body-weight: 400;
+  --font-body-weight-bold: 700;
+  --font-heading-family: 'Nobel Condensed', 'Nobel', 'Helvetica Neue', Arial, sans-serif;
+  --font-heading-style: normal;
+  --font-heading-weight: 700;
+}
+
+h1, h2, h3, .h0, .h1, .h2, .h3 { text-transform: uppercase; letter-spacing: 0.01em; }
