@@ -255,3 +255,6 @@ html.sb-age-pending body { overflow: hidden; }
 .sb-footer-mark img { width: 100%; height: auto; display: block; }
 @media (min-width: 750px) { .sb-mood--cols-2 .sb-mood__tile { max-height: calc(100svh - 10rem); } }
 .sb-retailer img { max-height: 6rem; }
+.sb-flavor-card.is-current { box-shadow: none; }
+.sb-flavor-card.is-current::after { content: ""; position: absolute; inset: 0; border: 4px solid var(--sb-yellow); border-radius: inherit; pointer-events: none; z-index: 3; }
+@media (max-width: 749px) { .sb-label { box-shadow: .8rem .8rem 0 var(--flavor-b, var(--sb-teal)); max-width: calc(100% - .8rem); margin-left: 0; } }

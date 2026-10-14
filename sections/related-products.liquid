@@ -38,7 +38,7 @@
         role="list"
       >
         {% assign skip_card_product_styles = false %}
-        {% for recommendation in recommendations.products %}
+        {% for recommendation in recommendations.products %}{%- if recommendation.metafields.sunboy.hero_line != blank or recommendation.tags contains "trade" -%}{%- continue -%}{%- endif -%}
           <li class="grid__item">
             {% render 'card-product',
               card_product: recommendation,
