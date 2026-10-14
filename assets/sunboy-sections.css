@@ -349,3 +349,4 @@ form.is-done .sb-mc-done { display: block; }
 .sb-finder__online { margin-top: 4rem; text-align: center; }
 .sb-finder__online .sb-btn { margin: .4rem; color: var(--sb-brown); }
 .sb-finder__note { text-align: center; font-size: 1.3rem; opacity: .7; margin-top: 3.2rem; }
+.sb-finder__map .leaflet-tile-pane { filter: saturate(.35) sepia(.15) brightness(1.04); }
