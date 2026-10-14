@@ -1,4 +1,5 @@
 <div class="color-{{ section.settings.color_scheme }} gradient">
+  {%- if section.settings.show_mark -%}<a class="sb-footer-mark" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }} home"><img src="{{ 'sunboy-wordmark.svg' | asset_url }}" alt="" width="1400" height="412" loading="lazy"></a>{%- endif -%}
   <p class="sb-legal">{{ section.settings.text }}</p>
 </div>
 
@@ -7,6 +8,7 @@
   "name": "SUNBOY legal line",
   "settings": [
     { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-4" },
+    { "type": "checkbox", "id": "show_mark", "label": "Show big SUNBOY wordmark", "default": true },
     { "type": "text", "id": "text", "label": "Text", "default": "Please enjoy responsibly. Must be 21+." }
   ],
   "presets": [ { "name": "SUNBOY legal line" } ]

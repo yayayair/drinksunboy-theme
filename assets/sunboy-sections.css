@@ -66,14 +66,14 @@
 .sb-mood__title { font-family: var(--font-heading-family); font-weight: 700; text-transform: uppercase; font-size: clamp(3rem, 4.4vw, 5.6rem); line-height: .92; margin: 0 0 1rem; }
 
 /* Statement */
-.sb-statement { text-align: center; padding: 8rem 0; }
-@media (min-width: 990px) { .sb-statement { padding: 12rem 0; } }
+.sb-statement { text-align: center; padding-block: 8rem; }
+@media (min-width: 990px) { .sb-statement { padding-block: 12rem; } }
 .sb-statement__line { font-size: clamp(4.4rem, 8vw, 10.4rem); max-width: 12em; margin: 0 auto; }
 .sb-statement__body { max-width: 56rem; margin: 2.8rem auto 0; font-size: 1.8rem; line-height: 1.5; }
 .sb-statement__art { width: 14rem; margin: 0 auto 2.4rem; display: block; }
 
 /* Flavor lineup */
-.sb-lineup { padding: 7rem 0 8rem; }
+.sb-lineup { padding-block: 7rem 8rem; }
 .sb-lineup__head { display: flex; justify-content: space-between; align-items: end; gap: 2rem; margin-bottom: 3.2rem; flex-wrap: wrap; }
 .sb-lineup__title { font-size: clamp(4rem, 6vw, 7.2rem); }
 .sb-lineup__grid {
@@ -96,7 +96,7 @@
 .sb-flavor-card__line { position: relative; z-index: 1; font-size: 1.4rem; line-height: 1.35; text-align: center; margin: 0; opacity: .95; }
 
 /* Find Us band */
-.sb-find { padding: 8rem 0; text-align: center; position: relative; overflow: hidden; }
+.sb-find { padding-block: 8rem; text-align: center; position: relative; overflow: hidden; }
 .sb-find__title { font-size: clamp(4.8rem, 9vw, 11rem); }
 .sb-find__sub { font-size: 1.8rem; margin: 1.6rem auto 3.2rem; max-width: 52rem; }
 .sb-find__form { display: flex; gap: .8rem; max-width: 52rem; margin: 0 auto; flex-wrap: wrap; justify-content: center; }
@@ -108,7 +108,7 @@
 .sb-find__geo { background: none; border: 0; color: inherit; font: inherit; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: 1.2rem; margin-top: 1.6rem; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
 .sb-find__retailers { margin-top: 4.8rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: 1.3rem; line-height: 2.2; opacity: .95; }
 .sb-find__retailers span + span::before { content: "·"; margin: 0 1.2rem; }
-.sb-find__art { position: absolute; width: 18rem; right: -2rem; bottom: -2rem; opacity: .95; display: none; }
+.sb-find__art { position: absolute; width: 18rem; right: 4rem; bottom: 3rem; opacity: .95; display: none; }
 @media (min-width: 990px) { .sb-find__art { display: block; } }
 
 /* Split story */
@@ -124,7 +124,7 @@
 .sb-split__cta { margin-top: 2.4rem; }
 
 /* Pillars */
-.sb-pillars { padding: 7rem 0; }
+.sb-pillars { padding-block: 7rem; }
 .sb-pillars__grid { display: grid; gap: 3.2rem; grid-template-columns: 1fr; }
 @media (min-width: 750px) { .sb-pillars__grid { grid-template-columns: repeat(3, 1fr); } }
 .sb-pillar { text-align: center; padding: 0 1rem; }
@@ -136,7 +136,7 @@
 .sb-press .sb-marquee__item { font-family: var(--font-heading-family); font-size: 2.4rem; letter-spacing: .04em; gap: 3.2rem; }
 
 /* Goods */
-.sb-goods { padding: 7rem 0; }
+.sb-goods { padding-block: 7rem; }
 .sb-goods__grid { display: grid; grid-auto-flow: column; grid-auto-columns: 62%; gap: 1.6rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
 @media (min-width: 750px) { .sb-goods__grid { grid-auto-columns: 30%; } }
 @media (min-width: 1200px) { .sb-goods__grid { grid-auto-flow: row; grid-template-columns: repeat(4, 1fr); } }
@@ -168,7 +168,7 @@
 .sb-fhero__ctas { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center; }
 
 /* Flip band */
-.sb-flip { display: grid; grid-template-columns: 1fr; align-items: center; gap: 2.4rem; padding: 6rem 0; }
+.sb-flip { display: grid; grid-template-columns: 1fr; align-items: center; gap: 2.4rem; padding-block: 6rem; }
 @media (min-width: 750px) { .sb-flip { grid-template-columns: 22rem 1fr; } }
 .sb-flip__art { width: 18rem; margin: 0 auto; }
 .sb-flip__title { font-size: clamp(4.4rem, 6vw, 7.2rem); }
@@ -187,3 +187,11 @@
 .sb-fhero .sb-btn--yellow { color: var(--sb-brown); }
 .sb-press .sb-eyebrow { margin-bottom: 1.6rem; }
 html { scroll-behavior: smooth; }
+
+.sb-mood__title { color: #fff; }
+.sb-mood__tile::after { background: linear-gradient(180deg, rgba(30,20,8,0) 45%, rgba(30,20,8,.6)); }
+@media (min-width: 750px) { .sb-mood__tile { max-height: calc(100svh - 12rem); min-height: 52rem; aspect-ratio: auto; height: calc(50vw * 1.25); } .sb-mood[style*="21 / 9"] .sb-mood__tile { height: calc(100vw * 9 / 21); } .sb-mood[style*="16 / 9"] .sb-mood__tile { height: calc(100vw * 9 / 16 / var(--sb-cols)); } }
+.sb-good__img img { mix-blend-mode: multiply; }
+@media (min-width: 1200px) { .sb-lineup__grid .sb-flavor-card__name { font-size: 2.6rem; } .sb-lineup__grid .sb-flavor-card__can { height: 26rem; } .sb-flavor-card { min-height: 42rem; } }
+.sb-footer-mark { display: block; width: min(92%, 140rem); margin: 0 auto; padding: 4rem 0 1rem; }
+.sb-footer-mark img { width: 100%; height: auto; display: block; }
