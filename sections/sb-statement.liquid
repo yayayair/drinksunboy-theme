@@ -1,0 +1,32 @@
+<section class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="sb-wrap sb-statement">
+    {%- if section.settings.art != blank -%}
+      {{ section.settings.art | image_url: width: 400 | image_tag: class: 'sb-statement__art', loading: 'lazy', alt: '' }}
+    {%- elsif section.settings.art_fallback != blank -%}
+      <img class="sb-statement__art" src="{{ section.settings.art_fallback | asset_url }}" alt="" loading="lazy">
+    {%- endif -%}
+    {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="sb-display sb-statement__line">{{ section.settings.heading }}</h2>
+    {%- if section.settings.body != blank -%}<div class="sb-statement__body">{{ section.settings.body }}</div>{%- endif -%}
+    {%- if section.settings.button_label != blank -%}
+      <p style="margin-top:3.2rem"><a class="sb-link-arrow" href="{{ section.settings.button_link }}">{{ section.settings.button_label }}</a></p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SUNBOY big statement",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-5" },
+    { "type": "image_picker", "id": "art", "label": "Illustration (optional)" },
+    { "type": "text", "id": "art_fallback", "label": "Fallback theme image", "info": "Used only when no illustration is picked." },
+    { "type": "text", "id": "eyebrow", "label": "Small label" },
+    { "type": "textarea", "id": "heading", "label": "Statement", "default": "Most drinks make you choose. SUNBOY doesn't." },
+    { "type": "richtext", "id": "body", "label": "Text" },
+    { "type": "text", "id": "button_label", "label": "Link text" },
+    { "type": "url", "id": "button_link", "label": "Link" }
+  ],
+  "presets": [ { "name": "SUNBOY big statement" } ]
+}
+{% endschema %}

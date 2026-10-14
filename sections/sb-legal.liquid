@@ -1,0 +1,14 @@
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <p class="sb-legal">{{ section.settings.text }}</p>
+</div>
+
+{% schema %}
+{
+  "name": "SUNBOY legal line",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-4" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Please enjoy responsibly. Must be 21+." }
+  ],
+  "presets": [ { "name": "SUNBOY legal line" } ]
+}
+{% endschema %}

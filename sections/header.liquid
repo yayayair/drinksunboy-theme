@@ -205,7 +205,7 @@
             }}
           </div>
         {%- else -%}
-          <span class="h2">{{ shop.name }}</span>
+          <span class="sb-logo"><img src="{{ 'sunboy-wordmark.svg' | asset_url }}" alt="{{ shop.name | escape }}" width="180" height="53" class="sb-logo__img"></span>
         {%- endif -%}
       </a>
       {%- if request.page_type == 'index' -%}
@@ -248,7 +248,7 @@
             }}
           </div>
         {%- else -%}
-          <span class="h2">{{ shop.name }}</span>
+          <span class="sb-logo"><img src="{{ 'sunboy-wordmark.svg' | asset_url }}" alt="{{ shop.name | escape }}" width="180" height="53" class="sb-logo__img"></span>
         {%- endif -%}
       </a>
       {%- if request.page_type == 'index' -%}

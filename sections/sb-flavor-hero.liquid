@@ -1,0 +1,68 @@
+{%- comment -%}
+  Flavor page hero. Reads the product's SUNBOY metafields
+  (hero line, romance, tasting notes, in the can, available in, colours).
+  Beer is not sold online, so there is no add-to-cart: the CTA goes to Find Us.
+{%- endcomment -%}
+{%- liquid
+  assign slug = product.handle | remove_first: 'sunboy-'
+  assign mf = product.metafields.sunboy
+  assign c_main = mf.color_main.value | default: '#0BB89B'
+  assign c_accent = mf.color_accent.value | default: '#F9ED25'
+  assign pattern = 'sb-leaf-' | append: slug | append: '.jpg'
+  assign can = 'sb-can-' | append: slug | append: '.webp'
+  assign finder = section.settings.finder_url | default: '/pages/find-us'
+-%}
+<section class="sb-fhero" style="--flavor-a: {{ c_accent }}; --flavor-b: {{ c_main }};">
+  <div class="sb-fhero__stage">
+    <span class="sb-fhero__pattern" style="background-image:url('{{ pattern | asset_url }}')"></span>
+    {%- if section.settings.can_image != blank -%}
+      {{ section.settings.can_image | image_url: width: 900 | image_tag: class: 'sb-fhero__can', fetchpriority: 'high', alt: product.title }}
+    {%- else -%}
+      <img class="sb-fhero__can" src="{{ can | asset_url }}" alt="{{ product.title | escape }} can" width="385" height="1000" fetchpriority="high">
+    {%- endif -%}
+  </div>
+  <div class="sb-fhero__text">
+    <p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>
+    <h1 class="sb-display sb-fhero__name">{{ product.title }}</h1>
+    {%- if mf.hero_line != blank -%}<p class="sb-fhero__hero">{{ mf.hero_line }}</p>{%- endif -%}
+    {%- if mf.romance != blank -%}
+      <p class="sb-fhero__romance">{{ mf.romance | newline_to_br }}</p>
+    {%- elsif product.description != blank -%}
+      <div class="sb-fhero__romance">{{ product.description }}</div>
+    {%- endif -%}
+    {%- if mf.tasting_notes != blank or mf.in_the_can != blank or mf.available_in != blank -%}
+      <dl class="sb-fhero__facts">
+        {%- if mf.tasting_notes != blank -%}<div class="sb-fhero__fact"><dt>Tasting notes</dt><dd>{{ mf.tasting_notes }}</dd></div>{%- endif -%}
+        {%- if mf.in_the_can != blank -%}<div class="sb-fhero__fact"><dt>In the can</dt><dd>{{ mf.in_the_can }}</dd></div>{%- endif -%}
+        {%- if mf.available_in != blank -%}<div class="sb-fhero__fact"><dt>Available in</dt><dd>{{ mf.available_in }}</dd></div>{%- endif -%}
+      </dl>
+    {%- endif -%}
+    {%- if section.settings.badges != blank -%}
+      <div class="sb-fhero__badges">
+        {%- assign badges = section.settings.badges | split: ',' -%}
+        {%- for b in badges -%}<span class="sb-badge">{{ b | strip }}</span>{%- endfor -%}
+      </div>
+    {%- endif -%}
+    <div class="sb-fhero__ctas">
+      <a class="sb-btn sb-btn--yellow" href="{{ finder }}?flavor={{ slug }}">Find {{ product.title | capitalize }} near you</a>
+      {%- if section.settings.secondary_label != blank -%}
+        <a class="sb-link-arrow" href="{{ section.settings.secondary_link }}">{{ section.settings.secondary_label }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SUNBOY flavor hero",
+  "settings": [
+    { "type": "paragraph", "content": "Words and colours come from each product's SUNBOY metafields (Products → flavor → Metafields)." },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Spiked coconut water · 5% ABV" },
+    { "type": "text", "id": "badges", "label": "Badges (comma separated)", "default": "5% ABV, 0g added sugar, Gluten-free, Real coconut water" },
+    { "type": "url", "id": "finder_url", "label": "Find Us page", "default": "/pages/find-us" },
+    { "type": "text", "id": "secondary_label", "label": "Second link text", "default": "See all flavors" },
+    { "type": "url", "id": "secondary_link", "label": "Second link", "default": "/#flavors" },
+    { "type": "image_picker", "id": "can_image", "label": "Can image override", "info": "Only for a template used by one flavor. Leave empty to use the built-in can art." }
+  ]
+}
+{% endschema %}

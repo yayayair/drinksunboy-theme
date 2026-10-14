@@ -1,0 +1,37 @@
+<section class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="sb-wrap sb-pillars">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="sb-display" style="text-align:center;font-size:clamp(3.6rem,5vw,6.4rem);margin-bottom:4.8rem">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    <div class="sb-pillars__grid">
+      {%- for block in section.blocks -%}
+        <div class="sb-pillar" {{ block.shopify_attributes }}>
+          <h3 class="sb-display sb-pillar__title">{{ block.settings.title }}</h3>
+          <p class="sb-pillar__body">{{ block.settings.body }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SUNBOY three truths",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-3" },
+    { "type": "text", "id": "heading", "label": "Heading (optional)" }
+  ],
+  "blocks": [
+    {
+      "type": "pillar",
+      "name": "Column",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Real coconut water" },
+        { "type": "textarea", "id": "body", "label": "Text" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "SUNBOY three truths", "blocks": [ { "type": "pillar" }, { "type": "pillar" }, { "type": "pillar" } ] } ]
+}
+{% endschema %}

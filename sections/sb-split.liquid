@@ -1,0 +1,37 @@
+<section class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="sb-split{% if section.settings.flip %} sb-split--flip{% endif %}">
+    <div class="sb-split__media">
+      {%- if section.settings.image != blank -%}
+        {{ section.settings.image | image_url: width: 2000 | image_tag: sizes: '(min-width: 990px) 50vw, 100vw', widths: '600, 900, 1200, 1600, 2000', loading: 'lazy', alt: section.settings.heading }}
+      {%- elsif section.settings.fallback != blank -%}
+        <img src="{{ section.settings.fallback | asset_url }}" alt="{{ section.settings.heading | escape }}" loading="lazy">
+      {%- endif -%}
+    </div>
+    <div class="sb-split__text">
+      {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h2 class="sb-display sb-split__title">{{ section.settings.heading }}</h2>
+      <div class="sb-split__body">{{ section.settings.body }}</div>
+      {%- if section.settings.button_label != blank -%}
+        <p class="sb-split__cta"><a class="sb-link-arrow" href="{{ section.settings.button_link }}">{{ section.settings.button_label }}</a></p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SUNBOY image + story",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-5" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "fallback", "label": "Fallback theme image" },
+    { "type": "checkbox", "id": "flip", "label": "Image on the right", "default": false },
+    { "type": "text", "id": "eyebrow", "label": "Small label" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Spread joy with coconuts" },
+    { "type": "richtext", "id": "body", "label": "Text" },
+    { "type": "text", "id": "button_label", "label": "Link text" },
+    { "type": "url", "id": "button_link", "label": "Link" }
+  ],
+  "presets": [ { "name": "SUNBOY image + story" } ]
+}
+{% endschema %}

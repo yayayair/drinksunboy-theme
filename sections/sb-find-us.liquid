@@ -1,0 +1,64 @@
+{%- comment -%}
+  Find Us band. The zip form sends shoppers to the Find Us page (?zip=12345);
+  "Use my location" sends ?lat=..&lng=.. . The full finder lives on that page.
+{%- endcomment -%}
+<section class="color-{{ section.settings.color_scheme }} gradient" id="find-us-{{ section.id }}">
+  <div class="sb-wrap sb-find">
+    {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h2 class="sb-display sb-find__title">{{ section.settings.heading }}</h2>
+    {%- if section.settings.subheading != blank -%}<p class="sb-find__sub">{{ section.settings.subheading }}</p>{%- endif -%}
+    <form class="sb-find__form" action="{{ section.settings.finder_url | default: '/pages/find-us' }}" method="get" role="search">
+      {%- if product and template.name == 'product' -%}<input type="hidden" name="flavor" value="{{ product.handle | remove_first: 'sunboy-' }}">{%- endif -%}
+      <label class="visually-hidden" for="sb-zip-{{ section.id }}">ZIP code</label>
+      <input class="sb-find__input" id="sb-zip-{{ section.id }}" name="zip" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" placeholder="{{ section.settings.placeholder | escape }}" required>
+      <button class="sb-btn sb-btn--yellow" type="submit">{{ section.settings.button_label }}</button>
+    </form>
+    <button class="sb-find__geo" type="button" data-sb-geo="{{ section.settings.finder_url | default: '/pages/find-us' }}">Use my location</button>
+    {%- if section.settings.retailers != blank -%}
+      <p class="sb-find__retailers">
+        {%- assign names = section.settings.retailers | split: ',' -%}
+        {%- for n in names -%}<span>{{ n | strip }}</span>{%- endfor -%}
+      </p>
+    {%- endif -%}
+    {%- if section.settings.art != blank -%}
+      {{ section.settings.art | image_url: width: 500 | image_tag: class: 'sb-find__art', loading: 'lazy', alt: '' }}
+    {%- elsif section.settings.art_fallback != blank -%}
+      <img class="sb-find__art" src="{{ section.settings.art_fallback | asset_url }}" alt="" loading="lazy">
+    {%- endif -%}
+  </div>
+</section>
+<script>
+  document.querySelectorAll('[data-sb-geo]').forEach(function (btn) {
+    if (!('geolocation' in navigator)) { btn.hidden = true; return; }
+    btn.addEventListener('click', function () {
+      btn.textContent = 'Finding you…';
+      navigator.geolocation.getCurrentPosition(function (p) {
+        var u = new URL(btn.dataset.sbGeo, location.origin);
+        u.searchParams.set('lat', p.coords.latitude.toFixed(4));
+        u.searchParams.set('lng', p.coords.longitude.toFixed(4));
+        var f = btn.closest('section').querySelector('input[name="flavor"]');
+        if (f) u.searchParams.set('flavor', f.value);
+        location.href = u.toString();
+      }, function () { btn.textContent = 'Use my location'; });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "SUNBOY find us",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-2" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Thousands of stores nationwide" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Find SUNBOY" },
+    { "type": "text", "id": "subheading", "label": "Text", "default": "Pop in your ZIP and we'll point you to the nearest cooler." },
+    { "type": "text", "id": "placeholder", "label": "ZIP placeholder", "default": "Your ZIP code" },
+    { "type": "text", "id": "button_label", "label": "Button", "default": "Search" },
+    { "type": "url", "id": "finder_url", "label": "Find Us page", "default": "/pages/find-us" },
+    { "type": "textarea", "id": "retailers", "label": "Retailers (comma separated)", "default": "Target, H-E-B, Whole Foods Market, Trader Joe's, Total Wine & More, Harris Teeter, Kroger, Lowes Foods" },
+    { "type": "image_picker", "id": "art", "label": "Illustration (optional)" },
+    { "type": "text", "id": "art_fallback", "label": "Fallback theme image" }
+  ],
+  "presets": [ { "name": "SUNBOY find us" } ]
+}
+{% endschema %}

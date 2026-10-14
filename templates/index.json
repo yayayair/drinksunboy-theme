@@ -1,75 +1,115 @@
 {
   "sections": {
-    "image_banner": {
-      "type": "image-banner",
+    "hero": {
+      "type": "sb-mood",
+      "settings": { "color_scheme": "scheme-1", "ratio": "4 / 5", "gap": true },
       "blocks": {
-        "heading": {
-          "type": "heading",
-          "settings": {
-            "heading": "Browse our latest products",
-            "heading_size": "h0"
-          }
-        },
-        "button": {
-          "type": "buttons",
-          "settings": {
-            "button_label_1": "Shop all",
-            "button_link_1": "shopify://collections/all",
-            "button_style_secondary_1": true,
-            "button_label_2": "",
-            "button_link_2": "",
-            "button_style_secondary_2": false
-          }
-        }
+        "t1": { "type": "tile", "settings": { "fallback": "sb-life-18.jpg", "eyebrow": "Real coconut water. Real fruit. Really spiked.", "title": "The world's first spiked coconut water", "link_label": "Find it near you", "link": "/pages/find-us" } },
+        "t2": { "type": "tile", "settings": { "fallback": "sb-life-19.jpg", "eyebrow": "5% ABV · 0g added sugar", "title": "You'll thank us tomorrow morning.", "link_label": "Meet the lineup", "link": "#flavors" } }
       },
-      "block_order": [
-        "heading",
-        "button"
-      ],
+      "block_order": ["t1", "t2"]
+    },
+    "statement": {
+      "type": "sb-statement",
       "settings": {
-        "image_overlay_opacity": 40,
-        "image_height": "large",
-        "desktop_content_position": "bottom-center",
-        "show_text_box": false,
-        "image_behavior": "none",
-        "desktop_content_alignment": "center",
-        "color_scheme": "scheme-3",
-        "mobile_content_alignment": "center",
-        "stack_images_on_mobile": false,
-        "show_text_below": false
+        "color_scheme": "scheme-5",
+        "art_fallback": "sb-sunman-surfing.png",
+        "eyebrow": "No tradeoffs, ever",
+        "heading": "Most drinks make you choose. SUNBOY doesn't.",
+        "body": "<p>Real hydrating coconut water, real fruit, playfully spiked and sparkled. 5% ABV, never bloaty. Flip before you sip.</p>",
+        "button_label": "Our story",
+        "button_link": "/pages/about"
       }
     },
-    "featured_collection": {
-      "type": "featured-collection",
+    "lineup": {
+      "type": "sb-flavor-lineup",
+      "settings": { "color_scheme": "scheme-1", "eyebrow": "Seven flavors", "heading": "Meet the lineup", "link_label": "Find SUNBOY near you", "link": "/pages/find-us" },
+      "blocks": {
+        "f1": { "type": "flavor", "settings": { "product": "sunboy-passion-fruit" } },
+        "f2": { "type": "flavor", "settings": { "product": "sunboy-pineapple" } },
+        "f3": { "type": "flavor", "settings": { "product": "sunboy-tangerine" } },
+        "f4": { "type": "flavor", "settings": { "product": "sunboy-mango" } },
+        "f5": { "type": "flavor", "settings": { "product": "coconut" } },
+        "f6": { "type": "flavor", "settings": { "product": "peach" } },
+        "f7": { "type": "flavor", "settings": { "product": "guava" } }
+      },
+      "block_order": ["f1", "f2", "f3", "f4", "f5", "f6", "f7"]
+    },
+    "find": {
+      "type": "sb-find-us",
       "settings": {
-        "title": "Featured products",
-        "heading_size": "h2",
-        "description": "",
-        "show_description": false,
-        "description_style": "body",
-        "collection": "all",
-        "products_to_show": 8,
-        "columns_desktop": 4,
-        "color_scheme": "scheme-1",
-        "full_width": false,
-        "show_view_all": true,
-        "view_all_style": "solid",
-        "enable_desktop_slider": false,
-        "swipe_on_mobile": false,
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "columns_mobile": "2",
-        "padding_top": 44,
-        "padding_bottom": 36
+        "color_scheme": "scheme-2",
+        "eyebrow": "Thousands of stores nationwide",
+        "heading": "Find SUNBOY",
+        "subheading": "Pop in your ZIP and we'll point you to the nearest cooler.",
+        "placeholder": "Your ZIP code",
+        "button_label": "Search",
+        "finder_url": "/pages/find-us",
+        "retailers": "Target, H-E-B, Whole Foods Market, Trader Joe's, Total Wine & More, Harris Teeter, Kroger, Lowes Foods",
+        "art_fallback": "sb-sunman-loungechair.png"
       }
+    },
+    "origin": {
+      "type": "sb-split",
+      "settings": {
+        "color_scheme": "scheme-5",
+        "fallback": "sb-life-1.jpg",
+        "flip": false,
+        "eyebrow": "Spread joy with coconuts",
+        "heading": "It started with a bike cart on the Brooklyn Bridge.",
+        "body": "<p>In the early 2010s, Luke McKenna and Yair Tygiel built a bicycle-powered coconut cart and started throwing tropical parties in the streets of New York. Within a few years CoCo & Co was serving fresh coconut cocktails for Bacardi, Diageo, and Pernod Ricard.</p><p>People who drank coconut cocktails all day felt fine the next morning. So we put that in a can. Same premise as the bike cart: coconuts make people happy, and the good part of the night should not cost you the morning.</p>",
+        "button_label": "Read our story",
+        "button_link": "/pages/about"
+      }
+    },
+    "truths": {
+      "type": "sb-pillars",
+      "settings": { "color_scheme": "scheme-3", "heading": "" },
+      "blocks": {
+        "p1": { "type": "pillar", "settings": { "title": "Real coconut water", "body": "Hydrating young coconut water with naturally occurring electrolytes. Never sunscreeny, never earthy." } },
+        "p2": { "type": "pillar", "settings": { "title": "Real fruit", "body": "Real fruit juice and puree. Zero artificial flavors, zero added sugar. Real juice settles, so flip before you sip." } },
+        "p3": { "type": "pillar", "settings": { "title": "Really spiked", "body": "A smooth, gluten-free 5% alcohol base. Low fizz, no bloat. Not flat, and not a seltzer." } }
+      },
+      "block_order": ["p1", "p2", "p3"]
+    },
+    "palms": {
+      "type": "sb-mood",
+      "settings": { "color_scheme": "scheme-1", "ratio": "21 / 9", "gap": false },
+      "blocks": {
+        "t1": { "type": "tile", "settings": { "fallback": "sb-life-6.jpg", "eyebrow": "SUNBOY goods", "title": "From our palms to yours.", "link_label": "Shop the goods", "link": "/collections/all" } }
+      },
+      "block_order": ["t1"]
+    },
+    "goods": {
+      "type": "sb-goods",
+      "settings": { "color_scheme": "scheme-1", "eyebrow": "SUNBOY goods", "heading": "Gear for golden hour", "link_label": "Shop all", "link": "/collections/all" },
+      "blocks": {
+        "g1": { "type": "item", "settings": { "product": "sunboy-corduroy-hat" } },
+        "g2": { "type": "item", "settings": { "product": "sunboy-retro-cooler" } },
+        "g3": { "type": "item", "settings": { "product": "sunboy-crewneck" } },
+        "g4": { "type": "item", "settings": { "product": "sunboy-polo" } },
+        "g5": { "type": "item", "settings": { "product": "sunboy-tournament-grade-solid-wood-cornhole-set" } },
+        "g6": { "type": "item", "settings": { "product": "metal-sunboy-bucket" } },
+        "g7": { "type": "item", "settings": { "product": "sunboy-t-shirt" } },
+        "g8": { "type": "item", "settings": { "product": "sunboy-stickers-50-pack" } }
+      },
+      "block_order": ["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8"]
+    },
+    "press": {
+      "type": "sb-press",
+      "settings": { "color_scheme": "scheme-1", "eyebrow": "As seen in", "speed": 50 },
+      "blocks": {
+        "o1": { "type": "outlet", "settings": { "name": "Forbes" } },
+        "o2": { "type": "outlet", "settings": { "name": "Rolling Stone" } },
+        "o3": { "type": "outlet", "settings": { "name": "Food & Wine" } },
+        "o4": { "type": "outlet", "settings": { "name": "Gear Patrol" } },
+        "o5": { "type": "outlet", "settings": { "name": "SPY" } },
+        "o6": { "type": "outlet", "settings": { "name": "Hop Culture" } },
+        "o7": { "type": "outlet", "settings": { "name": "BevNet" } },
+        "o8": { "type": "outlet", "settings": { "name": "NEXTY Awards" } }
+      },
+      "block_order": ["o1", "o2", "o3", "o4", "o5", "o6", "o7", "o8"]
     }
   },
-  "order": [
-    "image_banner",
-    "featured_collection"
-  ]
+  "order": ["hero", "statement", "lineup", "find", "origin", "truths", "palms", "goods", "press"]
 }

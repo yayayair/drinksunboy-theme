@@ -1,0 +1,27 @@
+<section class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="sb-wrap sb-flip">
+    {%- if section.settings.art != blank -%}
+      {{ section.settings.art | image_url: width: 500 | image_tag: class: 'sb-flip__art', loading: 'lazy', alt: '' }}
+    {%- elsif section.settings.art_fallback != blank -%}
+      <img class="sb-flip__art" src="{{ section.settings.art_fallback | asset_url }}" alt="" loading="lazy">
+    {%- endif -%}
+    <div>
+      <h2 class="sb-display sb-flip__title">{{ section.settings.heading }}</h2>
+      <div class="sb-flip__body">{{ section.settings.body }}</div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SUNBOY note",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-3" },
+    { "type": "image_picker", "id": "art", "label": "Illustration" },
+    { "type": "text", "id": "art_fallback", "label": "Fallback theme image" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Flip before you sip." },
+    { "type": "richtext", "id": "body", "label": "Text", "default": "<p>Real fruit juice settles. Give the can a gentle flip before opening and everything comes back together.</p>" }
+  ],
+  "presets": [ { "name": "SUNBOY note" } ]
+}
+{% endschema %}

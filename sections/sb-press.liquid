@@ -1,0 +1,41 @@
+<section class="color-{{ section.settings.color_scheme }} gradient sb-press" aria-label="Press">
+  {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow" style="text-align:center">{{ section.settings.eyebrow }}</p>{%- endif -%}
+  <div class="sb-marquee" style="--sb-speed: {{ section.settings.speed }}s;">
+    <div class="sb-marquee__track">
+      {%- for pass in (1..2) -%}
+        {%- for i in (1..2) -%}
+          {%- for block in section.blocks -%}
+            <span class="sb-marquee__item" {% if pass > 1 or i > 1 %}aria-hidden="true"{% endif %} {{ block.shopify_attributes }}>
+              {%- if block.settings.logo != blank -%}
+                {{ block.settings.logo | image_url: height: 80 | image_tag: style: 'height:3.2rem;width:auto', alt: block.settings.name }}
+              {%- else -%}{{ block.settings.name }}{%- endif -%}
+              {% render 'sb-sun' %}
+            </span>
+          {%- endfor -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SUNBOY press bar",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "As seen in" },
+    { "type": "range", "id": "speed", "label": "Seconds per loop", "min": 10, "max": 120, "step": 5, "default": 50 }
+  ],
+  "blocks": [
+    {
+      "type": "outlet",
+      "name": "Outlet",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Name", "default": "Forbes" },
+        { "type": "image_picker", "id": "logo", "label": "Logo (optional)" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "SUNBOY press bar" } ]
+}
+{% endschema %}
