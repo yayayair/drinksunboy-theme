@@ -8,6 +8,12 @@ export function originOf(req) {
   try { return new URL(r).origin; } catch { return ''; }
 }
 
+// Vercel parses JSON bodies; accept text bodies too.
+export function body(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  try { return JSON.parse(req.body || '{}'); } catch { return {}; }
+}
+
 // Returns true if the request may proceed. Sets CORS headers for allowed origins.
 export function guard(req, res) {
   const origin = originOf(req);
@@ -17,7 +23,8 @@ export function guard(req, res) {
   }
   res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Vary', 'Origin');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.status(204).end(); return false; }
   if (!rateOk(clientIp(req))) { res.status(429).json({ error: 'slow down' }); return false; }
   return true;
