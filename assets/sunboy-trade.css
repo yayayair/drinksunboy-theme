@@ -95,3 +95,4 @@
 .sb-tadmin__inv table { width: 100%; border-collapse: collapse; margin: .8rem 0 1.2rem; }
 .sb-tadmin__inv th, .sb-tadmin__inv td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid rgba(82,59,24,.12); }
 .sb-tadmin__ok { display: flex; gap: .8rem; align-items: center; margin-bottom: 1rem; }
+.sb-trade__ctas .sb-btn:not(.sb-btn--yellow) { color: inherit; border-color: currentColor; }
