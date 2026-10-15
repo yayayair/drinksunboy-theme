@@ -306,6 +306,14 @@
   }
   function drawMap(stores, keepView) {
     if (!window.mapboxgl) { window.addEventListener('load', function () { drawMap(stores, keepView); }, { once: true }); return; }
+    // the Mapbox public token comes from the finder service (or the section setting, if filled in)
+    if (!root.dataset.mapbox) {
+      if (!drawMap.waiting) {
+        drawMap.waiting = true;
+        fetch(API + '/api/config').then(function (r) { return r.json(); }).then(function (c) { root.dataset.mapbox = c.mapbox || ''; drawMap.waiting = false; if (root.dataset.mapbox) drawMap(state.stores, keepView); });
+      }
+      return;
+    }
     var el = root.querySelector('[data-sb-map]');
     if (!map) {
       mapboxgl.accessToken = root.dataset.mapbox;
@@ -475,7 +483,7 @@
     { "type": "text", "id": "note", "label": "Small print", "default": "Stores update as shelves restock. Call ahead to check your flavor is in." },
     { "type": "range", "id": "days", "label": "Show spots that stocked SUNBOY in the last (days)", "min": 14, "max": 90, "step": 1, "default": 60 },
     { "type": "text", "id": "api_base", "label": "Finder service URL", "default": "https://sunboy-finder.vercel.app" },
-    { "type": "text", "id": "mapbox_token", "label": "Mapbox public token", "info": "Starts with pk. Restrict it to drinksunboy.com in your Mapbox account." }
+    { "type": "text", "id": "mapbox_token", "label": "Mapbox public token (optional)", "info": "Leave blank to use the token stored in the finder service (Vercel → MAPBOX_PUBLIC_TOKEN)." }
   ],
   "blocks": [
     { "type": "flavor", "name": "Flavor filter", "settings": [ { "type": "product", "id": "product", "label": "Flavor product" } ] }
