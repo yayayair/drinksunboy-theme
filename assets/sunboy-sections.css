@@ -1,3 +1,4 @@
+/* SUNBOY sections — finder uses Mapbox (Oct 2026) */
 /* SUNBOY custom sections. Brand tokens live in sunboy-brand.css.liquid. */
 :root { --sb-cream: #F3EEE2; --sb-cream-2: #FFF8E7; }
 html { scroll-behavior: smooth; }
