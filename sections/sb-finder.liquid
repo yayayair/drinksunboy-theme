@@ -152,7 +152,7 @@
     return '<div class="sb-store__dot' + (s.onPremise ? ' is-on' : '') + '"></div>' +
       '<div class="sb-store__main">' +
         '<h3 class="sb-store__name" data-name>' + esc(s.gname || s.name) + '</h3>' +
-        '<p class="sb-store__addr">' + esc(addr) + '</p>' +
+        '<p class="sb-store__addr"><a href="' + esc(dir) + '" target="_blank" rel="noopener" data-dir>' + esc(addr) + '</a></p>' +
         '<p class="sb-store__meta">' + (isFinite(s.distance) ? '<span class="sb-store__dist">' + (s.distance < 0.1 ? 'Right here' : s.distance.toFixed(1) + ' mi') + '</span>' : '') + kind + stocked + '</p>' +
         carries(s) +
         '<p class="sb-store__hours" data-hours>' + hoursLine(h) + '</p>' +
@@ -231,7 +231,7 @@
     var s = state.stores[el.dataset.i != null ? +el.dataset.i : state.sel], nm = el.querySelector('[data-name]');
     if (nm && s && s.gname) nm.textContent = s.gname;
     var hl = el.querySelector('[data-hours]'); if (hl) hl.innerHTML = hoursLine(h);
-    var a = el.querySelector('[data-dir]'); if (a && h.mapsUrl) a.href = h.mapsUrl;
+    if (h.mapsUrl) el.querySelectorAll('[data-dir]').forEach(function (a) { a.href = h.mapsUrl; });
   }
   var io;
   function watchHours() {
