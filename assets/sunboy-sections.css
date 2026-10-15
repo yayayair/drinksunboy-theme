@@ -332,7 +332,8 @@ form.is-done .sb-mc-done { display: block; }
 .sb-store__has { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; margin: 0 0 .4rem; font-size: 1.35rem; font-weight: 700; }
 .sb-has { display: inline-flex; align-items: center; gap: .5rem; }
 .sb-has::before { content: ""; width: .9rem; height: .9rem; border-radius: 50%; background: var(--dot, var(--sb-teal)); }
-.sb-has--pack::before { border-radius: .2rem; background: none; border: 2px solid currentColor; width: .7rem; height: .7rem; }
+.sb-has--pack::before { content: none; }
+.sb-has--pack img { width: auto; height: 2.6rem; object-fit: contain; margin: -.3rem 0; }
 .sb-store__sizes { margin: 0 0 .8rem; font-size: 1.3rem; opacity: .75; }
 .sb-seg { display: inline-flex; border: 2px solid currentColor; border-radius: 999px; padding: .3rem; gap: .2rem; flex-wrap: wrap; justify-content: center; }
 .sb-seg button { background: none; border: 0; color: inherit; font: inherit; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: 1.2rem; padding: .7rem 1.4rem; border-radius: 999px; cursor: pointer; }

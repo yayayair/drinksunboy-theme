@@ -11,7 +11,7 @@
     <form class="sb-find__form" action="{{ finder }}" method="get" role="search">
       {%- if template.name == 'product' and product.metafields.sunboy.hero_line != blank -%}<input type="hidden" name="flavor" value="{{ product.handle | remove_first: 'sunboy-' }}">{%- endif -%}
       <label class="visually-hidden" for="sb-zip-{{ section.id }}">ZIP code</label>
-      <input class="sb-find__input" id="sb-zip-{{ section.id }}" name="zip" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" placeholder="{{ section.settings.placeholder | escape }}" required>
+      <input class="sb-find__input" id="sb-zip-{{ section.id }}" name="zip" type="search" enterkeyhint="search" maxlength="160" autocomplete="postal-code" placeholder="{{ section.settings.placeholder | escape }}" required>
       <button class="sb-btn sb-btn--yellow" type="submit">{{ section.settings.button_label }}</button>
     </form>
     <button class="sb-find__geo" type="button" data-sb-geo="{{ finder }}">Use my location</button>
@@ -71,7 +71,7 @@
     { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Thousands of stores nationwide" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Find SUNBOY" },
     { "type": "text", "id": "subheading", "label": "Text", "default": "Pop in your ZIP and we'll point you to the nearest cooler." },
-    { "type": "text", "id": "placeholder", "label": "ZIP placeholder", "default": "Your ZIP code" },
+    { "type": "text", "id": "placeholder", "label": "Search placeholder", "default": "ZIP, city or address" },
     { "type": "text", "id": "button_label", "label": "Button", "default": "Search" },
     { "type": "url", "id": "finder_url", "label": "Find Us page" },
     { "type": "text", "id": "retail_label", "label": "Retailer row label", "default": "Or grab it at" },

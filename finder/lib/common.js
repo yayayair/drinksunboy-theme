@@ -29,7 +29,7 @@ export function clientIp(req) {
 
 const hits = new Map();
 function rateOk(ip) {
-  const now = Date.now(), win = 10 * 60 * 1000, max = 80;
+  const now = Date.now(), win = 10 * 60 * 1000, max = 240;
   const list = (hits.get(ip) || []).filter(t => now - t < win);
   list.push(now); hits.set(ip, list);
   if (hits.size > 5000) hits.clear();

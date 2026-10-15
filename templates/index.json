@@ -157,7 +157,7 @@
         "eyebrow": "Thousands of stores nationwide",
         "heading": "Find SUNBOY",
         "subheading": "Pop in your ZIP and we'll point you to the nearest cooler.",
-        "placeholder": "Your ZIP code",
+        "placeholder": "ZIP, city or address",
         "button_label": "Search",
         "finder_url": "/pages/find-us",
         "art_fallback": "sb-sunman-loungechair.png",
