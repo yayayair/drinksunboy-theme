@@ -1,4 +1,4 @@
-// GET /api/hours?name=..&address=..&lat=..&lng=..  → today's hours + open now (Google Places, cached 1 day at the edge)
+// GET /api/hours?name=..&address=..&lat=..&lng=..  → Google's listing name, today's hours + open now (Google Places, cached 1 day at the edge)
 import { guard } from '../lib/common.js';
 
 export default async function handler(req, res) {
@@ -22,6 +22,7 @@ export default async function handler(req, res) {
     if (!r.ok) { console.error('places', r.status, JSON.stringify(d).slice(0, 300)); return res.status(502).json({ error: 'hours unavailable' }); }
     const p = (d.places || [])[0];
     const out = p ? {
+      name: p.displayName?.text || null,
       mapsUrl: p.googleMapsUri || null,
       closed: p.businessStatus && p.businessStatus !== 'OPERATIONAL',
       week: p.regularOpeningHours?.weekdayDescriptions || [],

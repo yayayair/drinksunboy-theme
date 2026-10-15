@@ -39,8 +39,15 @@ function rateOk(ip) {
 export const isZip = v => /^\d{5}$/.test(String(v || ''));
 export const num = (v, lo, hi) => { const n = Number(v); return Number.isFinite(n) && n >= lo && n <= hi ? n : null; };
 
+// VIP names arrive upper-case and sometimes HTML-encoded ("CRAFT &amp; CARRY").
+export function decode(s) {
+  return String(s || '').replace(/&(amp|#38);/gi, '&').replace(/&(#39|apos|#x27);/gi, "'").replace(/&quot;/gi, '"')
+    .replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n)).replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
+}
+const SMALL = /\b(And|Of|At|In|On|The|By|For|To)\b/g;
 export function titleCase(s) {
-  return String(s || '').toLowerCase().replace(/\b([a-z])/g, m => m.toUpperCase())
-    .replace(/\b(Llc|Inc|Usa|Nyc|Bbq|Cvs|Ipa)\b/g, m => m.toUpperCase()).replace(/'S\b/g, "'s")
+  const t = decode(s).toLowerCase().replace(/\b([a-z])/g, m => m.toUpperCase())
+    .replace(/\b(Llc|Inc|Usa|Nyc|Bbq|Cvs|Ipa|Ues|Uws)\b/g, m => m.toUpperCase()).replace(/'S\b/g, "'s")
     .replace(/\bTrader Joes\b/g, "Trader Joe's").replace(/\bH E B\b|\bHeb\b/g, 'H-E-B').replace(/\bMc([a-z])/g, (m, c) => 'Mc' + c.toUpperCase());
+  return t.replace(SMALL, (m, w, i) => (i === 0 ? m : m.toLowerCase()));
 }

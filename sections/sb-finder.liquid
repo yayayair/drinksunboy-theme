@@ -142,7 +142,7 @@
     var dir = (h && h.mapsUrl) || 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(s.name + ', ' + addr);
     return '<div class="sb-store__num">' + (i + 1) + '</div>' +
       '<div class="sb-store__main">' +
-        '<h3 class="sb-store__name">' + esc(s.name) + '</h3>' +
+        '<h3 class="sb-store__name" data-name>' + esc(s.gname || s.name) + '</h3>' +
         '<p class="sb-store__addr">' + esc(addr) + '</p>' +
         '<p class="sb-store__meta"><span class="sb-store__dist">' + (s.distance < 0.1 ? 'Right here' : s.distance.toFixed(1) + ' mi') + '</span>' + kind + stocked + '</p>' +
         carries(s) +
@@ -184,10 +184,27 @@
   function loadHours(i, done) {
     if (hoursCache[i]) { done(hoursCache[i]); return; }
     var s = state.stores[i];
-    var q = new URLSearchParams({ name: s.name, address: s.street + ', ' + s.city + ', ' + s.state + ' ' + s.zip, lat: s.lat, lng: s.lng });
-    fetch(API + '/api/hours?' + q).then(function (r) { return r.json(); }).then(function (h) { hoursCache[i] = h; done(h); }).catch(function () {});
+    var q = new URLSearchParams({ name: s.name, address: s.street + ', ' + s.city + ', ' + s.state + ' ' + s.zip, lat: s.lat, lng: s.lng, v: 2 });
+    fetch(API + '/api/hours?' + q).then(function (r) { return r.json(); }).then(function (h) {
+      hoursCache[i] = h;
+      if (h.name && sameStore(s.name, h.name)) s.gname = h.name;
+      done(h);
+    }).catch(function () {});
+  }
+  // Google's listing name is usually the cleanest ("Craft + Carry" vs VIP's "CRAFT & CARRY R").
+  // Only use it when most of the words match, so a wrong Google hit never renames a store.
+  function words(n) {
+    return String(n).toLowerCase().replace(/&|\+/g, ' and ').replace(/['’`.]/g, '').split(/[^a-z0-9]+/)
+      .filter(function (w) { return w.length > 1 && !/^(the|and|of|at|store|inc|llc|nyc|ny|co|company|shop|market|deli|bar|restaurant)$/.test(w); });
+  }
+  function sameStore(a, b) {
+    var A = words(a), B = words(b); if (!A.length || !B.length || b.length > 48) return false;
+    var hit = A.filter(function (w) { return B.indexOf(w) > -1 || B.some(function (x) { return x.length > 3 && (x.indexOf(w) === 0 || w.indexOf(x) === 0); }); }).length;
+    return hit / A.length > 0.5 && hit / B.length >= 0.5;
   }
   function paintHours(el, h) {
+    var s = state.stores[+el.dataset.i] || state.stores[state.sel], nm = el.querySelector('[data-name]');
+    if (nm && s && s.gname) { nm.textContent = s.gname; if (markers[+(el.dataset.i || state.sel)]) markers[+(el.dataset.i || state.sel)].options.title = s.gname; }
     var hl = el.querySelector('[data-hours]'); if (hl) hl.innerHTML = hoursLine(h);
     var a = el.querySelector('[data-dir]'); if (a && h.mapsUrl) a.href = h.mapsUrl;
   }
