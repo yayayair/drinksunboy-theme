@@ -6,7 +6,11 @@
 {{ 'sunboy-trade.css' | asset_url | stylesheet_tag }}
 {%- liquid
   assign api = section.settings.api_base | default: 'https://sunboy-finder.vercel.app'
-  assign login = routes.account_login_url | append: '?return_url=' | append: request.path | append: '&return_to=' | append: request.path
+  assign sep = '?'
+  if routes.account_login_url contains '?'
+    assign sep = '&'
+  endif
+  assign login = routes.account_login_url | append: sep | append: 'return_url=' | append: request.path | append: '&return_to=' | append: request.path
   if customer
     assign ts = 'now' | date: '%s'
     assign payload = customer.id | append: '.' | append: ts
