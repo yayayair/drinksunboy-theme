@@ -402,10 +402,10 @@ html.sb-noscroll, html.sb-noscroll body { overflow: hidden; }
 .sb-finder__maptoggle { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 5; box-shadow: 0 8px 20px rgba(0,0,0,.2); }
 @media (min-width: 990px) { .sb-finder__maptoggle { display: none !important; } }
 .sb-pin { background: none; border: 0; }
-.sb-pin span { width: 100%; height: 100%; background: var(--sb-teal); color: #fff; border: 2px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 700 1.2rem/1 var(--font-body-family); box-shadow: 0 2px 6px rgba(0,0,0,.3); transition: transform .15s, background .15s; box-sizing: border-box; }
+.sb-pin span { width: 100%; height: 100%; background: var(--sb-teal); color: #fff; border: 2px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 700 1.25rem/1 var(--font-heading-family); padding-top: .1rem; box-shadow: 0 2px 6px rgba(0,0,0,.3); transition: transform .15s, background .15s; box-sizing: border-box; }
 .sb-pin--on span { background: var(--sb-brown); }
 .sb-pin.is-hl span { transform: scale(1.3); }
-.sb-pin.is-sel span { background: var(--sb-yellow); color: var(--sb-brown); border-color: var(--sb-brown); border-width: 3px; transform: scale(1.5); }
+.sb-pin.is-sel span { background: var(--sb-yellow); color: var(--sb-brown); border-color: var(--sb-brown); border-width: 3px; transform: scale(1.4); }
 .sb-finder__online { margin-top: 4rem; text-align: center; }
 .sb-finder__online .sb-btn { margin: .4rem; color: var(--sb-brown); }
 .sb-finder__note { text-align: center; font-size: 1.3rem; opacity: .7; margin-top: 3.2rem; }

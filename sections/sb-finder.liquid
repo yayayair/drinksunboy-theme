@@ -98,6 +98,8 @@
     history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : '') + location.hash);
   }
   function mi(n) { return n + (n === 1 ? ' mile' : ' miles'); }
+  // First letter of the spot's name for its pin ("The Belfry" → B, "124 Old Rabbit Club" → 1)
+  function initial(n) { var m = String(n || '').replace(/^the\s+/i, '').match(/[a-z0-9]/i); return m ? m[0].toUpperCase() : ''; }
   function keyOf(s) { return (s.name + '|' + s.street).toLowerCase(); }
   function miles(a, b) {
     var R = 3958.8, t = Math.PI / 180, dLat = (b.lat - a.lat) * t, dLng = (b.lng - a.lng) * t;
@@ -300,7 +302,7 @@
       if (!isFinite(s.lat) || !isFinite(s.lng)) return;
       var m = byKey[s.key];
       if (!m) {
-        var icon = L.divIcon({ className: 'sb-pin' + (s.onPremise ? ' sb-pin--on' : ''), html: '<span></span>', iconSize: [22, 22], iconAnchor: [11, 11] });
+        var icon = L.divIcon({ className: 'sb-pin' + (s.onPremise ? ' sb-pin--on' : ''), html: '<span>' + esc(initial(s.gname || s.name)) + '</span>', iconSize: [26, 26], iconAnchor: [13, 13] });
         m = byKey[s.key] = L.marker([s.lat, s.lng], { icon: icon, keyboard: true, title: s.gname || s.name }).addTo(layer);
         (function (k) { m.on('click', function () { var j = state.stores.findIndex(function (x) { return x.key === k; }); if (j > -1) select(j, 'pin'); }); })(s.key);
       }
