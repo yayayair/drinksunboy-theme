@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "sb-trade",
+      "settings": {
+        "eyebrow": "SUNBOY Team",
+        "heading": "Team Shop",
+        "signed_out_text": "POS and merch for RSMs and the SUNBOY team. Paid by SUNBOY; every order is approved by Yair or Sam."
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "main": {
+      "type": "sb-trade",
+      "settings": {
+        "eyebrow": "SUNBOY Trade",
+        "heading": "Distributor Shop"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "sb-trade-admin",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
