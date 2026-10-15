@@ -1,0 +1,92 @@
+{%- comment -%}
+  SUNBOY trade shop (Distributor Shop page, and the team shop for RSMs and internal staff).
+  - Signed out: sign-in button + "request an account" form (a normal Shopify contact form to the store inbox).
+  - Signed in: the page signs "<customer id>.<time>" with a private shop key; the finder service checks it,
+    looks up the customer's tags and co-op %, and returns the catalog they're allowed to order from.
+  Trade products stay hidden drafts in Shopify, so consumers can never see or buy them.
+{%- endcomment -%}
+{{ 'sunboy-trade.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign api = section.settings.api_base | default: 'https://sunboy-finder.vercel.app'
+  assign login = routes.account_login_url | append: '?return_url=' | append: request.path | append: '&return_to=' | append: request.path
+  if customer
+    assign ts = 'now' | date: '%s'
+    assign payload = customer.id | append: '.' | append: ts
+    assign key = shop.metafields.sunboy_private.trade_key.value | default: shop.metafields.sunboy_private.trade_key
+    assign sig = payload | hmac_sha256: key
+    assign token = payload | append: '.' | append: sig
+  endif
+-%}
+<section class="sb-trade" id="sb-trade-{{ section.id }}" data-mode="{{ section.settings.mode }}">
+  <div class="sb-trade__hero color-{{ section.settings.color_scheme }} gradient">
+    <div class="sb-wrap">
+      <p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>
+      <h1 class="sb-display sb-trade__title">{{ section.settings.heading }}</h1>
+      {%- if customer -%}
+        <p class="sb-trade__hi" data-hi>Hi {{ customer.first_name | default: customer.name | escape }}. Loading your shop…</p>
+      {%- else -%}
+        <p class="sb-trade__lede">{{ section.settings.signed_out_text }}</p>
+        <div class="sb-trade__ctas">
+          <a class="sb-btn sb-btn--yellow" href="{{ login }}">Sign in</a>
+          <a class="sb-btn" href="#sb-trade-apply">Request an account</a>
+        </div>
+        <p class="sb-trade__small">Sign in with your work email. We’ll send you a one-time code, no password needed.</p>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if customer -%}
+    <div class="sb-trade__app" data-trade-app data-api="{{ api }}" data-token="{{ token }}" data-cid="{{ customer.id }}"
+      data-brandkit="{{ section.settings.brand_kit_url }}" data-marketing="{{ section.settings.marketing_url }}"
+      data-admin-url="{{ section.settings.admin_page_url | default: '/pages/trade-admin' }}" data-logout="{{ routes.account_logout_url }}">
+      <div class="sb-trade__status" data-status><span class="sb-finder__spin"></span> Opening the shop…</div>
+    </div>
+  {%- endif -%}
+
+  <div class="sb-trade__apply" id="sb-trade-apply" {% if customer %}hidden data-apply{% endif %}>
+    <div class="sb-wrap sb-trade__applywrap">
+      <h2 class="sb-display sb-trade__h2">{{ section.settings.apply_heading }}</h2>
+      <p>{{ section.settings.apply_text }}</p>
+      {%- form 'contact', class: 'sb-trade__form' -%}
+        {%- if form.posted_successfully? -%}
+          <p class="sb-trade__ok">Thanks! We’ll set up your account and let you know when you can sign in.</p>
+        {%- else -%}
+          {{ form.errors | default_errors }}
+          <input type="hidden" name="contact[tags]" value="trade-application">
+          <input type="hidden" name="contact[Request]" value="Trade account">
+          <label>Your name<input name="contact[name]" required autocomplete="name" value="{{ customer.name }}"></label>
+          <label>Work email<input type="email" name="contact[email]" required autocomplete="email" value="{{ customer.email }}"></label>
+          <label>Distributor<input name="contact[Distributor]" required autocomplete="organization"></label>
+          <label>State(s) you cover<input name="contact[States]" required></label>
+          <label>Phone<input name="contact[phone]" autocomplete="tel"></label>
+          <label class="sb-trade__wide">Anything else?<textarea name="contact[body]" rows="3"></textarea></label>
+          <button class="sb-btn sb-btn--solid" type="submit">Request account</button>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{%- if customer -%}
+<script src="{{ 'sunboy-trade.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "SUNBOY trade shop",
+  "settings": [
+    { "type": "select", "id": "mode", "label": "Page", "default": "shop", "options": [ { "value": "shop", "label": "Trade shop" } ] },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme (top)", "default": "scheme-2" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "SUNBOY Trade" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Distributor Shop" },
+    { "type": "textarea", "id": "signed_out_text", "label": "Signed-out text", "default": "POS, merch and display gear at SUNBOY cost, with your co-op applied automatically. Billed to your SUNBOY account." },
+    { "type": "text", "id": "brand_kit_url", "label": "Brand Kit link", "default": "https://www.dropbox.com/scl/fo/0l75aqg155lgavs54rs9f/AM1veY6WjzCG-pwlCBnIu4E?rlkey=mrpo2luje87s0bytf3wll6j0a&st=fy1bx0vy&dl=0" },
+    { "type": "text", "id": "marketing_url", "label": "Trade Marketing link", "default": "https://www.dropbox.com/scl/fo/zquyz28alpil7xfrpa2nr/ACmuJEgPIfnxJG3sKr2tCSI?rlkey=kkbduq856ty450i0nivytnd4w&st=bob15n41&dl=0" },
+    { "type": "text", "id": "apply_heading", "label": "Request heading", "default": "New to SUNBOY Trade?" },
+    { "type": "textarea", "id": "apply_text", "label": "Request text", "default": "Distributor reps can request an account. Once approved, sign in with your work email." },
+    { "type": "text", "id": "admin_page_url", "label": "Admin page", "default": "/pages/trade-admin" },
+    { "type": "text", "id": "api_base", "label": "Trade service URL", "default": "https://sunboy-finder.vercel.app" }
+  ],
+  "presets": [ { "name": "SUNBOY trade shop" } ]
+}
+{% endschema %}

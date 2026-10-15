@@ -1,0 +1,44 @@
+{%- comment -%}
+  SUNBOY trade admin (hidden page, only works for customers tagged trade-admin).
+  Approve / edit / reject team and carton orders, and create QuickBooks invoices one click at a time.
+  Invoices are created unsent; nothing on this page emails anyone.
+{%- endcomment -%}
+{{ 'sunboy-trade.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign api = section.settings.api_base | default: 'https://sunboy-finder.vercel.app'
+  assign login = routes.account_login_url | append: '?return_url=' | append: request.path | append: '&return_to=' | append: request.path
+  if customer
+    assign ts = 'now' | date: '%s'
+    assign payload = customer.id | append: '.' | append: ts
+    assign key = shop.metafields.sunboy_private.trade_key.value | default: shop.metafields.sunboy_private.trade_key
+    assign sig = payload | hmac_sha256: key
+    assign token = payload | append: '.' | append: sig
+  endif
+-%}
+<section class="sb-trade sb-tadmin">
+  <div class="sb-trade__hero color-{{ section.settings.color_scheme }} gradient">
+    <div class="sb-wrap">
+      <p class="sb-eyebrow">SUNBOY Trade</p>
+      <h1 class="sb-display sb-trade__title">Approvals &amp; invoices</h1>
+      {%- unless customer -%}
+        <div class="sb-trade__ctas"><a class="sb-btn sb-btn--yellow" href="{{ login }}">Sign in</a></div>
+      {%- endunless -%}
+    </div>
+  </div>
+  {%- if customer -%}
+    <div class="sb-tadmin__app" data-admin-app data-api="{{ api }}" data-token="{{ token }}">
+      <div class="sb-trade__status"><span class="sb-finder__spin"></span> Loading…</div>
+    </div>
+    <script src="{{ 'sunboy-trade-admin.js' | asset_url }}" defer></script>
+  {%- endif -%}
+</section>
+{% schema %}
+{
+  "name": "SUNBOY trade admin",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme (top)", "default": "scheme-2" },
+    { "type": "text", "id": "api_base", "label": "Trade service URL", "default": "https://sunboy-finder.vercel.app" }
+  ],
+  "presets": [ { "name": "SUNBOY trade admin" } ]
+}
+{% endschema %}
