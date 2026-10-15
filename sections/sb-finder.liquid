@@ -284,6 +284,13 @@
     sheetBody.innerHTML = '<div class="sb-store is-sel" data-i="' + i + '">' + card(state.stores[i], i) + '</div>';
     peekEl.hidden = false; peekEl.classList.remove('is-tall');
     requestAnimationFrame(function () { root.classList.add('has-sheet'); });
+    // keep the tapped pin visible above the card
+    setTimeout(function () {
+      var m = markers[i]; if (!m || !map) return;
+      var pt = map.latLngToContainerPoint(m.getLatLng()), mh = map.getSize().y;
+      var r = map.getContainer().getBoundingClientRect(), visible = Math.min(mh, peekEl.getBoundingClientRect().top - r.top);
+      if (pt.y > visible - 40 || pt.y < 40) { quiet(); map.panBy([0, pt.y - visible / 2]); }
+    }, 280);
     loadHours(i, function (h) { if (state.sel === i) paintHours(sheetBody, h); });
   }
   function closeSheet() {
