@@ -1,10 +1,10 @@
 {%- comment -%}
   SUNBOY store finder. Live data from VIP/SRS (stores that bought SUNBOY recently) via the
-  sunboy-finder service on Vercel, plus store hours from Google. Map: Leaflet + OpenStreetMap tiles.
+  sunboy-finder service on Vercel, plus store hours from Google. Map: Mapbox GL JS (light style recoloured to SUNBOY tones; public token in section settings).
   URL params: ?zip=10003 | ?lat=..&lng=..  &flavor=coconut  &miles=25  &type=on|off
 {%- endcomment -%}
-{{ 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css' | stylesheet_tag }}
-<section class="sb-finder" id="sb-finder" data-api="{{ section.settings.api_base | default: 'https://sunboy-finder.vercel.app' }}" data-days="{{ section.settings.days }}" data-pack-classic="{{ 'sb-pack-classic-xs.webp' | asset_url }}" data-pack-refresher="{{ 'sb-pack-refresher-xs.webp' | asset_url }}" data-can="{{ 'sb-mini-can-coconut.webp' | asset_url }}">
+{{ 'https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css' | stylesheet_tag }}
+<section class="sb-finder" id="sb-finder" data-api="{{ section.settings.api_base | default: 'https://sunboy-finder.vercel.app' }}" data-days="{{ section.settings.days }}" data-pack-classic="{{ 'sb-pack-classic-xs.webp' | asset_url }}" data-pack-refresher="{{ 'sb-pack-refresher-xs.webp' | asset_url }}" data-can="{{ 'sb-mini-can-coconut.webp' | asset_url }}" data-mapbox="{{ section.settings.mapbox_token | escape }}">
   <div class="sb-finder__top color-{{ section.settings.color_scheme }} gradient">
     <div class="sb-wrap">
       {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
@@ -61,7 +61,7 @@
   </div>
 </section>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.js" defer></script>
 <script>
 (function () {
   var root = document.getElementById('sb-finder');
@@ -76,7 +76,7 @@
   var mobile = window.matchMedia('(max-width: 989px)');
   var state = { zip: '', q: '', lat: null, lng: null, flavor: '', miles: 25, type: 'all', data: null, stores: [], sel: null, area: 0, place: '', selKey: null, selStore: null, origin: null };
   var auto = false, autoT, moveT;
-  var map, layer, markers = {}, byKey = {}, hoursCache = {}, gnames = {};
+  var map, markers = {}, byKey = {}, hoursCache = {}, gnames = {};
   var params = new URLSearchParams(location.search);
   var COLORS = {}, NAMES = {};
   root.querySelectorAll('.sb-chip[data-flavor]').forEach(function (c) { if (c.dataset.flavor) { COLORS[c.dataset.flavor] = c.style.getPropertyValue('--chip'); NAMES[c.dataset.flavor] = c.dataset.name; } });
@@ -257,9 +257,9 @@
     state.sel = i; state.selKey = state.stores[i].key; state.selStore = state.stores[i];
     root.querySelectorAll('.sb-pin.is-sel').forEach(function (p) { p.classList.remove('is-sel'); });
     listEl.querySelectorAll('.sb-store.is-sel').forEach(function (c) { c.classList.remove('is-sel'); });
-    Object.keys(markers).forEach(function (k) { markers[k].setZIndexOffset(0); });
+    Object.keys(markers).forEach(function (k) { markers[k].getElement().style.zIndex = ''; });
     var m = markers[i], li = document.getElementById('store-' + i);
-    if (m) { m.setZIndexOffset(1000); var el = m.getElement(); if (el) el.classList.add('is-sel'); }
+    if (m) { var el = m.getElement(); el.style.zIndex = 5; el.classList.add('is-sel'); }
     if (li) li.classList.add('is-sel');
     if (from === 'restore') {
       if (!peekEl.hidden) sheetBody.innerHTML = '<div class="sb-store is-sel" data-i="' + i + '">' + card(state.stores[i], i) + '</div>';
@@ -270,10 +270,31 @@
         li.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     } else if (m && map) {
-      if (!map.getBounds().pad(-0.1).contains(m.getLatLng())) { quiet(); map.panTo(m.getLatLng()); }
+      var p = map.project(m.getLngLat()), box = map.getContainer();
+      if (p.x < box.clientWidth * .1 || p.x > box.clientWidth * .9 || p.y < box.clientHeight * .1 || p.y > box.clientHeight * .9) { quiet(); map.panTo(m.getLngLat()); }
     }
   }
 
+  // SUNBOY-toned map: cream land, soft teal water, white streets, brown labels, no POI/transit clutter.
+  function brandMap() {
+    (map.getStyle().layers || []).forEach(function (l) {
+      var id = l.id, t = l.type;
+      try {
+        if (/poi|transit|airport|aeroway|ferry|aerialway|housenum|building-number/.test(id)) { map.setLayoutProperty(id, 'visibility', 'none'); return; }
+        if (t === 'background') map.setPaintProperty(id, 'background-color', '#F6F0E4');
+        else if (/water/.test(id) && t === 'fill') map.setPaintProperty(id, 'fill-color', '#BFE4DC');
+        else if (/water/.test(id) && t === 'line') map.setPaintProperty(id, 'line-color', '#BFE4DC');
+        else if (/park|national|landuse|pitch|golf|cemetery/.test(id) && t === 'fill') map.setPaintProperty(id, 'fill-color', '#E6ECD3');
+        else if (/building/.test(id) && t === 'fill') { map.setPaintProperty(id, 'fill-color', '#EEE5D4'); map.setPaintProperty(id, 'fill-outline-color', '#E4D8C2'); }
+        else if (/land/.test(id) && t === 'fill') map.setPaintProperty(id, 'fill-color', '#F6F0E4');
+        else if (/road|street|bridge|tunnel|path/.test(id) && t === 'line') map.setPaintProperty(id, 'line-color', /case/.test(id) ? '#E9DDC7' : '#FFFFFF');
+        else if (t === 'symbol') {
+          map.setPaintProperty(id, 'text-color', /road|street/.test(id) ? '#9A8466' : '#6B5537');
+          map.setPaintProperty(id, 'text-halo-color', '#F6F0E4');
+        }
+      } catch (e) {}
+    });
+  }
   function quiet() { auto = true; clearTimeout(autoT); autoT = setTimeout(function () { auto = false; }, 900); }
   // Search this area: when someone drags or zooms the map, look again around what they're looking at.
   function areaSearch() {
@@ -284,34 +305,42 @@
     search({ keepView: true });
   }
   function drawMap(stores, keepView) {
-    if (!window.L) { window.addEventListener('load', function () { drawMap(stores, keepView); }, { once: true }); return; }
+    if (!window.mapboxgl) { window.addEventListener('load', function () { drawMap(stores, keepView); }, { once: true }); return; }
     var el = root.querySelector('[data-sb-map]');
     if (!map) {
-      map = L.map(el, { scrollWheelZoom: false, zoomControl: true });
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
-      layer = L.layerGroup().addTo(map);
+      mapboxgl.accessToken = root.dataset.mapbox;
+      quiet();
+      map = new mapboxgl.Map({ container: el, style: 'mapbox://styles/mapbox/light-v11', center: [state.lng || -73.99, state.lat || 40.73], zoom: 12, scrollZoom: false, dragRotate: false, pitchWithRotate: false, touchPitch: false, cooperativeGestures: false, attributionControl: true });
+      map.touchZoomRotate.disableRotation();
+      map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-left');
+      map.on('style.load', brandMap);
       map.on('click', function () { closeSheet(); });
       map.on('movestart', function () { clearTimeout(moveT); });
       map.on('moveend', function () { if (auto) return; clearTimeout(moveT); moveT = setTimeout(areaSearch, 700); });
     }
     // Pins that are still in view stay put; only new ones are added and gone ones removed.
-    if (!keepView) { layer.clearLayers(); byKey = {}; }
+    if (!keepView) { Object.keys(byKey).forEach(function (k) { byKey[k].remove(); }); byKey = {}; }
     var keep = {}, pts = [];
     markers = {};
     stores.forEach(function (s, i) {
       if (!isFinite(s.lat) || !isFinite(s.lng)) return;
       var m = byKey[s.key];
       if (!m) {
-        var icon = L.divIcon({ className: 'sb-pin' + (s.onPremise ? ' sb-pin--on' : ''), html: '<span>' + esc(initial(s.gname || s.name)) + '</span>', iconSize: [26, 26], iconAnchor: [13, 13] });
-        m = byKey[s.key] = L.marker([s.lat, s.lng], { icon: icon, keyboard: true, title: s.gname || s.name }).addTo(layer);
-        (function (k) { m.on('click', function () { var j = state.stores.findIndex(function (x) { return x.key === k; }); if (j > -1) select(j, 'pin'); }); })(s.key);
+        var pin = document.createElement('button');
+        pin.type = 'button'; pin.className = 'sb-pin' + (s.onPremise ? ' sb-pin--on' : '');
+        pin.innerHTML = '<span>' + esc(initial(s.gname || s.name)) + '</span>';
+        pin.title = s.gname || s.name; pin.setAttribute('aria-label', s.gname || s.name);
+        (function (k) { pin.addEventListener('click', function (e) { e.stopPropagation(); var j = state.stores.findIndex(function (x) { return x.key === k; }); if (j > -1) select(j, 'pin'); }); })(s.key);
+        m = byKey[s.key] = new mapboxgl.Marker({ element: pin }).setLngLat([s.lng, s.lat]).addTo(map);
       }
-      keep[s.key] = 1; markers[i] = m; pts.push([s.lat, s.lng]);
+      keep[s.key] = 1; markers[i] = m; pts.push([s.lng, s.lat]);
     });
-    Object.keys(byKey).forEach(function (k) { if (!keep[k]) { layer.removeLayer(byKey[k]); delete byKey[k]; } });
-    if (pts.length && !keepView) { quiet(); map.fitBounds(pts.slice(0, 15), { padding: [30, 30], maxZoom: 15 }); }
-    else if (!pts.length && !keepView && state.lat !== null) { quiet(); map.setView([state.lat, state.lng], 12); }
-    setTimeout(function () { quiet(); map.invalidateSize(); }, 50);
+    Object.keys(byKey).forEach(function (k) { if (!keep[k]) { byKey[k].remove(); delete byKey[k]; } });
+    map.resize();
+    if (pts.length && !keepView) {
+      var b = new mapboxgl.LngLatBounds(pts[0], pts[0]); pts.slice(0, 15).forEach(function (p) { b.extend(p); });
+      quiet(); map.fitBounds(b, { padding: 40, maxZoom: 15, duration: 0 });
+    } else if (!pts.length && !keepView && state.lat !== null) { quiet(); map.jumpTo({ center: [state.lng, state.lat], zoom: 12 }); }
     mapToggle.hidden = !pts.length;
   }
   listEl.addEventListener('click', function (e) {
@@ -321,13 +350,13 @@
   listEl.addEventListener('mouseover', function (e) {
     var li = e.target.closest('.sb-store'); root.querySelectorAll('.sb-pin.is-hl').forEach(function (p) { p.classList.remove('is-hl'); });
     if (!li || !markers[li.dataset.i]) return;
-    var el = markers[li.dataset.i].getElement(); if (el) el.classList.add('is-hl');
+    markers[li.dataset.i].getElement().classList.add('is-hl');
   });
   listEl.addEventListener('mouseleave', function () { root.querySelectorAll('.sb-pin.is-hl').forEach(function (p) { p.classList.remove('is-hl'); }); });
   function setView(showMap) {
     root.classList.toggle('show-map', showMap); mapToggle.textContent = showMap ? 'List' : 'Map';
     if (!showMap) { closeSheet(); setFull(false); }
-    if (map) setTimeout(function () { quiet(); map.invalidateSize(); }, 50);
+    if (map) setTimeout(function () { quiet(); map.resize(); }, 50);
   }
   // Phone: details slide up from the bottom when a pin is tapped. Drag the handle up for more, down to close.
   function openSheet(i) {
@@ -337,7 +366,7 @@
     // keep the tapped pin visible above the card
     setTimeout(function () {
       var m = markers[i]; if (!m || !map) return;
-      var pt = map.latLngToContainerPoint(m.getLatLng()), mh = map.getSize().y;
+      var pt = map.project(m.getLngLat()), mh = map.getContainer().clientHeight;
       var r = map.getContainer().getBoundingClientRect(), visible = Math.min(mh, peekEl.getBoundingClientRect().top - r.top);
       if (pt.y > visible - 40 || pt.y < 40) { quiet(); map.panBy([0, pt.y - visible / 2]); }
     }, 280);
@@ -364,7 +393,7 @@
   function setFull(on) {
     root.classList.toggle('is-full', on);
     document.documentElement.classList.toggle('sb-noscroll', on);
-    if (map) setTimeout(function () { quiet(); map.invalidateSize(); }, 60);
+    if (map) setTimeout(function () { quiet(); map.resize(); }, 60);
   }
   fsBtn.addEventListener('click', function () { setFull(!root.classList.contains('is-full')); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-full')) setFull(false); });
@@ -445,7 +474,8 @@
     { "type": "text", "id": "intro", "label": "Before searching", "default": "Pop in your ZIP to see coolers near you." },
     { "type": "text", "id": "note", "label": "Small print", "default": "Stores update as shelves restock. Call ahead to check your flavor is in." },
     { "type": "range", "id": "days", "label": "Show spots that stocked SUNBOY in the last (days)", "min": 14, "max": 90, "step": 1, "default": 60 },
-    { "type": "text", "id": "api_base", "label": "Finder service URL", "default": "https://sunboy-finder.vercel.app" }
+    { "type": "text", "id": "api_base", "label": "Finder service URL", "default": "https://sunboy-finder.vercel.app" },
+    { "type": "text", "id": "mapbox_token", "label": "Mapbox public token", "info": "Starts with pk. Restrict it to drinksunboy.com in your Mapbox account." }
   ],
   "blocks": [
     { "type": "flavor", "name": "Flavor filter", "settings": [ { "type": "product", "id": "product", "label": "Flavor product" } ] }
