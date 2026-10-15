@@ -4,7 +4,7 @@
   URL params: ?zip=10003 | ?lat=..&lng=..  &flavor=coconut  &miles=25  &type=on|off
 {%- endcomment -%}
 {{ 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css' | stylesheet_tag }}
-<section class="sb-finder" id="sb-finder" data-api="{{ section.settings.api_base | default: 'https://sunboy-finder.vercel.app' }}" data-days="{{ section.settings.days }}" data-pack-classic="{{ 'sb-pack-classic-xs.webp' | asset_url }}" data-pack-refresher="{{ 'sb-pack-refresher-xs.webp' | asset_url }}">
+<section class="sb-finder" id="sb-finder" data-api="{{ section.settings.api_base | default: 'https://sunboy-finder.vercel.app' }}" data-days="{{ section.settings.days }}" data-pack-classic="{{ 'sb-pack-classic-xs.webp' | asset_url }}" data-pack-refresher="{{ 'sb-pack-refresher-xs.webp' | asset_url }}" data-can="{{ 'sb-mini-can-coconut.webp' | asset_url }}">
   <div class="sb-finder__top color-{{ section.settings.color_scheme }} gradient">
     <div class="sb-wrap">
       {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
@@ -44,10 +44,16 @@
     <div class="sb-finder__status" data-sb-status aria-live="polite">{{ section.settings.intro }}</div>
     <div class="sb-finder__grid">
       <ol class="sb-finder__list" data-sb-list></ol>
-      <div class="sb-finder__mapwrap">
+      <div class="sb-finder__mapwrap" data-sb-mapwrap>
         <div class="sb-finder__map" data-sb-map></div>
-        <div class="sb-finder__peek" data-sb-peek hidden></div>
+        <div class="sb-finder__legend" aria-hidden="true"><span class="sb-key"></span>Stores <span class="sb-key sb-key--on"></span>Bars &amp; restaurants</div>
+        <button type="button" class="sb-finder__fs" data-sb-fs aria-label="Full screen map"><span class="sb-fs-open">⤢ Full screen</span><span class="sb-fs-close">✕ Close</span></button>
+        <p class="sb-finder__fsstatus" data-sb-fsstatus></p>
       </div>
+    </div>
+    <div class="sb-sheet" data-sb-peek hidden>
+      <button type="button" class="sb-sheet__handle" data-sb-sheet-handle aria-label="Expand or close details"><span></span></button>
+      <div class="sb-sheet__body" data-sb-sheet-body></div>
     </div>
     <button type="button" class="sb-finder__maptoggle sb-btn sb-btn--solid" data-sb-maptoggle hidden>List</button>
     <div class="sb-finder__online" data-sb-online hidden></div>
@@ -65,7 +71,8 @@
   var listEl = root.querySelector('[data-sb-list]'), statusEl = root.querySelector('[data-sb-status]');
   var milesEl = root.querySelector('[data-sb-miles]'), bodyEl = root.querySelector('[data-sb-body]');
   var onlineEl = root.querySelector('[data-sb-online]'), mapToggle = root.querySelector('[data-sb-maptoggle]');
-  var peekEl = root.querySelector('[data-sb-peek]');
+  var peekEl = root.querySelector('[data-sb-peek]'), sheetBody = root.querySelector('[data-sb-sheet-body]');
+  var fsBtn = root.querySelector('[data-sb-fs]'), fsStatus = root.querySelector('[data-sb-fsstatus]');
   var mobile = window.matchMedia('(max-width: 989px)');
   var state = { zip: '', q: '', lat: null, lng: null, flavor: '', miles: 25, type: 'all', data: null, stores: [], sel: null, area: 0, place: '' };
   var auto = false, autoT, moveT;
@@ -78,7 +85,7 @@
   if (mobile.matches) root.classList.add('show-map');
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function setStatus(t) { statusEl.innerHTML = t; }
+  function setStatus(t) { statusEl.innerHTML = t; fsStatus.innerHTML = t; }
   function group(sel, attr, val) {
     root.querySelectorAll(sel).forEach(function (c) { var on = c.dataset[attr] === val; c.classList.toggle('is-on', on); c.setAttribute('aria-checked', on); });
   }
@@ -115,7 +122,8 @@
       if (/classic/i.test(b)) return '<span class="sb-has sb-has--pack"><img src="' + root.dataset.packClassic + '" alt="" width="34" height="29" loading="lazy">Classic Variety 8pk</span>';
       if (/refresh/i.test(b)) return '<span class="sb-has sb-has--pack"><img src="' + root.dataset.packRefresher + '" alt="" width="34" height="29" loading="lazy">Refresher Variety 8pk</span>';
       var k = slugOf(b);
-      return '<span class="sb-has" style="--dot:' + esc(COLORS[k] || '#0BB89B') + '">' + esc(NAMES[k] || b) + '</span>';
+      if (NAMES[k]) return '<span class="sb-has sb-has--can"><img src="' + root.dataset.can.replace('sb-mini-can-coconut', 'sb-mini-can-' + k) + '" alt="" width="12" height="28" loading="lazy">' + esc(NAMES[k]) + '</span>';
+      return '<span class="sb-has" style="--dot:' + esc(COLORS[k] || '#0BB89B') + '">' + esc(b) + '</span>';
     });
     var sizes = [];
     (s.packages || []).forEach(function (p) {
@@ -146,7 +154,7 @@
   function render(keepView) {
     var d = state.data; if (!d) return;
     var stores = state.stores = d.stores;
-    state.sel = null; peekEl.hidden = true; hoursCache = {};
+    state.sel = null; closeSheet(); hoursCache = {};
     var flav = state.flavor ? (NAMES[state.flavor] || state.flavor) : 'SUNBOY';
     var kind = state.type === 'off' ? 'stores' : state.type === 'on' ? 'bars & restaurants' : 'spots';
     var where = state.area ? ' in this area' : ' within ' + mi(state.miles) + (state.place ? ' of ' + esc(state.place) : '');
@@ -213,9 +221,7 @@
     if (li) li.classList.add('is-sel');
     if (from === 'pin') {
       if (root.classList.contains('show-map') && mobile.matches) {
-        peekEl.innerHTML = '<div class="sb-store is-sel" data-i="' + i + '">' + card(state.stores[i], i) + '</div>';
-        peekEl.hidden = false;
-        loadHours(i, function (h) { if (state.sel === i) paintHours(peekEl, h); });
+        openSheet(i);
       } else if (li) {
         li.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -240,7 +246,7 @@
       map = L.map(el, { scrollWheelZoom: false, zoomControl: true });
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
       layer = L.layerGroup().addTo(map);
-      map.on('click', function () { if (!peekEl.hidden) { peekEl.hidden = true; } });
+      map.on('click', function () { closeSheet(); });
       map.on('movestart', function () { clearTimeout(moveT); });
       map.on('moveend', function () { if (auto) return; clearTimeout(moveT); moveT = setTimeout(areaSearch, 700); });
     }
@@ -270,9 +276,40 @@
   listEl.addEventListener('mouseleave', function () { root.querySelectorAll('.sb-pin.is-hl').forEach(function (p) { p.classList.remove('is-hl'); }); });
   function setView(showMap) {
     root.classList.toggle('show-map', showMap); mapToggle.textContent = showMap ? 'List' : 'Map';
-    if (!showMap) peekEl.hidden = true;
+    if (!showMap) { closeSheet(); setFull(false); }
     if (map) setTimeout(function () { quiet(); map.invalidateSize(); }, 50);
   }
+  // Phone: details slide up from the bottom when a pin is tapped. Drag the handle up for more, down to close.
+  function openSheet(i) {
+    sheetBody.innerHTML = '<div class="sb-store is-sel" data-i="' + i + '">' + card(state.stores[i], i) + '</div>';
+    peekEl.hidden = false; peekEl.classList.remove('is-tall');
+    requestAnimationFrame(function () { root.classList.add('has-sheet'); });
+    loadHours(i, function (h) { if (state.sel === i) paintHours(sheetBody, h); });
+  }
+  function closeSheet() {
+    if (peekEl.hidden) return;
+    root.classList.remove('has-sheet'); peekEl.classList.remove('is-tall');
+    setTimeout(function () { if (!root.classList.contains('has-sheet')) peekEl.hidden = true; }, 260);
+    root.querySelectorAll('.sb-pin.is-sel').forEach(function (p) { p.classList.remove('is-sel'); });
+  }
+  var y0 = null;
+  peekEl.addEventListener('touchstart', function (e) { y0 = e.touches[0].clientY; }, { passive: true });
+  peekEl.addEventListener('touchend', function (e) {
+    if (y0 === null) return; var dy = e.changedTouches[0].clientY - y0; y0 = null;
+    if (dy < -40) peekEl.classList.add('is-tall');
+    else if (dy > 50) { if (peekEl.classList.contains('is-tall') && sheetBody.scrollTop <= 0) peekEl.classList.remove('is-tall'); else if (sheetBody.scrollTop <= 0) closeSheet(); }
+  });
+  root.querySelector('[data-sb-sheet-handle]').addEventListener('click', function () { peekEl.classList.toggle('is-tall'); });
+
+  // Phone: full-screen map you can toggle in and out of.
+  function setFull(on) {
+    root.classList.toggle('is-full', on);
+    document.documentElement.classList.toggle('sb-noscroll', on);
+    if (map) setTimeout(function () { quiet(); map.invalidateSize(); }, 60);
+  }
+  fsBtn.addEventListener('click', function () { setFull(!root.classList.contains('is-full')); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-full')) setFull(false); });
+
   mapToggle.addEventListener('click', function () { setView(!root.classList.contains('show-map')); });
 
   form.addEventListener('submit', function (e) {
@@ -322,7 +359,7 @@
     b.addEventListener('click', function () { state.type = b.dataset.type; group('.sb-seg button', 'type', state.type); search(); });
   });
   milesEl.addEventListener('change', function () { state.miles = parseInt(milesEl.value, 10); state.area = 0; search(); });
-  mobile.addEventListener('change', function () { if (!mobile.matches) setView(false); });
+  mobile.addEventListener('change', function () { if (!mobile.matches) { setView(false); setFull(false); } });
 
   // Start from the URL (links from the homepage and flavor pages pass zip / lat,lng / flavor)
   if (params.get('flavor')) { state.flavor = params.get('flavor'); group('.sb-chip', 'flavor', state.flavor); }

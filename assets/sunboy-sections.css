@@ -347,8 +347,38 @@ form.is-done .sb-mc-done { display: block; }
 }
 .sb-finder__geo.is-busy { text-decoration: none; opacity: .85; cursor: progress; }
 .sb-finder__geo .sb-finder__spin { width: 1.2rem; height: 1.2rem; }
-.sb-finder__peek { margin-top: 1.2rem; }
-.sb-finder__peek .sb-store { cursor: default; }
+.sb-has--can::before { content: none; }
+.sb-has--can img { width: auto; height: 2.6rem; margin: -.3rem 0; }
+.sb-finder__mapwrap { position: relative; }
+.sb-finder__legend { position: absolute; left: 1rem; bottom: 1rem; z-index: 500; background: rgba(255,255,255,.92); border-radius: 999px; padding: .5rem 1.2rem; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: .5rem; box-shadow: 0 2px 8px rgba(0,0,0,.12); color: var(--sb-brown); }
+.sb-key { width: 1.1rem; height: 1.1rem; border-radius: 50%; background: var(--sb-teal); display: inline-block; }
+.sb-key--on { background: var(--sb-brown); margin-left: .8rem; }
+.sb-finder__fs, .sb-finder__fsstatus { display: none; }
+.sb-sheet { display: none; }
+@media (max-width: 989px) {
+  .sb-finder__fs { display: block; position: absolute; top: 1rem; right: 1rem; z-index: 500; background: #fff; color: var(--sb-brown); border: 0; border-radius: 999px; padding: .8rem 1.4rem; font: 700 1.2rem/1 var(--font-body-family); letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .sb-fs-close { display: none; }
+  .sb-finder.is-full .sb-fs-open { display: none; }
+  .sb-finder.is-full .sb-fs-close { display: inline; }
+  .sb-finder.is-full .sb-finder__mapwrap { position: fixed; inset: 0; z-index: 2000; background: var(--sb-cream); }
+  .sb-finder.is-full .sb-finder__map { height: 100%; min-height: 0; border-radius: 0; }
+  .sb-finder.is-full .sb-finder__fs { top: max(1.2rem, env(safe-area-inset-top)); }
+  .sb-finder.is-full .sb-finder__fsstatus { display: block; position: absolute; z-index: 500; top: max(1.2rem, env(safe-area-inset-top)); left: 1.2rem; right: 13rem; margin: 0; background: #fff; color: var(--sb-brown); border-radius: 1.4rem; padding: .7rem 1.2rem; font-size: 1.25rem; line-height: 1.3; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .sb-finder.is-full .sb-finder__fsstatus .sb-finder__muted { display: none; }
+  .sb-finder.is-full .sb-finder__legend { bottom: calc(1.2rem + env(safe-area-inset-bottom)); }
+  .sb-finder.is-full .leaflet-control-zoom { margin-top: 7rem; }
+  .sb-sheet { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 2100; background: var(--sb-cream); border-radius: 2rem 2rem 0 0; box-shadow: 0 -8px 30px rgba(0,0,0,.25); transform: translateY(105%); transition: transform .25s ease, max-height .25s ease; max-height: 46svh; display: flex; flex-direction: column; padding-bottom: env(safe-area-inset-bottom); }
+  .sb-sheet[hidden] { display: none; }
+  .sb-finder.has-sheet .sb-sheet { transform: none; }
+  .sb-sheet.is-tall { max-height: 85svh; }
+  .sb-sheet__handle { flex: none; background: none; border: 0; padding: 1rem 0 .4rem; width: 100%; cursor: grab; }
+  .sb-sheet__handle span { display: block; width: 4.4rem; height: .5rem; border-radius: 999px; background: rgba(82,59,24,.35); margin: 0 auto; }
+  .sb-sheet__body { overflow-y: auto; padding: 0 1.2rem 1.6rem; overscroll-behavior: contain; }
+  .sb-sheet .sb-store { box-shadow: none; background: transparent; cursor: default; padding: .8rem; }
+  .sb-finder.has-sheet .sb-finder__maptoggle { display: none; }
+  .sb-finder.is-full .sb-finder__maptoggle { display: none; }
+}
+html.sb-noscroll, html.sb-noscroll body { overflow: hidden; }
 @media (max-width: 989px) {
   .sb-finder.show-map .sb-finder__map { height: 58svh; min-height: 32rem; }
   .sb-finder__body { padding-bottom: 9rem; }
@@ -372,7 +402,7 @@ form.is-done .sb-mc-done { display: block; }
 @media (min-width: 990px) { .sb-finder__maptoggle { display: none !important; } }
 .sb-pin { background: none; border: 0; }
 .sb-pin span { width: 100%; height: 100%; background: var(--sb-teal); color: #fff; border: 2px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 700 1.2rem/1 var(--font-body-family); box-shadow: 0 2px 6px rgba(0,0,0,.3); transition: transform .15s, background .15s; box-sizing: border-box; }
-.sb-pin--on span { background: #EC5624; }
+.sb-pin--on span { background: var(--sb-brown); }
 .sb-pin.is-hl span { transform: scale(1.15); }
 .sb-pin.is-sel span { background: var(--sb-yellow); color: var(--sb-brown); border-color: var(--sb-brown); transform: scale(1.3); }
 .sb-finder__online { margin-top: 4rem; text-align: center; }
