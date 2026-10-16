@@ -1,3 +1,5 @@
+{%- comment -%} Flavor pages (pages with SUNBOY flavor data) use the flavor sections instead. {%- endcomment -%}
+{%- unless template.name == 'page' and page.metafields.sunboy.hero_line != blank -%}
 {{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
 
 {%- style -%}
@@ -134,6 +136,7 @@
     {%- endform -%}
   </div>
 </div>
+{%- endunless -%}
 
 {% schema %}
 {

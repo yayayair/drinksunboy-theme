@@ -9,7 +9,7 @@
     <h2 class="sb-display sb-find__title">{{ section.settings.heading }}</h2>
     {%- if section.settings.subheading != blank -%}<p class="sb-find__sub">{{ section.settings.subheading }}</p>{%- endif -%}
     <form class="sb-find__form" action="{{ finder }}" method="get" role="search">
-      {%- if template.suffix == 'flavor' and page.metafields.sunboy.hero_line != blank -%}<input type="hidden" name="flavor" value="{{ page.handle }}">{%- endif -%}
+      {%- if template.name == 'page' and page.metafields.sunboy.hero_line != blank -%}<input type="hidden" name="flavor" value="{{ page.handle }}">{%- endif -%}
       <label class="visually-hidden" for="sb-zip-{{ section.id }}">ZIP code</label>
       <input class="sb-find__input" id="sb-zip-{{ section.id }}" name="zip" type="search" enterkeyhint="search" maxlength="160" autocomplete="postal-code" placeholder="{{ section.settings.placeholder | escape }}" required>
       <button class="sb-btn sb-btn--yellow" type="submit">{{ section.settings.button_label }}</button>

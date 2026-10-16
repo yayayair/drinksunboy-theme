@@ -13,7 +13,7 @@
     assign is_flavor = true
   endif
   assign show = true
-  if template.name == 'product' or template.suffix == 'flavor'
+  if template.name == 'product' or template.name == 'page'
     if section.settings.show_on == 'flavors' and is_flavor == false
       assign show = false
     endif

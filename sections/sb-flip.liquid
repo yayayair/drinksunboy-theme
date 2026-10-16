@@ -1,4 +1,19 @@
-{%- unless template.name == 'product' and product.metafields.sunboy.hero_line == blank -%}
+{%- liquid
+  assign sb_flavor_ctx = false
+  if template.name == 'page' and page.metafields.sunboy.hero_line != blank
+    assign sb_flavor_ctx = true
+  elsif template.name == 'product' and product.metafields.sunboy.hero_line != blank
+    assign sb_flavor_ctx = true
+  endif
+  assign sb_hide = false
+  if section.settings.flavor_only and sb_flavor_ctx == false
+    assign sb_hide = true
+  endif
+  if template.name == 'product' and product.metafields.sunboy.hero_line == blank
+    assign sb_hide = true
+  endif
+-%}
+{%- unless sb_hide -%}
 <section class="color-{{ section.settings.color_scheme }} gradient">
   <div class="sb-wrap sb-flip">
     {%- if section.settings.art != blank -%}
@@ -18,6 +33,7 @@
 {
   "name": "SUNBOY note",
   "settings": [
+    { "type": "checkbox", "id": "flavor_only", "label": "Only show on flavor pages", "default": false },
     { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-3" },
     { "type": "image_picker", "id": "art", "label": "Illustration" },
     { "type": "text", "id": "art_fallback", "label": "Fallback theme image" },
