@@ -158,6 +158,8 @@
               >
                 {% assign skip_card_product_styles = false %}
                 {%- for product in collection.products -%}
+                  {%- comment -%} Cans are never shown or sold on the site. {%- endcomment -%}
+                  {%- if product.type == 'Beer' -%}{%- continue -%}{%- endif -%}
                   {% assign lazy_load = false %}
                   {%- if forloop.index > 2 -%}
                     {%- assign lazy_load = true -%}

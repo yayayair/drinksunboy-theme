@@ -258,6 +258,7 @@
               >
                 {%- assign skip_card_product_styles = false -%}
                 {%- for item in search.results -%}
+                  {%- if item.object_type == 'product' and item.type == 'Beer' -%}{%- continue -%}{%- endif -%}
                   {% assign lazy_load = false %}
                   {%- if forloop.index > 2 -%}
                     {%- assign lazy_load = true -%}

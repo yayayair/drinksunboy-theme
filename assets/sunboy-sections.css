@@ -582,3 +582,6 @@ html.sb-noscroll, html.sb-noscroll body { overflow: hidden; }
 .sb-acctpage__addrs { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fill, minmax(26rem, 1fr)); }
 .sb-acctpage__addrs li { background: var(--sb-cream); padding: 2rem; font-size: 1.5rem; line-height: 1.5; }
 .sb-acctpage__edit { margin: 3.2rem 0 .8rem; }
+/* product photos: white backgrounds melt into the cream cards (no image editing needed) */
+.card__media { background-color: inherit; }
+.card__media img, .product__media img { mix-blend-mode: multiply; }

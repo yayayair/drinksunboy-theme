@@ -16,18 +16,22 @@
   if template.name == 'collection' and collection.handle == 'frontpage'
     assign sb_old_front = true
   endif
+  assign sb_all = false
+  if template.name == 'collection' and collection.handle == 'all'
+    assign sb_all = true
+  endif
 -%}
-{%- if sb_portal != blank or sb_old_front -%}
+{%- if sb_portal != blank or sb_old_front or sb_all -%}
 <script>
 (function () {
-  var portal = {{ sb_portal | json }}, oldFront = {{ sb_old_front | json }};
+  var portal = {{ sb_portal | json }}, oldFront = {{ sb_old_front | json }}, allProducts = {{ sb_all | json }};
   if (portal && location.pathname === portal) return;
   var fromAccount = false;
   try {
     var h = document.referrer ? new URL(document.referrer).hostname : '';
     fromAccount = !!h && h !== location.hostname && (/(^|\.)shopify\.com$/.test(h) || /^account\./.test(h));
   } catch (e) {}
-  var dest = portal && (fromAccount || oldFront) ? portal : oldFront ? '/' : null;
+  var dest = portal && (fromAccount || oldFront) ? portal : oldFront ? '/' : allProducts ? '/collections/sunboy-swag' : null;
   if (!dest) return;
   var t = window.Shopify && Shopify.theme;
   if (t && t.role && t.role !== 'main') dest += (dest.indexOf('?') > -1 ? '&' : '?') + 'preview_theme_id=' + t.id;
