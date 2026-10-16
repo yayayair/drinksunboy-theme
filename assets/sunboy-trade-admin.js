@@ -31,7 +31,7 @@
     app.innerHTML =
       '<div class="sb-tadmin__qbo">' + (q.connected
         ? 'QuickBooks connected' + (q.by ? ' by ' + esc(q.by) : '') + '. Invoices are created only when you click, and never sent.'
-        : (data.qboConnectUrl ? 'QuickBooks isn’t connected. <a class="sb-btn sb-btn--teal" href="' + esc(data.qboConnectUrl) + '">Connect QuickBooks</a>' : 'QuickBooks isn’t set up yet (waiting on the Intuit app keys).')) + '</div>' +
+        : (data.qboConnectUrl ? (q.reconnect ? 'QuickBooks needs to be reconnected (access expired or was revoked).' : 'QuickBooks isn’t connected.') + ' <a class="sb-btn sb-btn--teal" href="' + esc(data.qboConnectUrl) + '">' + (q.reconnect ? 'Reconnect' : 'Connect') + ' QuickBooks</a>' : 'QuickBooks isn’t set up yet (waiting on the Intuit app keys).')) + '</div>' +
       '<h2 class="sb-trade__h3">Waiting for approval (' + data.pending.length + ')</h2>' +
       '<ul class="sb-tadmin__list">' + (data.pending.map(function (o, i) {
         return '<li class="sb-tadmin__card' + (o.test ? ' is-test' : '') + '" data-p="' + i + '">' +

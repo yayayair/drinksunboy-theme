@@ -21,20 +21,39 @@ export function checkState(s) {
   return want.length === sig.length && crypto.timingSafeEqual(Buffer.from(want), Buffer.from(sig)) ? cid : null;
 }
 
-export function authorizeUrl(cid) {
-  return 'https://appcenter.intuit.com/connect/oauth2?' + new URLSearchParams({
+// Endpoints come from Intuit's discovery document (cached), with the documented defaults as a fallback.
+const DISCOVERY = () => process.env.QBO_ENV === 'sandbox'
+  ? 'https://developer.api.intuit.com/.well-known/openid_sandbox_configuration'
+  : 'https://developer.api.intuit.com/.well-known/openid_configuration';
+let disco = { at: 0, auth: 'https://appcenter.intuit.com/connect/oauth2', token: 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer' };
+export async function endpoints() {
+  if (Date.now() - disco.at < 24 * 3600_000) return disco;
+  try {
+    const d = await (await fetch(DISCOVERY())).json();
+    if (d.authorization_endpoint && d.token_endpoint) disco = { at: Date.now(), auth: d.authorization_endpoint, token: d.token_endpoint };
+  } catch (e) { console.error('qbo discovery', e.message); }
+  return disco;
+}
+
+export async function authorizeUrl(cid) {
+  const e = await endpoints();
+  return e.auth + '?' + new URLSearchParams({
     client_id: ID(), response_type: 'code', scope: 'com.intuit.quickbooks.accounting', redirect_uri: REDIRECT, state: state(cid)
   });
 }
 
 async function tokenCall(params) {
-  const r = await fetch('https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer', {
+  const r = await fetch((await endpoints()).token, {
     method: 'POST',
     headers: { Authorization: 'Basic ' + Buffer.from(`${ID()}:${SECRET()}`).toString('base64'), 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
     body: new URLSearchParams(params)
   });
   const d = await r.json().catch(() => ({}));
-  if (!r.ok || !d.access_token) throw new Error(`QuickBooks token ${r.status}: ${d.error || ''}`);
+  if (!r.ok || !d.access_token) {
+    const err = new Error(`QuickBooks token ${r.status}: ${d.error || ''}`);
+    err.reconnect = d.error === 'invalid_grant' || r.status === 400 || r.status === 401;
+    throw err;
+  }
   return d;
 }
 
@@ -47,8 +66,14 @@ export async function connect(code, realmId, by) {
 async function session() {
   const v = await vaultGet('qbo');
   if (!v) throw new Error('QuickBooks isn’t connected yet.');
+  if (v.needsReconnect) throw new Error('QuickBooks needs to be reconnected. Use “Reconnect QuickBooks” at the top of this page.');
   if (Date.now() < v.accessExp - 120_000) return v;
-  const d = await tokenCall({ grant_type: 'refresh_token', refresh_token: v.refresh });
+  let d;
+  try { d = await tokenCall({ grant_type: 'refresh_token', refresh_token: v.refresh }); }
+  catch (e) {
+    if (e.reconnect) { await vaultSet('qbo', { ...v, needsReconnect: true }); throw new Error('QuickBooks needs to be reconnected. Use “Reconnect QuickBooks” at the top of this page.'); }
+    throw e;
+  }
   const nv = { ...v, access: d.access_token, accessExp: Date.now() + d.expires_in * 1000, refresh: d.refresh_token || v.refresh };
   await vaultSet('qbo', nv);
   return nv;
@@ -56,7 +81,8 @@ async function session() {
 
 export async function status() {
   const v = await vaultGet('qbo').catch(() => null);
-  return v ? { connected: true, by: v.by, at: v.at } : { connected: false };
+  if (!v) return { connected: false };
+  return v.needsReconnect ? { connected: false, reconnect: true, by: v.by } : { connected: true, by: v.by, at: v.at };
 }
 
 async function api(path, init = {}) {
@@ -65,6 +91,10 @@ async function api(path, init = {}) {
     ...init, headers: { Authorization: `Bearer ${s.access}`, Accept: 'application/json', 'Content-Type': 'application/json', ...(init.headers || {}) }
   });
   const d = await r.json().catch(() => ({}));
+  if (r.status === 401 && !init._retried) { // access token rejected early: refresh once, then retry
+    await vaultSet('qbo', { ...s, accessExp: 0 });
+    return api(path, { ...init, _retried: true });
+  }
   if (!r.ok) throw new Error(`QuickBooks ${r.status}: ${JSON.stringify(d.Fault || d).slice(0, 300)}`);
   return d;
 }

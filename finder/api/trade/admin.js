@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         me: { name: me.name },
         pending: d.pending.nodes.filter(o => !o.tags.includes('rejected')).map(o => shape(o, 'draft')),
         ready: d.ready.nodes.map(o => shape(o, 'order')).concat(d.draftsReady.nodes.filter(o => !o.tags.includes('needs-approval')).map(o => shape(o, 'draft'))),
-        qbo: await qbo.status(), qboConnectUrl: process.env.QBO_CLIENT_ID ? qbo.authorizeUrl(cid) : ''
+        qbo: await qbo.status(), qboConnectUrl: process.env.QBO_CLIENT_ID ? await qbo.authorizeUrl(cid) : ''
       });
     }
 
