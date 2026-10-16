@@ -20,6 +20,7 @@
   {%- if n.calcium != blank -%}<div class="sb-label__row"><span>Calcium {{ n.calcium }}</span><span>{{ n.calcium_dv }}</span></div>{%- endif -%}
   {%- if n.not_significant != blank -%}<p class="sb-label__note">{{ n.not_significant }}</p>{%- endif -%}
   {%- if n.ingredients != blank -%}<p class="sb-label__ingr"><b>Ingredients:</b> {{ n.ingredients }}</p>{%- endif -%}
-  <p class="sb-label__abv">{{ n.abv | default: '5%' }} ABV · Gluten-free · Loudly and proudly contains coconut</p>
+  <p class="sb-label__abv">{{ n.abv | default: '5%' }} ABV · Gluten-free</p>
+  <p class="sb-label__coco">Loudly and proudly contains coconut</p>
 </div>
 {%- endif -%}
