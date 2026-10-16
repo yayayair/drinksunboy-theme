@@ -2,9 +2,43 @@
   "sections": {
     "main": {
       "type": "sb-trade",
+      "blocks": {
+        "brand_kit": {
+          "type": "folder",
+          "settings": {
+            "title": "Brand Kit",
+            "text": "Logos, colors, fonts and product shots.",
+            "url": "https://www.dropbox.com/scl/fo/0l75aqg155lgavs54rs9f/AM1veY6WjzCG-pwlCBnIu4E?rlkey=mrpo2luje87s0bytf3wll6j0a&dl=0",
+            "audience": "all"
+          }
+        },
+        "sell_sheets": {
+          "type": "folder",
+          "settings": {
+            "title": "Sell Sheets",
+            "text": "Current sell sheets for every flavor and pack.",
+            "url": "",
+            "audience": "all"
+          }
+        },
+        "assets": {
+          "type": "folder",
+          "settings": {
+            "title": "Assets & Collateral",
+            "text": "Campaign art, table tents, shelf talkers and social.",
+            "url": "https://www.dropbox.com/scl/fo/zquyz28alpil7xfrpa2nr/ACmuJEgPIfnxJG3sKr2tCSI?rlkey=kkbduq856ty450i0nivytnd4w&dl=0",
+            "audience": "all"
+          }
+        }
+      },
+      "block_order": [
+        "brand_kit",
+        "sell_sheets",
+        "assets"
+      ],
       "settings": {
         "eyebrow": "SUNBOY Trade",
-        "heading": "Distributor Shop"
+        "heading": "Distributor Portal"
       }
     }
   },

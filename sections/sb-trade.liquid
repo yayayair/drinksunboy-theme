@@ -13,7 +13,13 @@
     assign sep = '&'
   endif
   assign login = routes.account_login_url | append: sep | append: 'return_url=' | append: request.path | append: '&return_to=' | append: request.path
+  assign role = 'none'
   if customer
+    if customer.tags contains 'rsm' or customer.tags contains 'internal'
+      assign role = 'team'
+    elsif customer.tags contains 'trade'
+      assign role = 'trade'
+    endif
     assign ts = 'now' | date: '%s'
     assign payload = customer.id | append: '.' | append: ts
     assign key = shop.metafields.sunboy_private.trade_key.value | default: shop.metafields.sunboy_private.trade_key
@@ -27,7 +33,7 @@
       <p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>
       <h1 class="sb-display sb-trade__title">{{ section.settings.heading }}</h1>
       {%- if customer -%}
-        <p class="sb-trade__hi" data-hi>Hi {{ customer.first_name | default: customer.name | escape }}. Loading your shop…</p>
+        <p class="sb-trade__hi" data-hi>Hi {{ customer.first_name | default: customer.name | escape }}.</p>
       {%- else -%}
         <p class="sb-trade__lede">{{ section.settings.signed_out_text }}</p>
         <div class="sb-trade__ctas">
@@ -39,8 +45,33 @@
     </div>
   </div>
 
+  {%- if customer and role != 'none' -%}
+    {%- capture folders -%}
+      {%- for block in section.blocks -%}
+        {%- if block.settings.audience == 'all' or block.settings.audience == role -%}
+          {%- if block.settings.url != blank -%}
+            <a class="sb-folder" href="{{ block.settings.url }}" target="_blank" rel="noopener" {{ block.shopify_attributes }}>
+          {%- else -%}
+            <div class="sb-folder is-soon" {{ block.shopify_attributes }}>
+          {%- endif -%}
+              <span class="sb-folder__icon" aria-hidden="true"><svg viewBox="0 0 48 40" width="48" height="40"><path d="M2 6a4 4 0 0 1 4-4h12l5 5h19a4 4 0 0 1 4 4v23a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z" fill="currentColor"/><path d="M2 14h44v20a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z" fill="#fff" opacity=".22"/></svg></span>
+              <span class="sb-folder__title">{{ block.settings.title | escape }}</span>
+              {%- if block.settings.text != blank -%}<span class="sb-folder__text">{{ block.settings.text | escape }}</span>{%- endif -%}
+              <span class="sb-folder__go">{% if block.settings.url != blank %}Open folder →{% else %}Coming soon{% endif %}</span>
+          {%- if block.settings.url != blank -%}</a>{%- else -%}</div>{%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- if folders != blank -%}
+      <div class="sb-trade__folders" id="toolkit">
+        <h2 class="sb-trade__h3">{{ section.settings.folders_heading }}</h2>
+        <div class="sb-folders">{{ folders }}</div>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
   {%- if customer -%}
-    <div class="sb-trade__app" data-trade-app data-api="{{ api }}" data-token="{{ token }}" data-cid="{{ customer.id }}"
+    <div class="sb-trade__app" data-trade-app data-api="{{ api }}" data-token="{{ token }}" data-cid="{{ customer.id }}" data-store-heading="{{ section.settings.store_heading | escape }}"
       data-brandkit="{{ section.settings.brand_kit_url }}" data-marketing="{{ section.settings.marketing_url }}"
       data-admin-url="{{ section.settings.admin_page_url | default: '/pages/trade-admin' }}" data-logout="{{ routes.account_logout_url }}">
       <div class="sb-trade__status" data-status><span class="sb-finder__spin"></span> Opening the shop…</div>
@@ -84,12 +115,23 @@
     { "type": "text", "id": "eyebrow", "label": "Small label", "default": "SUNBOY Trade" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Distributor Shop" },
     { "type": "textarea", "id": "signed_out_text", "label": "Signed-out text", "default": "POS, merch and display gear at SUNBOY cost, with your co-op applied automatically. Billed to your SUNBOY account." },
-    { "type": "text", "id": "brand_kit_url", "label": "Brand Kit link", "default": "https://www.dropbox.com/scl/fo/0l75aqg155lgavs54rs9f/AM1veY6WjzCG-pwlCBnIu4E?rlkey=mrpo2luje87s0bytf3wll6j0a&st=fy1bx0vy&dl=0" },
+    { "type": "text", "id": "folders_heading", "label": "Folders heading", "default": "Your SUNBOY toolkit" },
+    { "type": "text", "id": "store_heading", "label": "Store heading", "default": "SUNBOY Trade Store" },
+    { "type": "text", "id": "brand_kit_url", "label": "Brand Kit link (legacy)", "default": "https://www.dropbox.com/scl/fo/0l75aqg155lgavs54rs9f/AM1veY6WjzCG-pwlCBnIu4E?rlkey=mrpo2luje87s0bytf3wll6j0a&st=fy1bx0vy&dl=0" },
     { "type": "text", "id": "marketing_url", "label": "Trade Marketing link", "default": "https://www.dropbox.com/scl/fo/zquyz28alpil7xfrpa2nr/ACmuJEgPIfnxJG3sKr2tCSI?rlkey=kkbduq856ty450i0nivytnd4w&st=bob15n41&dl=0" },
     { "type": "text", "id": "apply_heading", "label": "Request heading", "default": "New to SUNBOY Trade?" },
     { "type": "textarea", "id": "apply_text", "label": "Request text", "default": "Distributor reps can request an account. Once approved, sign in with your work email." },
     { "type": "text", "id": "admin_page_url", "label": "Admin page", "default": "/pages/trade-admin" },
     { "type": "text", "id": "api_base", "label": "Trade service URL", "default": "https://sunboy-finder.vercel.app" }
+  ],
+  "blocks": [
+    { "type": "folder", "name": "Folder", "settings": [
+      { "type": "text", "id": "title", "label": "Title", "default": "Brand Kit" },
+      { "type": "text", "id": "text", "label": "Short description" },
+      { "type": "url", "id": "url", "label": "Link (Dropbox, Drive…)", "info": "Leave empty to show 'Coming soon'." },
+      { "type": "select", "id": "audience", "label": "Who sees it", "default": "all", "options": [
+        { "value": "all", "label": "Everyone signed in" }, { "value": "trade", "label": "Distributors only" }, { "value": "team", "label": "Team only" } ] }
+    ] }
   ],
   "presets": [ { "name": "SUNBOY trade shop" } ]
 }

@@ -282,7 +282,23 @@
       </div>
       {% render 'header-search', input_id: 'Search-In-Modal' %}
 
-      {%- if shop.customer_accounts_enabled -%}
+      {%- liquid
+        assign sb_portal = blank
+        if customer
+          if customer.tags contains 'rsm' or customer.tags contains 'internal'
+            assign sb_portal = '/pages/sunboy-rsm-portal'
+          elsif customer.tags contains 'trade'
+            assign sb_portal = '/pages/sunboy-distributor-shop'
+          endif
+        endif
+      -%}
+      {%- if sb_portal != blank -%}
+        {%- comment -%} Trade and team people go straight to their SUNBOY portal, not Shopify's order list. {%- endcomment -%}
+        <a href="{{ sb_portal }}" class="header__icon header__icon--account link focus-inset" title="Your SUNBOY portal">
+          <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+          <span class="visually-hidden">Your SUNBOY portal</span>
+        </a>
+      {%- elsif shop.customer_accounts_enabled -%}
         <shopify-account
           menu="{{ settings.customer_account_menu | default: 'customer-account-main-menu' }}"
           class="header__icon header__icon--account link focus-inset"

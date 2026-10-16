@@ -4,6 +4,7 @@
     "Dawn": {
       "logo_width": 90,
       "customer_account_menu": "customer-account-main-menu",
+      "favicon": "shopify://shop_images/Favicon.png",
       "color_schemes": {
         "scheme-1": {
           "settings": {

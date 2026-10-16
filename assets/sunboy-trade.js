@@ -59,22 +59,20 @@
   function render() {
     var types = ['All'];
     me.catalog.forEach(function (p) { if (types.indexOf(p.type) < 0) types.push(p.type); });
-    var links = [];
-    if (app.dataset.brandkit) links.push('<a href="' + esc(app.dataset.brandkit) + '" target="_blank" rel="noopener">Brand Kit</a>');
-    if (app.dataset.marketing) links.push('<a href="' + esc(app.dataset.marketing) + '" target="_blank" rel="noopener">Trade Marketing</a>');
-    if (me.admin) links.push('<a href="' + esc(app.dataset.adminUrl) + '"><b>Admin: approvals & invoices</b></a>');
+    var links = ['<a href="#sb-orders">Your orders</a>'];
+    if (me.admin) links.push('<a href="' + esc(app.dataset.adminUrl) + '"><b>Approvals & invoices</b></a>');
     links.push('<a href="' + esc(app.dataset.logout) + '">Sign out</a>');
     app.innerHTML =
       (me.test ? '<div class="sb-trade__test">TEST ACCOUNT: orders stay as drafts and never ship.</div>' : '') +
-      '<div class="sb-trade__bar"><nav class="sb-trade__links">' + links.join('') + '</nav></div>' +
+      '<div class="sb-trade__storehead"><h2 class="sb-trade__h2 sb-display">' + esc(app.dataset.storeHeading || 'SUNBOY Trade Store') + '</h2><nav class="sb-trade__links">' + links.join('') + '</nav></div>' +
       '<div class="sb-trade__grid">' +
         '<div class="sb-trade__main">' +
           '<div class="sb-finder__chips sb-trade__chips">' + types.map(function (t) { return '<button type="button" class="sb-chip' + (t === filter ? ' is-on' : '') + '" data-type="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' +
           '<ul class="sb-trade__products" data-products></ul>' +
-          '<div class="sb-trade__history" data-history></div>' +
         '</div>' +
         '<aside class="sb-trade__cart" data-cart></aside>' +
       '</div>' +
+      '<section class="sb-trade__history" id="sb-orders" data-history></section>' +
       '<button type="button" class="sb-trade__cartbtn sb-btn sb-btn--solid" data-cartbtn hidden></button>';
     products(); cartView(); history();
     app.querySelectorAll('.sb-trade__chips .sb-chip').forEach(function (b) { b.addEventListener('click', function () { filter = b.dataset.type; render(); }); });
@@ -190,10 +188,16 @@
 
   function history() {
     var el = app.querySelector('[data-history]');
-    if (!me.history || !me.history.length) { el.innerHTML = ''; return; }
-    el.innerHTML = '<h2 class="sb-trade__h3">Recent orders</h2><ul class="sb-trade__orders">' + me.history.map(function (o) {
-      return '<li><b>' + esc(o.name) + '</b> <span>' + new Date(o.date).toLocaleDateString() + '</span> <span class="sb-tag">' + esc(o.status) + '</span> <span>' + $(o.total) + '</span><br><small>' + esc(o.items.join(', ')) + '</small></li>';
-    }).join('') + '</ul>';
+    var list = me.history || [];
+    function tone(st) { return /ship/i.test(st) ? 'ok' : /not approved/i.test(st) ? 'no' : /wait|test/i.test(st) ? 'wait' : 'go'; }
+    el.innerHTML = '<h2 class="sb-trade__h3">Your orders</h2>' + (list.length
+      ? '<ul class="sb-orders">' + list.map(function (o) {
+          return '<li class="sb-order"><div class="sb-order__top"><b class="sb-order__name">' + esc(o.name) + '</b>' +
+            '<span class="sb-order__pill is-' + tone(o.status) + '">' + esc(o.status) + '</span></div>' +
+            '<div class="sb-order__meta">' + new Date(o.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + $(o.total) + '</div>' +
+            '<p class="sb-order__items">' + esc(o.items.join(' · ')) + '</p></li>';
+        }).join('') + '</ul>'
+      : '<p class="sb-trade__muted">No orders yet. Your trade orders will show up here.</p>');
   }
   function refreshHistory() {
     fetch(API + '/api/trade/me?t=' + encodeURIComponent(T)).then(function (r) { return r.json(); }).then(function (d) { if (d.history) { me.history = d.history; me.catalog = d.catalog; history(); products(); } });
