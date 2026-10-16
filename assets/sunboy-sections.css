@@ -441,7 +441,7 @@ html.sb-noscroll, html.sb-noscroll body { overflow: hidden; }
 /* Find Us: desktop mini search bar under the pinned header */
 .sb-minibar { display: none; }
 @media (min-width: 990px) {
-  .sb-minibar { display: block; position: fixed; left: 0; right: 0; top: 0; z-index: 3; transform: translateY(-110%); opacity: 0; transition: transform .25s ease, opacity .2s ease; box-shadow: 0 10px 24px rgba(0,0,0,.14); pointer-events: none; }
+  .sb-minibar { display: block; position: fixed; left: 0; right: 0; top: 0; z-index: 2; transform: translateY(-110%); opacity: 0; transition: transform .25s ease, opacity .2s ease; box-shadow: 0 10px 24px rgba(0,0,0,.14); pointer-events: none; }
   .sb-minibar.is-on { transform: none; opacity: 1; pointer-events: auto; }
   .sb-minibar__inner { max-width: 144rem; margin: 0 auto; padding: 1rem 4rem; display: flex; align-items: center; gap: 1.6rem; }
   .sb-minibar__label { font-family: var(--font-heading-family); font-weight: 700; text-transform: uppercase; font-size: 2.2rem; line-height: 1; white-space: nowrap; }
