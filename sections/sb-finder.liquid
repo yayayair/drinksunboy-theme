@@ -13,7 +13,7 @@
         <label class="visually-hidden" for="sb-finder-zip">ZIP code, city or address</label>
         <input class="sb-find__input" id="sb-finder-zip" name="zip" type="search" enterkeyhint="search" maxlength="160" autocomplete="postal-code" placeholder="ZIP, city or address">
         <button class="sb-btn sb-btn--yellow" type="submit">Search</button>
-        <button class="sb-finder__geo" type="button" data-sb-finder-geo>⌖ Use my location</button>
+        <button class="sb-finder__geo" type="button" data-sb-finder-geo>⌖ <span>Use my location</span></button>
       </form>
       <div class="sb-finder__filters">
         <div class="sb-finder__chips" role="radiogroup" aria-label="Flavor">
@@ -37,6 +37,35 @@
           </label>
         </div>
       </div>
+    </div>
+  </div>
+
+
+  {%- comment -%} Mini controls: slide in under the header on desktop once the main controls scroll away. They drive the main controls. {%- endcomment -%}
+  <div class="sb-minibar color-{{ section.settings.color_scheme }} gradient" data-sb-mini aria-hidden="true" inert>
+    <div class="sb-minibar__inner">
+      <span class="sb-minibar__label">Find SUNBOY</span>
+      <form class="sb-minibar__form" data-mini-form>
+        <input class="sb-find__input" name="zip" type="search" enterkeyhint="search" maxlength="160" placeholder="ZIP, city or address" aria-label="ZIP code, city or address">
+        <button class="sb-btn sb-btn--yellow" type="submit">Search</button>
+        <button class="sb-minibar__geo" type="button" data-mini-geo title="Use my location" aria-label="Use my location">⌖</button>
+      </form>
+      <div class="sb-minibar__chips">
+        <button type="button" class="sb-chip is-on" data-mini-flavor="">All</button>
+        {%- for block in section.blocks -%}
+          {%- assign f = block.settings.flavor -%}
+          {%- if f == blank -%}{%- continue -%}{%- endif -%}
+          <button type="button" class="sb-chip" data-mini-flavor="{{ f.handle | remove_first: 'sunboy-' }}" style="--chip: {{ f.metafields.sunboy.color_main.value | default: '#523B18' }}">{{ f.title | capitalize }}</button>
+        {%- endfor -%}
+      </div>
+      <div class="sb-seg sb-minibar__seg">
+        <button type="button" class="is-on" data-mini-type="all">All</button>
+        <button type="button" data-mini-type="off">Stores</button>
+        <button type="button" data-mini-type="on">Bars</button>
+      </div>
+      <select class="sb-minibar__miles" data-mini-miles aria-label="Distance">
+        <option value="1">1 mi</option><option value="5">5 mi</option><option value="10">10 mi</option><option value="25" selected>25 mi</option><option value="50">50 mi</option>
+      </select>
     </div>
   </div>
 
@@ -453,22 +482,88 @@
   });
   zipEl.addEventListener('input', function () { if (geoBtn.innerHTML !== GEO_LABEL && !geoBtn.disabled) geoDone(); });
 
-  root.querySelectorAll('.sb-chip').forEach(function (c) {
-    c.addEventListener('click', function () { state.flavor = c.dataset.flavor; group('.sb-chip', 'flavor', state.flavor); search(); });
+  root.querySelectorAll('.sb-chip[data-flavor]').forEach(function (c) {
+    c.addEventListener('click', function () { state.flavor = c.dataset.flavor; group('.sb-chip[data-flavor]', 'flavor', state.flavor); search(); });
   });
-  root.querySelectorAll('.sb-seg button').forEach(function (b) {
-    b.addEventListener('click', function () { state.type = b.dataset.type; group('.sb-seg button', 'type', state.type); search(); });
+  root.querySelectorAll('.sb-seg button[data-type]').forEach(function (b) {
+    b.addEventListener('click', function () { state.type = b.dataset.type; group('.sb-seg button[data-type]', 'type', state.type); search(); });
   });
   milesEl.addEventListener('change', function () { state.miles = parseInt(milesEl.value, 10); state.area = 0; search(); });
   mobile.addEventListener('change', function () { if (!mobile.matches) { setView(false); setFull(false); } });
 
   // Start from the URL (links from the homepage and flavor pages pass zip / lat,lng / flavor)
-  if (params.get('flavor')) { state.flavor = params.get('flavor'); group('.sb-chip', 'flavor', state.flavor); }
-  if (/^(on|off)$/.test(params.get('type') || '')) { state.type = params.get('type'); group('.sb-seg button', 'type', state.type); }
+  if (params.get('flavor')) { state.flavor = params.get('flavor'); group('.sb-chip[data-flavor]', 'flavor', state.flavor); }
+  if (/^(on|off)$/.test(params.get('type') || '')) { state.type = params.get('type'); group('.sb-seg button[data-type]', 'type', state.type); }
   if (params.get('miles')) { state.miles = parseInt(params.get('miles'), 10) || 25; milesEl.value = String(state.miles); }
   var startQ = (params.get('q') || params.get('zip') || '').trim();
   if (startQ) { zipEl.value = startQ; lookup(startQ); }
   else if (params.get('lat') && params.get('lng')) { state.lat = parseFloat(params.get('lat')); state.lng = parseFloat(params.get('lng')); state.origin = { lat: state.lat, lng: state.lng }; search(); }
+})();
+</script>
+
+
+<script>
+(function () {
+  /* Desktop mini search bar for Find Us */
+  var root = document.getElementById('sb-finder'), bar = root && root.querySelector('[data-sb-mini]');
+  if (!bar) return;
+  var wide = window.matchMedia('(min-width: 990px)');
+  var filters = root.querySelector('.sb-finder__filters'), body = root.querySelector('[data-sb-body]');
+  var mainForm = root.querySelector('[data-sb-finder-form]'), mainZip = mainForm.querySelector('[name=zip]');
+  var miniForm = bar.querySelector('[data-mini-form]'), miniZip = miniForm.querySelector('[name=zip]');
+  var miniMiles = bar.querySelector('[data-mini-miles]'), mainMiles = root.querySelector('[data-sb-miles]');
+  function headH() { var h = document.querySelector('.header-wrapper'); return h ? Math.round(h.getBoundingClientRect().bottom) : 0; }
+  function sync() {
+    bar.querySelectorAll('[data-mini-flavor]').forEach(function (b) {
+      var m = root.querySelector('.sb-finder__chips [data-flavor="' + b.dataset.miniFlavor + '"]');
+      b.classList.toggle('is-on', !!(m && m.classList.contains('is-on')));
+    });
+    bar.querySelectorAll('[data-mini-type]').forEach(function (b) {
+      var m = root.querySelector('.sb-finder__opts [data-type="' + b.dataset.miniType + '"]');
+      b.classList.toggle('is-on', !!(m && m.classList.contains('is-on')));
+    });
+    miniMiles.value = mainMiles.value;
+    if (document.activeElement !== miniZip) miniZip.value = mainZip.value;
+  }
+  var shown = false;
+  function place() {
+    var on = false, top = headH();
+    if (wide.matches) {
+      var f = filters.getBoundingClientRect(), b = body.getBoundingClientRect();
+      on = f.bottom < top && b.bottom > top + 160;
+    }
+    bar.style.top = top + 'px';
+    if (on !== shown) {
+      shown = on; bar.classList.toggle('is-on', on);
+      if (on) { bar.removeAttribute('inert'); bar.removeAttribute('aria-hidden'); sync(); }
+      else { bar.setAttribute('inert', ''); bar.setAttribute('aria-hidden', 'true'); }
+    }
+    document.documentElement.style.setProperty('--sb-mini', on ? bar.offsetHeight + 'px' : '0px');
+    document.documentElement.style.setProperty('--sb-head', top + 'px');
+  }
+  var raf = 0;
+  function onScroll() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; place(); }); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  place();
+
+  miniForm.addEventListener('submit', function (e) {
+    e.preventDefault(); mainZip.value = miniZip.value;
+    if (mainForm.requestSubmit) mainForm.requestSubmit(); else mainForm.dispatchEvent(new Event('submit', { cancelable: true }));
+    miniZip.blur();
+  });
+  bar.querySelector('[data-mini-geo]').addEventListener('click', function () { var g = root.querySelector('[data-sb-finder-geo]'); if (g) g.click(); });
+  bar.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-mini-flavor],[data-mini-type]'); if (!b) return;
+    var m = b.hasAttribute('data-mini-flavor')
+      ? root.querySelector('.sb-finder__chips [data-flavor="' + b.dataset.miniFlavor + '"]')
+      : root.querySelector('.sb-finder__opts [data-type="' + b.dataset.miniType + '"]');
+    if (m) m.click();
+    setTimeout(sync, 0);
+  });
+  miniMiles.addEventListener('change', function () { mainMiles.value = miniMiles.value; mainMiles.dispatchEvent(new Event('change', { bubbles: true })); });
+  new MutationObserver(sync).observe(root.querySelector('.sb-finder__filters'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+  mainZip.addEventListener('input', sync); mainMiles.addEventListener('change', sync);
 })();
 </script>
 

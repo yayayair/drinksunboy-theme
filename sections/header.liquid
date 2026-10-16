@@ -144,7 +144,8 @@
 
 <{{ header_tag }}
   {% if header_tag == 'sticky-header' %}
-    data-sticky-type="{{ section.settings.sticky_header_type }}"
+    {%- comment -%} Find Us keeps the header pinned so the mini search bar can sit under it. {%- endcomment -%}
+    {%- if request.page_type == 'page' and page.handle == 'find-us' -%}data-sticky-type="always"{%- else -%}data-sticky-type="{{ section.settings.sticky_header_type }}"{%- endif -%}
   {% endif %}
   class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}"
 >
