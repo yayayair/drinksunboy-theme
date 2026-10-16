@@ -438,3 +438,25 @@ html.sb-noscroll, html.sb-noscroll body { overflow: hidden; }
 .sb-acct__signout { display: block; width: fit-content; margin: 1.4rem auto 0; font-size: 1.25rem; letter-spacing: .06em; color: inherit; opacity: .75; text-underline-offset: 3px; }
 .sb-acct__signout:hover { opacity: 1; }
 @media (max-width: 749px) { .sb-acct__sheet { position: fixed; top: var(--header-bottom, 7rem); right: 1.2rem; } }
+/* Find Us: desktop mini search bar under the pinned header */
+.sb-minibar { display: none; }
+@media (min-width: 990px) {
+  .sb-minibar { display: block; position: fixed; left: 0; right: 0; top: 0; z-index: 3; transform: translateY(-110%); opacity: 0; transition: transform .25s ease, opacity .2s ease; box-shadow: 0 10px 24px rgba(0,0,0,.14); pointer-events: none; }
+  .sb-minibar.is-on { transform: none; opacity: 1; pointer-events: auto; }
+  .sb-minibar__inner { max-width: 144rem; margin: 0 auto; padding: 1rem 4rem; display: flex; align-items: center; gap: 1.6rem; }
+  .sb-minibar__label { font-family: var(--font-heading-family); font-weight: 700; text-transform: uppercase; font-size: 2.2rem; line-height: 1; white-space: nowrap; }
+  .sb-minibar__form { display: flex; align-items: center; gap: .6rem; flex: 0 1 38rem; min-width: 26rem; }
+  .sb-minibar__form .sb-find__input { flex: 1; min-width: 0; padding-block: .8rem; font-size: 1.5rem; min-height: 0; }
+  .sb-minibar__form .sb-btn { min-height: 4rem; padding: 0 1.6rem; font-size: 1.3rem; }
+  .sb-minibar__geo { width: 4rem; height: 4rem; flex: none; border-radius: 50%; border: 2px solid currentColor; background: none; color: inherit; font-size: 1.8rem; line-height: 1; cursor: pointer; }
+  .sb-minibar__chips { display: flex; gap: .5rem; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; padding: .2rem 0; }
+  .sb-minibar__chips::-webkit-scrollbar { display: none; }
+  .sb-minibar__chips .sb-chip { padding: .5rem 1rem; font-size: 1.05rem; border-width: 1.5px; }
+  .sb-minibar__chips .sb-chip[data-mini-flavor=""].is-on { background: #fff; color: var(--sb-brown); border-color: #fff; }
+  .sb-minibar__seg { flex: none; flex-wrap: nowrap; }
+  .sb-minibar__seg button { padding: .5rem 1rem; font-size: 1.05rem; }
+  .sb-minibar__miles { flex: none; border-radius: 999px; border: 2px solid currentColor; background: transparent; color: inherit; padding: .6rem 1rem; font: inherit; font-weight: 700; font-size: 1.3rem; }
+  .sb-minibar__miles option { color: #000; }
+  .sb-finder__mapwrap { top: calc(var(--sb-head, 8rem) + var(--sb-mini, 0px) + 1.6rem) !important; transition: top .25s ease; }
+}
+@media (min-width: 990px) and (max-width: 1239px) { .sb-minibar__label { display: none; } .sb-minibar__inner { padding-inline: 2rem; gap: 1rem; } }
