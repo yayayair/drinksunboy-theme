@@ -6,25 +6,25 @@
         "f1": {
           "type": "flavor",
           "settings": {
-            "product": "coconut"
+            "flavor": "coconut"
           }
         },
         "f2": {
           "type": "flavor",
           "settings": {
-            "product": "sunboy-pineapple"
+            "flavor": "pineapple"
           }
         },
         "f3": {
           "type": "flavor",
           "settings": {
-            "product": "peach"
+            "flavor": "peach"
           }
         },
         "f4": {
           "type": "flavor",
           "settings": {
-            "product": "guava"
+            "flavor": "guava"
           }
         }
       },
@@ -76,43 +76,43 @@
         "f1": {
           "type": "flavor",
           "settings": {
-            "product": "sunboy-passion-fruit"
+            "flavor": "passion-fruit"
           }
         },
         "f2": {
           "type": "flavor",
           "settings": {
-            "product": "sunboy-pineapple"
+            "flavor": "pineapple"
           }
         },
         "f3": {
           "type": "flavor",
           "settings": {
-            "product": "sunboy-tangerine"
+            "flavor": "tangerine"
           }
         },
         "f4": {
           "type": "flavor",
           "settings": {
-            "product": "sunboy-mango"
+            "flavor": "mango"
           }
         },
         "f5": {
           "type": "flavor",
           "settings": {
-            "product": "coconut"
+            "flavor": "coconut"
           }
         },
         "f6": {
           "type": "flavor",
           "settings": {
-            "product": "peach"
+            "flavor": "peach"
           }
         },
         "f7": {
           "type": "flavor",
           "settings": {
-            "product": "guava"
+            "flavor": "guava"
           }
         }
       },

@@ -86,102 +86,6 @@
         "padding_bottom": 28
       }
     },
-    "hero": {
-      "type": "sb-flavor-hero",
-      "settings": {
-        "eyebrow": "Spiked coconut water · 5% ABV",
-        "badges": "5% ABV, 0g added sugar, Gluten-free, Real coconut water",
-        "finder_url": "/pages/find-us"
-      }
-    },
-    "nutrition": {
-      "type": "sb-nutrition",
-      "settings": {
-        "color_scheme": "scheme-5",
-        "eyebrow": "Radical transparency",
-        "heading": "Nothing to hide. Literally.",
-        "body": "<p>We put every number on the can and every number right here. Real coconut water, real fruit, zero added sugar and a clean 5% alcohol base. No artificial flavors, no mystery syrups, no fine print.</p>"
-      }
-    },
-    "flip": {
-      "type": "sb-flip",
-      "settings": {
-        "color_scheme": "scheme-3",
-        "art_fallback": "sb-sunman-floaty.png",
-        "heading": "Flip before you sip.",
-        "body": "<p>Real fruit juice settles. Give the can a gentle flip before opening and everything comes back together. That is how you know it is real.</p>"
-      }
-    },
-    "faq-flavors": {
-      "type": "sb-faq",
-      "blocks": {
-        "q1": {
-          "type": "question",
-          "settings": {
-            "question": "Wait, why do I flip it?",
-            "answer": "<p>Real fruit juice settles. That's how you know it's real. Give the can a gentle flip before you crack it (gentle, this isn't a cocktail-shaker audition) and everything comes back together.</p>"
-          }
-        },
-        "q2": {
-          "type": "question",
-          "settings": {
-            "question": "Is this a seltzer?",
-            "answer": "<p>Nope. Not flat, not a seltzer. Real hydrating coconut water and real fruit, playfully spiked and sparkled. Low fizz, no bloat. Think beachside coconut cocktail that fits in your hand.</p>"
-          }
-        },
-        "q3": {
-          "type": "question",
-          "settings": {
-            "question": "How strong is it?",
-            "answer": "<p>5% ABV from a smooth, gluten-free alcohol base. Strong enough to make it a party, chill enough for one more before the sun goes down.</p>"
-          }
-        },
-        "q4": {
-          "type": "question",
-          "settings": {
-            "question": "Any added sugar?",
-            "answer": "<p>Zero. The sweetness comes from real coconut water and real fruit. Every number is in the nutrition panel above, because we've got nothing to hide.</p>"
-          }
-        },
-        "q5": {
-          "type": "question",
-          "settings": {
-            "question": "Can I buy it on this website?",
-            "answer": "<p>Not online. Shipping alcohol comes with a whole rulebook. But you'll find SUNBOY in thousands of stores. <a href=\"/pages/find-us\">Find SUNBOY near you</a>.</p>"
-          }
-        },
-        "q6": {
-          "type": "question",
-          "settings": {
-            "question": "Does it need to stay cold?",
-            "answer": "<p>Not until you're ready for it. Unopened cans are good for 18 months from the born-on date. But trust us: ice cold is the move.</p>"
-          }
-        },
-        "q7": {
-          "type": "question",
-          "settings": {
-            "question": "Will I really thank you tomorrow morning?",
-            "answer": "<p>That's the whole idea behind real coconut water and zero added sugar. We can vouch for what's in the can. What you do with it is between you and your Tuesday. Please enjoy responsibly.</p>"
-          }
-        }
-      },
-      "block_order": [
-        "q1",
-        "q2",
-        "q3",
-        "q4",
-        "q5",
-        "q6",
-        "q7"
-      ],
-      "settings": {
-        "show_on": "flavors",
-        "color_scheme": "scheme-1",
-        "eyebrow": "Good questions",
-        "heading": "Asked & answered",
-        "intro": "<p>Got one we missed? <a href=\"/pages/contact\">Ask us</a>.</p>"
-      }
-    },
     "faq-goods": {
       "type": "sb-faq",
       "blocks": {
@@ -235,81 +139,12 @@
         "heading": "Asked & answered",
         "intro": ""
       }
-    },
-    "lineup": {
-      "type": "sb-flavor-lineup",
-      "blocks": {
-        "f1": {
-          "type": "flavor",
-          "settings": {
-            "product": "sunboy-passion-fruit"
-          }
-        },
-        "f2": {
-          "type": "flavor",
-          "settings": {
-            "product": "sunboy-pineapple"
-          }
-        },
-        "f3": {
-          "type": "flavor",
-          "settings": {
-            "product": "sunboy-tangerine"
-          }
-        },
-        "f4": {
-          "type": "flavor",
-          "settings": {
-            "product": "sunboy-mango"
-          }
-        },
-        "f5": {
-          "type": "flavor",
-          "settings": {
-            "product": "coconut"
-          }
-        },
-        "f6": {
-          "type": "flavor",
-          "settings": {
-            "product": "peach"
-          }
-        },
-        "f7": {
-          "type": "flavor",
-          "settings": {
-            "product": "guava"
-          }
-        }
-      },
-      "block_order": [
-        "f1",
-        "f2",
-        "f3",
-        "f4",
-        "f5",
-        "f6",
-        "f7"
-      ],
-      "settings": {
-        "color_scheme": "scheme-1",
-        "eyebrow": "Keep exploring",
-        "heading": "The whole lineup",
-        "link_label": "Find SUNBOY near you",
-        "link": "/pages/find-us",
-        "anchor": "lineup"
-      }
     }
   },
   "order": [
     "main",
-    "hero",
-    "nutrition",
-    "flip",
-    "faq-flavors",
     "faq-goods",
     "disclosures",
-    "related-products",
-    "lineup"
+    "related-products"
   ]
 }
