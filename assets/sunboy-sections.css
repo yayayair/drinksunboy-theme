@@ -470,7 +470,8 @@ html.sb-noscroll, html.sb-noscroll body { overflow: hidden; }
     @keyframes sb-parallax { from { transform: translateY(0); } to { transform: translateY(-12%); } }
   }
 }
-.sb-shero__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(40,26,8,.6) 100%); }
+.sb-shero__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 25%, rgba(40,26,8,.45) 60%, rgba(40,26,8,.8) 100%); }
+.sb-shero__sub { text-shadow: 0 1px 12px rgba(0,0,0,.45); }
 .sb-shero__text { position: relative; z-index: 1; width: 100%; max-width: 144rem; margin: 0 auto; padding: 0 2.4rem 6.4rem; box-sizing: border-box; }
 @media (min-width: 990px) { .sb-shero__text { padding: 0 6.4rem 8rem; } }
 .sb-shero__eyebrow { color: var(--sb-yellow); }
