@@ -11,7 +11,7 @@ import { loadTradeDoc, preview, create, markInvoiced } from '../../lib/invoice.j
 
 const strip = t => t.replace(/\s*\(trade\)\s*$/i, '');
 const attrsOf = o => Object.fromEntries((o.customAttributes || []).map(a => [a.key, a.value]));
-const LIST = `id name createdAt tags note poNumber customAttributes { key value }
+const LIST_FOR = kind => `id name createdAt tags ${kind === 'draft' ? 'note: note2' : 'note'} poNumber customAttributes { key value }
   totalPriceSet { shopMoney { amount } } subtotalPriceSet { shopMoney { amount } }
   shippingAddress { name company address1 city provinceCode zip }
   customer { id displayName email qbo: metafield(namespace: "sunboy", key: "qbo_customer_id") { value } }
@@ -43,9 +43,9 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const d = await gql(`{
-        pending: draftOrders(first: 50, reverse: true, query: "tag:needs-approval AND status:open") { nodes { ${LIST} } }
-        draftsReady: draftOrders(first: 50, reverse: true, query: "tag:trade-test AND tag:invoice-ready AND status:open") { nodes { ${LIST} } }
-        ready: orders(first: 50, reverse: true, query: "tag:invoice-ready AND -tag:invoiced") { nodes { ${LIST} } }
+        pending: draftOrders(first: 50, reverse: true, query: "tag:needs-approval AND status:open") { nodes { ${LIST_FOR('draft')} } }
+        draftsReady: draftOrders(first: 50, reverse: true, query: "tag:trade-test AND tag:invoice-ready AND status:open") { nodes { ${LIST_FOR('draft')} } }
+        ready: orders(first: 50, reverse: true, query: "tag:invoice-ready AND -tag:invoiced") { nodes { ${LIST_FOR('order')} } }
       }`);
       return res.status(200).json({
         me: { name: me.name },
