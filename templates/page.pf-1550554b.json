@@ -38,7 +38,8 @@
       ],
       "settings": {
         "eyebrow": "SUNBOY Trade",
-        "heading": "Distributor Portal"
+        "heading": "Distributor Portal",
+        "signed_out_text": ""
       }
     }
   },

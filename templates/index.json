@@ -198,7 +198,8 @@
           "type": "retailer",
           "settings": {
             "name": "H-E-B",
-            "logo": "shopify://shop_images/retailer-heb.png"
+            "logo": "shopify://shop_images/retailer-heb.png",
+            "link": "https://www.heb.com/search?q=sunboy"
           }
         },
         "r6": {
@@ -292,32 +293,6 @@
         "p1",
         "p2",
         "p3"
-      ]
-    },
-    "palms": {
-      "type": "sb-mood",
-      "settings": {
-        "color_scheme": "scheme-1",
-        "columns": "1",
-        "ratio": "21 / 9",
-        "gap": false
-      },
-      "blocks": {
-        "t1": {
-          "type": "tile",
-          "settings": {
-            "image": "shopify://shop_images/sunboy-ian-citibike.jpg",
-            "focus": "center",
-            "eyebrow": "SUNBOY goods",
-            "title": "Spread joy with coconuts.",
-            "link_label": "Shop the goods",
-            "link": "/collections/sunboy-swag",
-            "fallback": ""
-          }
-        }
-      },
-      "block_order": [
-        "t1"
       ]
     },
     "goods": {
@@ -456,7 +431,8 @@
         "o6",
         "o7",
         "o8"
-      ]
+      ],
+      "disabled": true
     }
   },
   "order": [
@@ -466,7 +442,6 @@
     "find",
     "truths",
     "origin",
-    "palms",
     "goods",
     "press"
   ]

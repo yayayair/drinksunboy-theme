@@ -292,27 +292,53 @@
           endif
         endif
       -%}
-      {%- if sb_portal != blank -%}
-        {%- comment -%} Trade and team people go straight to their SUNBOY portal, not Shopify's order list. {%- endcomment -%}
-        <a href="{{ sb_portal }}" class="header__icon header__icon--account link focus-inset" title="Your SUNBOY portal">
-          <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
-          <span class="visually-hidden">Your SUNBOY portal</span>
-        </a>
-      {%- elsif shop.customer_accounts_enabled and customer == nil -%}
+      {%- if customer -%}
+        {%- comment -%}
+          Our own account sheet (Shopify's built-in one can't be extended): greeting, portal for trade/team,
+          Orders, Profile, and a small Sign out link.
+        {%- endcomment -%}
+        {%- liquid
+          assign acct_parts = routes.account_url | split: '?'
+          assign acct_base = acct_parts | first
+          assign acct_q = ''
+          if acct_parts.size > 1
+            assign acct_q = '?' | append: acct_parts.last
+          endif
+          assign sb_name = customer.first_name | default: customer.name | default: 'there'
+          assign sb_initial = sb_name | slice: 0 | upcase
+        -%}
+        <details class="sb-acct header__icon header__icon--account" data-sb-acct>
+          <summary class="sb-acct__avatar link focus-inset" aria-label="Your account">{{ sb_initial }}</summary>
+          <div class="sb-acct__sheet" role="dialog" aria-label="Your account">
+            <button type="button" class="sb-acct__close" aria-label="Close" data-sb-acct-close>
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <p class="sb-acct__hi">Hi, {{ sb_name | escape }}</p>
+            <p class="sb-acct__email">{{ customer.email | escape }}</p>
+            {%- if sb_portal != blank -%}
+              <a class="sb-acct__btn sb-acct__btn--portal" href="{{ sb_portal }}">Your SUNBOY portal</a>
+            {%- endif -%}
+            <div class="sb-acct__btns">
+              <a class="sb-acct__btn" href="{{ acct_base }}/orders{{ acct_q }}">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM4 7l2-3h12l2 3M9 11h6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                Orders
+              </a>
+              <a class="sb-acct__btn" href="{{ acct_base }}/profile{{ acct_q }}">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 18.2c1.3-2 3.2-3 5.5-3s4.2 1 5.5 3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                Profile
+              </a>
+            </div>
+            <a class="sb-acct__signout" href="{{ routes.account_logout_url }}">Sign out</a>
+          </div>
+        </details>
+        {%- render 'sb-acct-js' -%}
+      {%- elsif shop.customer_accounts_enabled -%}
         {%- comment -%} Signing in from the header brings people back to the site (trade/team then go to their portal), not Shopify's Orders page. {%- endcomment -%}
         {%- assign sb_back = request.path | url_encode -%}
         <a href="/customer_authentication/login?return_to={{ sb_back }}" class="header__icon header__icon--account link focus-inset" rel="nofollow">
           <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
           <span class="visually-hidden">{{ 'customer.log_in' | t }}</span>
         </a>
-      {%- elsif shop.customer_accounts_enabled -%}
-        <shopify-account
-          menu="{{ settings.customer_account_menu | default: 'customer-account-main-menu' }}"
-          class="header__icon header__icon--account link focus-inset"
-        >
-          <span slot="signed-out-avatar" class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
-          <span slot="signed-out-avatar" class="visually-hidden">{{ 'customer.log_in' | t }}</span>
-        </shopify-account>
       {%- endif -%}
 
       {%- for block in section.blocks -%}
