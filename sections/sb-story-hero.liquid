@@ -12,7 +12,7 @@
     {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow sb-shero__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
     <h1 class="sb-display sb-shero__title">
       {%- assign words = section.settings.heading | split: ' ' -%}
-      {%- for w in words -%}<span class="sb-shero__w" style="--i: {{ forloop.index0 }}">{{ w }}</span>{% unless forloop.last %} {% endunless %}{%- endfor -%}
+      {%- for w in words -%}<span class="sb-shero__w" style="--i: {{ forloop.index0 }}">{{ w }}</span>{%- unless forloop.last -%}{{ ' ' }}{%- endunless -%}{%- endfor -%}
     </h1>
     {%- if section.settings.sub != blank -%}<p class="sb-shero__sub">{{ section.settings.sub }}</p>{%- endif -%}
   </div>
