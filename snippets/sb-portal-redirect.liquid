@@ -1,0 +1,37 @@
+{%- comment -%}
+  Trade and team people should never be left on Shopify's account pages or the old "Home page" can collection.
+  If a tagged customer arrives from Shopify's sign-in/account screens (or the "Shop now" button there),
+  send them to their SUNBOY portal. Consumers are unaffected, except the old frontpage collection goes to the home page.
+{%- endcomment -%}
+{%- liquid
+  assign sb_portal = blank
+  if customer
+    if customer.tags contains 'rsm' or customer.tags contains 'internal'
+      assign sb_portal = '/pages/sunboy-rsm-portal'
+    elsif customer.tags contains 'trade'
+      assign sb_portal = '/pages/sunboy-distributor-shop'
+    endif
+  endif
+  assign sb_old_front = false
+  if template.name == 'collection' and collection.handle == 'frontpage'
+    assign sb_old_front = true
+  endif
+-%}
+{%- if sb_portal != blank or sb_old_front -%}
+<script>
+(function () {
+  var portal = {{ sb_portal | json }}, oldFront = {{ sb_old_front | json }};
+  if (portal && location.pathname === portal) return;
+  var fromAccount = false;
+  try {
+    var h = document.referrer ? new URL(document.referrer).hostname : '';
+    fromAccount = !!h && h !== location.hostname && (/(^|\.)shopify\.com$/.test(h) || /^account\./.test(h));
+  } catch (e) {}
+  var dest = portal && (fromAccount || oldFront) ? portal : oldFront ? '/' : null;
+  if (!dest) return;
+  var t = window.Shopify && Shopify.theme;
+  if (t && t.role && t.role !== 'main') dest += (dest.indexOf('?') > -1 ? '&' : '?') + 'preview_theme_id=' + t.id;
+  location.replace(dest);
+})();
+</script>
+{%- endif -%}

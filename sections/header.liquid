@@ -298,6 +298,13 @@
           <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
           <span class="visually-hidden">Your SUNBOY portal</span>
         </a>
+      {%- elsif shop.customer_accounts_enabled and customer == nil -%}
+        {%- comment -%} Signing in from the header brings people back to the site (trade/team then go to their portal), not Shopify's Orders page. {%- endcomment -%}
+        {%- assign sb_back = request.path | url_encode -%}
+        <a href="/customer_authentication/login?return_to={{ sb_back }}" class="header__icon header__icon--account link focus-inset" rel="nofollow">
+          <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+          <span class="visually-hidden">{{ 'customer.log_in' | t }}</span>
+        </a>
       {%- elsif shop.customer_accounts_enabled -%}
         <shopify-account
           menu="{{ settings.customer_account_menu | default: 'customer-account-main-menu' }}"
