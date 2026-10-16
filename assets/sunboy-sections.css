@@ -585,3 +585,8 @@ html.sb-noscroll, html.sb-noscroll body { overflow: hidden; }
 /* product photos: white backgrounds melt into the cream cards (no image editing needed) */
 .card__media { background-color: inherit; }
 .card__media img, .product__media img { mix-blend-mode: multiply; }
+/* variety pack pages (phones/narrow): room for the can's shadow so it fades out instead of ending in a hard line */
+@media (max-width: 989px) {
+  .sb-packflavor__stage { min-height: 0; height: auto; padding: 3.2rem 0 9rem; }
+  .sb-packflavor__can { filter: drop-shadow(0 22px 26px rgba(0,0,0,.26)); }
+}
