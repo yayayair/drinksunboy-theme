@@ -1,0 +1,146 @@
+{%- comment -%}
+  SUNBOY account page (Orders + Profile) inside the site, with the normal header and footer.
+  Only renders on the page with handle "account". Order details and profile editing hand off to Shopify's secure account pages.
+{%- endcomment -%}
+{%- if template.name == 'page' and page.handle == 'account' -%}
+{%- liquid
+  assign acct_parts = routes.account_url | split: '?'
+  assign acct_base = acct_parts | first
+  assign acct_q = ''
+  if acct_parts.size > 1
+    assign acct_q = '?' | append: acct_parts.last
+  endif
+  assign back = request.path | url_encode
+  assign sb_portal = blank
+  if customer
+    if customer.tags contains 'rsm' or customer.tags contains 'internal'
+      assign sb_portal = '/pages/sunboy-rsm-portal'
+    elsif customer.tags contains 'trade'
+      assign sb_portal = '/pages/sunboy-distributor-shop'
+    endif
+  endif
+-%}
+<section class="sb-acctpage">
+  <div class="sb-acctpage__top color-{{ section.settings.color_scheme }} gradient">
+    <div class="sb-acctpage__wrap">
+      <p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- if customer -%}
+        <h1 class="sb-display sb-acctpage__title">Hi, {{ customer.first_name | default: customer.name | escape }}</h1>
+        <p class="sb-acctpage__email">{{ customer.email | escape }}</p>
+        <nav class="sb-acctpage__tabs" aria-label="Account">
+          <a href="#orders" class="is-on" data-acct-tab="orders">Orders</a>
+          <a href="#profile" data-acct-tab="profile">Profile</a>
+          {%- if sb_portal != blank -%}<a href="{{ sb_portal }}">Your SUNBOY portal</a>{%- endif -%}
+          <a href="{{ routes.account_logout_url }}" class="sb-acctpage__out">Sign out</a>
+        </nav>
+      {%- else -%}
+        <h1 class="sb-display sb-acctpage__title">Your account</h1>
+        <p class="sb-acctpage__email">Sign in with your email and we'll send you a one-time code. No password needed.</p>
+        <p><a class="sb-btn sb-btn--yellow" href="/customer_authentication/login?return_to={{ back }}">Sign in</a></p>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if customer -%}
+  <div class="sb-acctpage__wrap sb-acctpage__body">
+    <div class="sb-acctpage__panel" id="orders" data-acct-panel="orders">
+      <h2 class="sb-acctpage__h">Orders</h2>
+      {%- paginate customer.orders by 20 -%}
+        {%- if customer.orders.size > 0 -%}
+          <ul class="sb-orders2" role="list">
+            {%- for order in customer.orders -%}
+              <li class="sb-order2">
+                <header class="sb-order2__head">
+                  <div>
+                    <p class="sb-order2__name">{{ order.name }}</p>
+                    <p class="sb-order2__meta">{{ order.created_at | date: '%b %-d, %Y' }} · {{ order.total_price | money }}</p>
+                  </div>
+                  <div class="sb-order2__pills">
+                    {%- if order.cancelled -%}
+                      <span class="sb-order2__pill is-no">Cancelled</span>
+                    {%- else -%}
+                      <span class="sb-order2__pill{% if order.fulfillment_status == 'fulfilled' %} is-ok{% else %} is-wait{% endif %}">{{ order.fulfillment_status_label }}</span>
+                      <span class="sb-order2__pill">{{ order.financial_status_label }}</span>
+                    {%- endif -%}
+                  </div>
+                </header>
+                <ul class="sb-order2__items" role="list">
+                  {%- for item in order.line_items -%}
+                    <li>
+                      <span class="sb-order2__thumb">{%- if item.image -%}{{ item.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}{%- endif -%}</span>
+                      <span class="sb-order2__item">{{ item.title | remove: ' (Trade)' | escape }}</span>
+                      <span class="sb-order2__qty">× {{ item.quantity }}</span>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+                <footer class="sb-order2__foot">
+                  {%- assign tracked = false -%}
+                  {%- for item in order.line_items -%}
+                    {%- if item.fulfillment.tracking_url != blank and tracked == false -%}
+                      <a class="sb-order2__link" href="{{ item.fulfillment.tracking_url }}" target="_blank" rel="noopener">Track package</a>
+                      {%- assign tracked = true -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                  <a class="sb-order2__link" href="{{ order.customer_url }}">Order details →</a>
+                </footer>
+              </li>
+            {%- endfor -%}
+          </ul>
+          {%- if paginate.pages > 1 -%}{{ paginate | default_pagination }}{%- endif -%}
+        {%- else -%}
+          <div class="sb-acctpage__empty">
+            <p>No orders yet.</p>
+            <a class="sb-btn sb-btn--solid" href="/collections/sunboy-swag">Shop the merch</a>
+          </div>
+        {%- endif -%}
+      {%- endpaginate -%}
+    </div>
+
+    <div class="sb-acctpage__panel" id="profile" data-acct-panel="profile" hidden>
+      <h2 class="sb-acctpage__h">Profile</h2>
+      <dl class="sb-acctpage__dl">
+        <div><dt>Name</dt><dd>{{ customer.name | default: '—' | escape }}</dd></div>
+        <div><dt>Email</dt><dd>{{ customer.email | escape }}</dd></div>
+        {%- if customer.phone != blank -%}<div><dt>Phone</dt><dd>{{ customer.phone | escape }}</dd></div>{%- endif -%}
+        <div><dt>Emails from SUNBOY</dt><dd>{% if customer.accepts_marketing %}Subscribed{% else %}Not subscribed{% endif %}</dd></div>
+      </dl>
+      <h3 class="sb-acctpage__h3">Addresses</h3>
+      {%- if customer.addresses.size > 0 -%}
+        <ul class="sb-acctpage__addrs" role="list">
+          {%- for address in customer.addresses -%}
+            <li>{%- if address == customer.default_address -%}<span class="sb-order2__pill is-ok">Default</span>{%- endif -%}{{ address | format_address }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <p class="sb-acctpage__muted">No saved addresses yet.</p>
+      {%- endif -%}
+      <p class="sb-acctpage__edit"><a class="sb-btn sb-btn--solid" href="{{ acct_base }}/profile{{ acct_q }}">Edit profile &amp; addresses</a></p>
+      <p class="sb-acctpage__muted">Editing opens Shopify's secure account page.</p>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var tabs = document.querySelectorAll('[data-acct-tab]'), panels = document.querySelectorAll('[data-acct-panel]');
+      function show(name) {
+        if (!document.querySelector('[data-acct-panel="' + name + '"]')) name = 'orders';
+        tabs.forEach(function (t) { t.classList.toggle('is-on', t.dataset.acctTab === name); });
+        panels.forEach(function (p) { p.hidden = p.dataset.acctPanel !== name; });
+      }
+      tabs.forEach(function (t) { t.addEventListener('click', function (e) { e.preventDefault(); history.replaceState(null, '', '#' + t.dataset.acctTab); show(t.dataset.acctTab); }); });
+      show((location.hash || '#orders').slice(1));
+    })();
+  </script>
+  {%- endif -%}
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "SUNBOY account",
+  "settings": [
+    { "type": "paragraph", "content": "Shows on the page with the handle 'account' only." },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme (top)", "default": "scheme-2" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Your SUNBOY account" }
+  ]
+}
+{% endschema %}

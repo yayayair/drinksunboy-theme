@@ -17,7 +17,6 @@
             {{ block.settings.image | image_url: width: 1400 | image_tag: widths: '600, 900, 1200, 1400', sizes: '(min-width: 990px) 45vw, 100vw', loading: 'lazy', class: 'sb-story__img', alt: '' }}
           {%- endif -%}
         {%- endfor -%}
-        <span class="sb-story__count"><b data-sb-story-n>01</b> / {{ chapters.size | prepend: '0' | slice: -2, 2 }}</span>
       </div>
     </div>
     <div class="sb-story__chapters">
@@ -26,7 +25,7 @@
           {%- if block.settings.image != blank -%}
             {{ block.settings.image | image_url: width: 1000 | image_tag: widths: '500, 750, 1000', sizes: '100vw', loading: 'lazy', class: 'sb-chapter__img', alt: block.settings.image.alt | default: '' }}
           {%- endif -%}
-          <p class="sb-chapter__kicker"><span class="sb-chapter__num">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>{{ block.settings.kicker }}</p>
+          {%- if block.settings.kicker != blank -%}<p class="sb-chapter__kicker">{{ block.settings.kicker }}</p>{%- endif -%}
           <h2 class="sb-display sb-chapter__title">{{ block.settings.heading }}</h2>
           <div class="sb-chapter__body">{{ block.settings.body }}</div>
         </article>
@@ -51,7 +50,6 @@
   if (!root || root.dataset.bound) return; root.dataset.bound = 1;
   var chapters = [].slice.call(root.querySelectorAll('[data-sb-chapter]'));
   var imgs = [].slice.call(root.querySelectorAll('.sb-story__img'));
-  var n = root.querySelector('[data-sb-story-n]');
   var last = imgs.length - 1, cur = -1;
   function show(i) {
     if (i === cur) return; cur = i;
@@ -60,7 +58,6 @@
     if (c.dataset.fg) root.style.setProperty('--story-fg', c.dataset.fg);
     var img = Math.min(i, last);
     imgs.forEach(function (el, k) { el.classList.toggle('is-on', k === img); });
-    if (n) n.textContent = ('0' + (img + 1)).slice(-2);
     chapters.forEach(function (el, k) { el.classList.toggle('is-on', k === i); });
   }
   show(0);

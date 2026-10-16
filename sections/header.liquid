@@ -314,17 +314,18 @@
             <button type="button" class="sb-acct__close" aria-label="Close" data-sb-acct-close>
               <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
+            <p class="sb-acct__eyebrow">Signed in</p>
             <p class="sb-acct__hi">Hi, {{ sb_name | escape }}</p>
             <p class="sb-acct__email">{{ customer.email | escape }}</p>
             {%- if sb_portal != blank -%}
               <a class="sb-acct__btn sb-acct__btn--portal" href="{{ sb_portal }}">Your SUNBOY portal</a>
             {%- endif -%}
             <div class="sb-acct__btns">
-              <a class="sb-acct__btn" href="{{ acct_base }}/orders{{ acct_q }}">
+              <a class="sb-acct__btn" href="/pages/account#orders">
                 <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM4 7l2-3h12l2 3M9 11h6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
                 Orders
               </a>
-              <a class="sb-acct__btn" href="{{ acct_base }}/profile{{ acct_q }}">
+              <a class="sb-acct__btn" href="/pages/account#profile">
                 <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 18.2c1.3-2 3.2-3 5.5-3s4.2 1 5.5 3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
                 Profile
               </a>

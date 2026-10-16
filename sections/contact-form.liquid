@@ -1,5 +1,5 @@
-{%- comment -%} Flavor pages (pages with SUNBOY flavor data) use the flavor sections instead. {%- endcomment -%}
-{%- unless template.name == 'page' and page.metafields.sunboy.hero_line != blank -%}
+{%- comment -%} The contact form only shows on the Contact page (other pages share this template). {%- endcomment -%}
+{%- unless template.name == 'page' and page.handle != 'contact' -%}
 {{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
 
 {%- style -%}

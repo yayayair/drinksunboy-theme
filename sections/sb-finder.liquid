@@ -120,7 +120,8 @@
   }
   function syncUrl() {
     var p = new URLSearchParams();
-    if (state.zip) p.set('zip', state.zip); else if (state.q) p.set('q', state.q); else if (state.lat !== null) { p.set('lat', state.lat.toFixed(4)); p.set('lng', state.lng.toFixed(4)); }
+    if (state.auto) {} // opening view near the visitor's approximate city: keep the URL clean
+    else if (state.zip) p.set('zip', state.zip); else if (state.q) p.set('q', state.q); else if (state.lat !== null) { p.set('lat', state.lat.toFixed(4)); p.set('lng', state.lng.toFixed(4)); }
     if (state.flavor) p.set('flavor', state.flavor);
     if (state.area) p.set('miles', state.area); else if (state.miles !== 25) p.set('miles', state.miles);
     if (state.type !== 'all') p.set('type', state.type);
@@ -214,7 +215,8 @@
     if (!count) {
       setStatus('No ' + esc(kind === 'spots' ? '' : kind + ' with ') + esc(flav) + where + ' yet. ' + (state.area ? 'Try zooming out' : 'Try a bigger radius') + (state.flavor ? ' or all flavors' : '') + '.');
     } else {
-      setStatus('<b>' + count + (count === 60 ? '+' : '') + '</b> ' + esc(kind) + ' with ' + esc(flav) + where + (d.widened ? ' <span class="sb-finder__muted">(including spots that last stocked it a little while ago)</span>' : '') + '.');
+      setStatus('<b>' + count + (count === 60 ? '+' : '') + '</b> ' + esc(kind) + ' with ' + esc(flav) + where + (d.widened ? ' <span class="sb-finder__muted">(including spots that last stocked it a little while ago)</span>' : '') + '.' +
+        (state.auto ? ' <span class="sb-finder__muted">Not where you are? Pop in your ZIP or use your location.</span>' : ''));
     }
     listEl.innerHTML = stores.map(function (s, i) { return '<li class="sb-store" id="store-' + i + '" data-i="' + i + '">' + card(s, i) + '</li>'; }).join('');
     online(d.online || []);
@@ -330,7 +332,7 @@
     var c = map.getCenter(), b = map.getBounds();
     var r = Math.ceil(c.distanceTo(b.getNorthEast()) / 1609.34);
     state.area = Math.max(1, Math.min(100, r));
-    state.lat = c.lat; state.lng = c.lng; state.zip = ''; state.q = ''; state.place = '';
+    state.lat = c.lat; state.lng = c.lng; state.zip = ''; state.q = ''; state.place = ''; state.auto = false;
     search({ keepView: true });
   }
   function drawMap(stores, keepView) {
@@ -444,6 +446,7 @@
   });
   // A 5-digit ZIP goes straight to the finder; anything else (city, neighborhood, street address) is looked up first.
   function lookup(v, opts) {
+    state.auto = false;
     state.area = 0;
     if (/^\d{5}$/.test(v)) {
       state.zip = v; state.q = ''; state.place = ''; state.lat = state.lng = null; state.origin = null; search(opts);
@@ -462,6 +465,7 @@
   // Use my location: always say what's happening, and why it didn't work if it didn't.
   function geoDone(label) { geoBtn.disabled = false; geoBtn.classList.remove('is-busy'); geoBtn.innerHTML = label || GEO_LABEL; }
   geoBtn.addEventListener('click', function () {
+    state.auto = false;
     if (!navigator.geolocation || !window.isSecureContext) { setStatus('This browser can’t share your location. Pop in your ZIP instead.'); return; }
     geoBtn.disabled = true; geoBtn.classList.add('is-busy');
     geoBtn.innerHTML = '<span class="sb-finder__spin"></span> Finding you…';
@@ -498,6 +502,20 @@
   var startQ = (params.get('q') || params.get('zip') || '').trim();
   if (startQ) { zipEl.value = startQ; lookup(startQ); }
   else if (params.get('lat') && params.get('lng')) { state.lat = parseFloat(params.get('lat')); state.lng = parseFloat(params.get('lng')); state.origin = { lat: state.lat, lng: state.lng }; search(); }
+  else {
+    // Nothing asked for yet: open on spots near the visitor's approximate city (New York City if unknown)
+    var startAt = function (lat, lng, label) {
+      if (state.zip || state.q || state.lat !== null) return; // they already searched
+      state.auto = true; state.lat = lat; state.lng = lng; state.origin = { lat: lat, lng: lng }; state.place = label;
+      search();
+    };
+    var nyc = function () { startAt(40.7181, -73.9879, 'New York City'); };
+    var t = setTimeout(nyc, 2500);
+    fetch(API + '/api/where').then(function (r) { return r.json(); }).then(function (w) {
+      clearTimeout(t);
+      if (isFinite(w.lat) && isFinite(w.lng)) startAt(w.lat, w.lng, w.label || 'you'); else nyc();
+    }).catch(function () { clearTimeout(t); nyc(); });
+  }
 })();
 </script>
 

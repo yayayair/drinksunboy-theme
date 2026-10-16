@@ -1,5 +1,14 @@
-{%- comment -%} Flavor pages (pages with SUNBOY flavor data) use the flavor sections instead. {%- endcomment -%}
-{%- unless template.name == 'page' and page.metafields.sunboy.hero_line != blank -%}
+{%- comment -%} Flavor pages and the account page use their own SUNBOY sections instead. {%- endcomment -%}
+{%- liquid
+  assign sb_skip_main = false
+  if template.name == 'page' and page.metafields.sunboy.hero_line != blank
+    assign sb_skip_main = true
+  endif
+  if template.name == 'page' and page.handle == 'account'
+    assign sb_skip_main = true
+  endif
+-%}
+{%- unless sb_skip_main -%}
 {{ 'section-main-page.css' | asset_url | stylesheet_tag }}
 
 {%- style -%}
