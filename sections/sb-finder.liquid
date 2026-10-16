@@ -345,6 +345,23 @@
     state.lat = c.lat; state.lng = c.lng; state.zip = ''; state.q = ''; state.place = ''; state.auto = false;
     search({ keepView: true });
   }
+  // Pins closer than a pin's width at this zoom fan out in a small circle so each one can be seen and clicked
+  function spreadPins() {
+    if (!map) return;
+    var keys = Object.keys(byKey).sort(), P = {}, used = {}, NEAR = 22;
+    keys.forEach(function (k) { P[k] = map.project(byKey[k].getLngLat()); });
+    keys.forEach(function (k) {
+      if (used[k]) return;
+      var group = [k]; used[k] = 1;
+      keys.forEach(function (o) { if (!used[o] && Math.abs(P[o].x - P[k].x) < NEAR && Math.abs(P[o].y - P[k].y) < NEAR) { group.push(o); used[o] = 1; } });
+      if (group.length === 1) { byKey[k].setOffset([0, 0]); return; }
+      var r = Math.max(15, group.length * 6);
+      group.forEach(function (g, i) {
+        var a = -Math.PI / 2 + i * 2 * Math.PI / group.length;
+        byKey[g].setOffset([Math.round(Math.cos(a) * r), Math.round(Math.sin(a) * r)]);
+      });
+    });
+  }
   function drawMap(stores, keepView) {
     if (!window.mapboxgl) { window.addEventListener('load', function () { drawMap(stores, keepView); }, { once: true }); return; }
     // the Mapbox public token comes from the finder service (or the section setting, if filled in)
@@ -386,11 +403,13 @@
     });
     Object.keys(byKey).forEach(function (k) { if (!keep[k]) { byKey[k].remove(); delete byKey[k]; } });
     map.resize();
+    if (!drawMap.spreadBound) { drawMap.spreadBound = true; map.on('zoomend', spreadPins); }
     if (pts.length && !keepView) {
       var b = new mapboxgl.LngLatBounds(pts[0], pts[0]); pts.slice(0, 15).forEach(function (p) { b.extend(p); });
       quiet(); map.fitBounds(b, { padding: 40, maxZoom: 15, duration: 0 });
     } else if (!pts.length && !keepView && state.lat !== null) { quiet(); map.jumpTo({ center: [state.lng, state.lat], zoom: 12 }); }
     mapToggle.hidden = !pts.length;
+    spreadPins();
   }
   listEl.addEventListener('click', function (e) {
     if (e.target.closest('a')) return;
