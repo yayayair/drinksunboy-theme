@@ -345,9 +345,9 @@
     state.lat = c.lat; state.lng = c.lng; state.zip = ''; state.q = ''; state.place = ''; state.auto = false;
     search({ keepView: true });
   }
-  // Only when zoomed right down to street level (zoom 17+): pins still on top of each other fan out in a small
+  // Only when zoomed right down to street level (zoom 16+): pins still on top of each other fan out in a small
   // circle so each can be clicked. At every other zoom, pins sit exactly where they are and may overlap.
-  var SPREAD_ZOOM = 17;
+  var SPREAD_ZOOM = 16;
   function spreadPins() {
     if (!map) return;
     var keys = Object.keys(byKey).sort(), P = {}, used = {}, NEAR = 22;
