@@ -19,7 +19,7 @@
     if (d.error) { app.innerHTML = '<div class="sb-trade__status">' + esc(d.error) + ' <a href="' + esc(app.dataset.logout) + '">Sign out</a></div>'; return; }
     if (d.role === 'none') {
       hi.textContent = 'Hi ' + (d.name || 'there') + '. Your account isn’t set up for trade ordering yet.';
-      app.innerHTML = '<div class="sb-trade__status">If you’re a distributor rep, request access below and we’ll turn it on.</div>';
+      app.innerHTML = '<div class="sb-trade__status">If you’re a distributor representative, request access below and we’ll turn it on.</div>';
       if (applyEl) applyEl.hidden = false;
       return;
     }
