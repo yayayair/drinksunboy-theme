@@ -345,10 +345,13 @@
     state.lat = c.lat; state.lng = c.lng; state.zip = ''; state.q = ''; state.place = ''; state.auto = false;
     search({ keepView: true });
   }
-  // Pins closer than a pin's width at this zoom fan out in a small circle so each one can be seen and clicked
+  // Only when zoomed right down to street level (zoom 17+): pins still on top of each other fan out in a small
+  // circle so each can be clicked. At every other zoom, pins sit exactly where they are and may overlap.
+  var SPREAD_ZOOM = 17;
   function spreadPins() {
     if (!map) return;
     var keys = Object.keys(byKey).sort(), P = {}, used = {}, NEAR = 22;
+    if (map.getZoom() < SPREAD_ZOOM) { keys.forEach(function (k) { byKey[k].setOffset([0, 0]); }); return; }
     keys.forEach(function (k) { P[k] = map.project(byKey[k].getLngLat()); });
     keys.forEach(function (k) {
       if (used[k]) return;
