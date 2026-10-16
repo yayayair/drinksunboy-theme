@@ -185,7 +185,7 @@ a.sb-retailer:hover { transform: translateY(-2px); opacity: .85; }
 .sb-label b { font-weight: 900; }
 .sb-label__note { font-size: 1.15rem; line-height: 1.35; border-top: .5rem solid #000; padding-top: .6rem; margin-top: .2rem; }
 .sb-label__abv { margin-top: 1rem; font-size: 1.3rem; font-weight: 700; }
-.sb-label__coco { margin: .6rem 0 0; padding-top: .6rem; border-top: 1px solid currentColor; font-size: 1.3rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+.sb-label__coco { margin: .6rem 0 0; padding-top: .6rem; border-top: 1px solid currentColor; font-size: min(1.3rem, 3.2vw); font-weight: 700; text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; }
 .sb-label--compact .sb-label__coco { font-size: 1.1rem; white-space: normal; }
 
 /* Flip band */
