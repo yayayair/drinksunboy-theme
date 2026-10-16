@@ -9,6 +9,13 @@
  */
 {
   "sections": {
+    "account": {
+      "type": "sb-account",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "eyebrow": "Your SUNBOY account"
+      }
+    },
     "hero": {
       "type": "sb-flavor-hero",
       "settings": {
@@ -190,6 +197,7 @@
     }
   },
   "order": [
+    "account",
     "hero",
     "nutrition",
     "flip",
