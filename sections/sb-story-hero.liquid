@@ -1,0 +1,34 @@
+{%- comment -%}
+  Our Story opener: full-bleed photo, headline that rises in word by word, gentle parallax.
+{%- endcomment -%}
+<section class="sb-shero" style="--sb-shero-h: {{ section.settings.height }}svh;">
+  <div class="sb-shero__media">
+    {%- if section.settings.image != blank -%}
+      {{ section.settings.image | image_url: width: 2400 | image_tag: widths: '750, 1100, 1500, 2000, 2400', sizes: '100vw', fetchpriority: 'high', class: 'sb-shero__img', alt: section.settings.image.alt | default: '' }}
+    {%- endif -%}
+  </div>
+  <div class="sb-shero__shade"></div>
+  <div class="sb-shero__text">
+    {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow sb-shero__eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h1 class="sb-display sb-shero__title">
+      {%- assign words = section.settings.heading | split: ' ' -%}
+      {%- for w in words -%}<span class="sb-shero__w" style="--i: {{ forloop.index0 }}">{{ w }}</span>{% unless forloop.last %} {% endunless %}{%- endfor -%}
+    </h1>
+    {%- if section.settings.sub != blank -%}<p class="sb-shero__sub">{{ section.settings.sub }}</p>{%- endif -%}
+  </div>
+  <a class="sb-shero__cue" href="#sb-story" aria-label="Read the story"><span></span></a>
+</section>
+
+{% schema %}
+{
+  "name": "SUNBOY story opener",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Photo" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Our story" },
+    { "type": "text", "id": "heading", "label": "Headline", "default": "Spread joy with coconuts." },
+    { "type": "text", "id": "sub", "label": "Line under the headline" },
+    { "type": "range", "id": "height", "label": "Height (% of screen)", "min": 50, "max": 100, "step": 5, "default": 90, "unit": "%" }
+  ],
+  "presets": [ { "name": "SUNBOY story opener" } ]
+}
+{% endschema %}

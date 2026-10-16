@@ -1,0 +1,69 @@
+{%- comment -%}
+  Instagram strip: handle, follow button, and a row of photos that link to the profile.
+  For a live feed, add the Instafeed app block to this section in the theme editor; it replaces the photo row.
+{%- endcomment -%}
+{%- liquid
+  assign handle = section.settings.handle | remove: '@' | strip
+  assign profile = 'https://www.instagram.com/' | append: handle | append: '/'
+  assign has_app = false
+  for block in section.blocks
+    if block.type == '@app'
+      assign has_app = true
+    endif
+  endfor
+-%}
+<section class="sb-insta color-{{ section.settings.color_scheme }} gradient">
+  <div class="sb-insta__head">
+    <div>
+      {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h2 class="sb-display sb-insta__title"><a href="{{ profile }}" target="_blank" rel="noopener">@{{ handle }}</a></h2>
+      {%- if section.settings.text != blank -%}<p class="sb-insta__text">{{ section.settings.text }}</p>{%- endif -%}
+    </div>
+    <a class="sb-btn sb-btn--solid sb-insta__follow" href="{{ profile }}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor"/></svg>
+      Follow on Instagram
+    </a>
+  </div>
+
+  {%- if has_app -%}
+    <div class="sb-insta__app">
+      {%- for block in section.blocks -%}{%- if block.type == '@app' -%}{% render block %}{%- endif -%}{%- endfor -%}
+    </div>
+  {%- else -%}
+    <ul class="sb-insta__row" role="list">
+      {%- for block in section.blocks -%}
+        {%- if block.type != 'photo' or block.settings.image == blank -%}{%- continue -%}{%- endif -%}
+        <li {{ block.shopify_attributes }}>
+          <a class="sb-insta__tile" href="{{ block.settings.link | default: profile }}" target="_blank" rel="noopener" aria-label="SUNBOY on Instagram (opens in a new tab)">
+            {{ block.settings.image | image_url: width: 600 | image_tag: widths: '300, 450, 600', sizes: '(min-width: 990px) 17vw, 42vw', loading: 'lazy', alt: block.settings.image.alt | default: '' }}
+            <span class="sb-insta__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor"/></svg></span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "SUNBOY Instagram",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Follow the sunshine" },
+    { "type": "text", "id": "handle", "label": "Instagram handle", "default": "drinksunboy" },
+    { "type": "text", "id": "text", "label": "Line under the handle", "default": "Parties, new flavors, merch drops and where we're popping up next." }
+  ],
+  "blocks": [
+    { "type": "@app" },
+    {
+      "type": "photo",
+      "name": "Photo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Photo" },
+        { "type": "url", "id": "link", "label": "Link to a post (optional)", "info": "Leave empty to link to the profile." }
+      ]
+    }
+  ],
+  "presets": [ { "name": "SUNBOY Instagram" } ]
+}
+{% endschema %}

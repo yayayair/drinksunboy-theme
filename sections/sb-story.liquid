@@ -1,0 +1,105 @@
+{%- comment -%}
+  Our Story chapters. Desktop: the photo stays pinned on the left and swaps as each chapter scrolls in,
+  while the whole section's colour shifts to the chapter's colour. Phones: each chapter shows its own photo.
+  Ends with a "say hi" line and buttons.
+{%- endcomment -%}
+{%- liquid
+  assign chapters = section.blocks | where: 'type', 'chapter'
+  assign first = chapters.first
+-%}
+<section class="sb-story" id="sb-story" data-sb-story
+  style="--story-bg: {{ first.settings.bg | default: '#F3EEE2' }}; --story-fg: {{ first.settings.fg | default: '#523B18' }};">
+  <div class="sb-story__grid">
+    <div class="sb-story__media" aria-hidden="true">
+      <div class="sb-story__frame">
+        {%- for block in chapters -%}
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 1400 | image_tag: widths: '600, 900, 1200, 1400', sizes: '(min-width: 990px) 45vw, 100vw', loading: 'lazy', class: 'sb-story__img', alt: '' }}
+          {%- endif -%}
+        {%- endfor -%}
+        <span class="sb-story__count"><b data-sb-story-n>01</b> / {{ chapters.size | prepend: '0' | slice: -2, 2 }}</span>
+      </div>
+    </div>
+    <div class="sb-story__chapters">
+      {%- for block in chapters -%}
+        <article class="sb-chapter" data-sb-chapter data-i="{{ forloop.index0 }}" data-bg="{{ block.settings.bg }}" data-fg="{{ block.settings.fg }}" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 1000 | image_tag: widths: '500, 750, 1000', sizes: '100vw', loading: 'lazy', class: 'sb-chapter__img', alt: block.settings.image.alt | default: '' }}
+          {%- endif -%}
+          <p class="sb-chapter__kicker"><span class="sb-chapter__num">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>{{ block.settings.kicker }}</p>
+          <h2 class="sb-display sb-chapter__title">{{ block.settings.heading }}</h2>
+          <div class="sb-chapter__body">{{ block.settings.body }}</div>
+        </article>
+      {%- endfor -%}
+      {%- if section.settings.close_heading != blank -%}
+        <div class="sb-chapter sb-story__close" data-sb-chapter data-i="{{ chapters.size }}" data-bg="{{ section.settings.close_bg }}" data-fg="{{ section.settings.close_fg }}">
+          <h2 class="sb-display sb-chapter__title">{{ section.settings.close_heading }}</h2>
+          <div class="sb-chapter__body">{{ section.settings.close_body }}</div>
+          <div class="sb-story__ctas">
+            {%- if section.settings.button_label != blank -%}<a class="sb-btn sb-btn--yellow" href="{{ section.settings.button_link }}">{{ section.settings.button_label }}</a>{%- endif -%}
+            {%- if section.settings.link_label != blank -%}<a class="sb-link-arrow" href="{{ section.settings.link }}">{{ section.settings.link_label }}</a>{%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var root = document.querySelector('[data-sb-story]');
+  if (!root || root.dataset.bound) return; root.dataset.bound = 1;
+  var chapters = [].slice.call(root.querySelectorAll('[data-sb-chapter]'));
+  var imgs = [].slice.call(root.querySelectorAll('.sb-story__img'));
+  var n = root.querySelector('[data-sb-story-n]');
+  var last = imgs.length - 1, cur = -1;
+  function show(i) {
+    if (i === cur) return; cur = i;
+    var c = chapters[i];
+    if (c.dataset.bg) root.style.setProperty('--story-bg', c.dataset.bg);
+    if (c.dataset.fg) root.style.setProperty('--story-fg', c.dataset.fg);
+    var img = Math.min(i, last);
+    imgs.forEach(function (el, k) { el.classList.toggle('is-on', k === img); });
+    if (n) n.textContent = ('0' + (img + 1)).slice(-2);
+    chapters.forEach(function (el, k) { el.classList.toggle('is-on', k === i); });
+  }
+  show(0);
+  if (!('IntersectionObserver' in window)) { chapters.forEach(function (c) { c.classList.add('is-on'); }); return; }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) show(parseInt(e.target.dataset.i, 10)); });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  chapters.forEach(function (c) { io.observe(c); });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "SUNBOY story chapters",
+  "settings": [
+    { "type": "header", "content": "Closing" },
+    { "type": "text", "id": "close_heading", "label": "Heading", "default": "Say hi." },
+    { "type": "richtext", "id": "close_body", "label": "Text", "default": "<p>Questions, ideas, collabs or coconut confessions: <a href=\"mailto:holler@drinksunboy.com\">holler@drinksunboy.com</a></p>" },
+    { "type": "text", "id": "button_label", "label": "Button", "default": "Find SUNBOY near you" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "text", "id": "link_label", "label": "Second link", "default": "Shop the merch" },
+    { "type": "url", "id": "link", "label": "Second link URL" },
+    { "type": "color", "id": "close_bg", "label": "Closing background", "default": "#523B18" },
+    { "type": "color", "id": "close_fg", "label": "Closing text", "default": "#FFFFFF" }
+  ],
+  "blocks": [
+    {
+      "type": "chapter",
+      "name": "Chapter",
+      "settings": [
+        { "type": "text", "id": "kicker", "label": "Small label", "default": "The bike cart" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "It started with a bike cart." },
+        { "type": "richtext", "id": "body", "label": "Text" },
+        { "type": "image_picker", "id": "image", "label": "Photo" },
+        { "type": "color", "id": "bg", "label": "Background while this chapter is on screen", "default": "#F3EEE2" },
+        { "type": "color", "id": "fg", "label": "Text colour", "default": "#523B18" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "SUNBOY story chapters", "blocks": [ { "type": "chapter" } ] } ]
+}
+{% endschema %}
