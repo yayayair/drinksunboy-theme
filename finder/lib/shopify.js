@@ -6,14 +6,14 @@ let tok = { value: '', exp: 0 };
 
 async function token() {
   if (tok.value && Date.now() < tok.exp - 60_000) return tok.value;
-  const id = process.env.SHOPIFY_CLIENT_ID, secret = process.env.SHOPIFY_CLIENT_SECRET;
+  const id = String(process.env.SHOPIFY_CLIENT_ID || '').trim(), secret = String(process.env.SHOPIFY_CLIENT_SECRET || '').trim();
   if (!id || !secret) throw new Error('Shopify app credentials missing');
   const r = await fetch(`https://${SHOP}/admin/oauth/access_token`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ client_id: id, client_secret: secret, grant_type: 'client_credentials' })
+    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+    body: new URLSearchParams({ grant_type: 'client_credentials', client_id: id, client_secret: secret })
   });
-  const d = await r.json().catch(() => ({}));
-  if (!r.ok || !d.access_token) throw new Error(`Shopify token ${r.status}: ${JSON.stringify(d).slice(0, 200)}`);
+  const txt = await r.text(); let d = {}; try { d = JSON.parse(txt); } catch {}
+  if (!r.ok || !d.access_token) throw new Error(`Shopify token ${r.status}: ${txt.slice(0, 200)}`);
   tok = { value: d.access_token, exp: Date.now() + (Number(d.expires_in) || 86399) * 1000 };
   return tok.value;
 }
