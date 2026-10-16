@@ -1,0 +1,20 @@
+{%- comment -%}
+  Cans are never sold online. In this theme a can product page (product type "Beer") sends visitors
+  to its flavor page (Pages → e.g. /pages/guava), so prices and sold-out buttons never show.
+{%- endcomment -%}
+{%- if template.name == 'product' and product.type == 'Beer' -%}
+  {%- liquid
+    assign slug = product.handle | remove_first: 'sunboy-'
+    assign dest = '/pages/' | append: slug
+    if product.handle == 'sunboy-variety-pack'
+      assign dest = '/pages/classic-variety-pack'
+    endif
+  -%}
+  <script>
+    (function () {
+      var d = {{ dest | json }}, t = window.Shopify && Shopify.theme;
+      if (t && t.role && t.role !== 'main') d += '?preview_theme_id=' + t.id;
+      location.replace(d);
+    })();
+  </script>
+{%- endif -%}
