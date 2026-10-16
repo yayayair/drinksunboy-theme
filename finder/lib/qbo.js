@@ -50,6 +50,7 @@ async function tokenCall(params) {
   });
   const d = await r.json().catch(() => ({}));
   if (!r.ok || !d.access_token) {
+    console.error('qbo token error', JSON.stringify({ status: r.status, intuit_tid: r.headers.get('intuit_tid') || '', error: d.error || '' }));
     const err = new Error(`QuickBooks token ${r.status}: ${d.error || ''}`);
     err.reconnect = d.error === 'invalid_grant' || r.status === 400 || r.status === 401;
     throw err;
@@ -95,7 +96,11 @@ async function api(path, init = {}) {
     await vaultSet('qbo', { ...s, accessExp: 0 });
     return api(path, { ...init, _retried: true });
   }
-  if (!r.ok) throw new Error(`QuickBooks ${r.status}: ${JSON.stringify(d.Fault || d).slice(0, 300)}`);
+  if (!r.ok) {
+    const tid = r.headers.get('intuit_tid') || '';
+    console.error('qbo api error', JSON.stringify({ status: r.status, path: path.split('?')[0], intuit_tid: tid, fault: d.Fault || d }).slice(0, 1500));
+    throw new Error(`QuickBooks ${r.status}${tid ? ' (intuit_tid ' + tid + ')' : ''}: ${JSON.stringify(d.Fault || d).slice(0, 300)}`);
+  }
   return d;
 }
 export const query = async q => (await api('query?query=' + encodeURIComponent(q))).QueryResponse || {};
