@@ -284,6 +284,16 @@
   }
 
   // One selected spot at a time: its pin turns yellow and its card is outlined, whichever you tapped.
+  // Bring a list card into view below the pinned header + mini search bar, never above the top of the list
+  function scrollToCard(li) {
+    var hw = document.querySelector('.header-wrapper'), mini = root.querySelector('[data-sb-mini]');
+    var bars = (hw ? hw.getBoundingClientRect().bottom : 0) + (mini && window.matchMedia('(min-width: 990px)').matches ? mini.offsetHeight : 0) + 16;
+    var r = li.getBoundingClientRect(), vh = window.innerHeight;
+    if (r.top >= bars && r.bottom <= vh - 16) return; // already fully visible
+    var listTop = listEl.getBoundingClientRect().top + window.scrollY - bars;
+    var centred = r.top + window.scrollY - bars - Math.max(0, (vh - bars - r.height) / 2);
+    window.scrollTo({ top: Math.max(listTop, centred), behavior: 'smooth' });
+  }
   function select(i, from) {
     state.sel = i; state.selKey = state.stores[i].key; state.selStore = state.stores[i];
     root.querySelectorAll('.sb-pin.is-sel').forEach(function (p) { p.classList.remove('is-sel'); });
@@ -298,7 +308,7 @@
       if (root.classList.contains('show-map') && mobile.matches) {
         openSheet(i);
       } else if (li) {
-        li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollToCard(li);
       }
     } else if (m && map) {
       var p = map.project(m.getLngLat()), box = map.getContainer();
