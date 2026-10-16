@@ -96,3 +96,4 @@
 .sb-tadmin__inv th, .sb-tadmin__inv td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid rgba(82,59,24,.12); }
 .sb-tadmin__ok { display: flex; gap: .8rem; align-items: center; margin-bottom: 1rem; }
 .sb-trade__ctas .sb-btn:not(.sb-btn--yellow) { color: inherit; border-color: currentColor; }
+.sb-trade__newaddr[hidden], .sb-tadmin__reject[hidden] { display: none; }
