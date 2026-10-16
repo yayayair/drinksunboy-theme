@@ -1,6 +1,6 @@
 {%- comment -%}
   Variety pack page: pack hero, then one row per flavor in the pack (can, story, nutrition, link).
-  Flavor words/nutrition come from each flavor product's SUNBOY metafields.
+  Flavor words/nutrition come from each flavor page's SUNBOY metafields.
 {%- endcomment -%}
 {%- liquid
   assign pack_img = section.settings.image
@@ -24,7 +24,7 @@
       {%- if section.settings.details != blank -%}<p class="sb-pack__details">{{ section.settings.details }}</p>{%- endif -%}
       <div class="sb-pack__chips">
         {%- for block in section.blocks -%}
-          {%- assign f = block.settings.product -%}
+          {%- assign f = block.settings.flavor -%}
           {%- if f == blank -%}{%- continue -%}{%- endif -%}
           <a class="sb-pack__chip" href="#pack-{{ f.handle }}" style="background: {{ f.metafields.sunboy.color_main.value | default: '#0BB89B' }}">{{ f.title }}</a>
         {%- endfor -%}
@@ -34,7 +34,7 @@
   </div>
 
   {%- for block in section.blocks -%}
-    {%- assign f = block.settings.product -%}
+    {%- assign f = block.settings.flavor -%}
     {%- if f == blank -%}{%- continue -%}{%- endif -%}
     {%- liquid
       assign slug = f.handle | remove_first: 'sunboy-'
@@ -81,7 +81,7 @@
     { "type": "url", "id": "finder_url", "label": "Find Us page" }
   ],
   "blocks": [
-    { "type": "flavor", "name": "Flavor in the pack", "settings": [ { "type": "product", "id": "product", "label": "Flavor product" } ] }
+    { "type": "flavor", "name": "Flavor in the pack", "settings": [ { "type": "page", "id": "flavor", "label": "Flavor page" } ] }
   ],
   "presets": [ { "name": "SUNBOY variety pack" } ]
 }

@@ -4,12 +4,16 @@
   "Show on" decides which products use this section (flavors, goods, or everything).
 {%- endcomment -%}
 {%- liquid
+  assign fl = product
+  if template.name == 'page'
+    assign fl = page
+  endif
   assign is_flavor = false
-  if product.metafields.sunboy.hero_line != blank
+  if fl.metafields.sunboy.hero_line != blank
     assign is_flavor = true
   endif
   assign show = true
-  if template.name == 'product'
+  if template.name == 'product' or template.suffix == 'flavor'
     if section.settings.show_on == 'flavors' and is_flavor == false
       assign show = false
     endif
@@ -17,7 +21,7 @@
       assign show = false
     endif
   endif
-  assign custom = product.metafields.sunboy.faqs.value
+  assign custom = fl.metafields.sunboy.faqs.value
 -%}
 {%- if show -%}
 <section class="color-{{ section.settings.color_scheme }} gradient">

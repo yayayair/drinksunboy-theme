@@ -1,6 +1,6 @@
 {%- comment -%}
-  Flavor lineup. Each block picks a flavor product; colours and hero line come from the
-  product's SUNBOY metafields. On a flavor page the current flavor is marked "You're here".
+  Flavor lineup. Each block picks a flavor page; colours and hero line come from the
+  page's SUNBOY metafields. On a flavor page the current flavor is marked "You're here".
   On a non-flavor product page this section hides itself.
 {%- endcomment -%}
 {%- liquid
@@ -23,10 +23,10 @@
     </div>
     <div class="sb-lineup__grid">
       {%- for block in section.blocks -%}
-        {%- assign flavor = block.settings.product -%}
+        {%- assign flavor = block.settings.flavor -%}
         {%- if flavor == blank -%}{%- continue -%}{%- endif -%}
         {%- assign is_current = false -%}
-        {%- if template.name == 'product' and flavor.id == product.id -%}{%- assign is_current = true -%}{%- endif -%}
+        {%- if template.suffix == 'flavor' and flavor.id == page.id -%}{%- assign is_current = true -%}{%- endif -%}
         <div {{ block.shopify_attributes }}>
           {% render 'sb-flavor-card', flavor: flavor, image: block.settings.image, current: is_current %}
         </div>
@@ -52,7 +52,7 @@
       "type": "flavor",
       "name": "Flavor",
       "settings": [
-        { "type": "product", "id": "product", "label": "Flavor product" },
+        { "type": "page", "id": "flavor", "label": "Flavor page" },
         { "type": "image_picker", "id": "image", "label": "Can image override", "info": "Transparent PNG of the can. Leave empty to use the Brand Kit can." }
       ]
     }

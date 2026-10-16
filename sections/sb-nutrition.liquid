@@ -1,10 +1,19 @@
 {%- comment -%}
-  Nutrition facts + transparency (flavor products only).
-  Numbers come from the product's "Nutrition facts" metafield (Content → Metaobjects → Nutrition facts).
+  Nutrition facts + transparency (flavor pages only).
+  Numbers come from the flavor page's "Nutrition facts" metafield (Content → Metaobjects → Nutrition facts).
 {%- endcomment -%}
-{%- assign n = product.metafields.sunboy.nutrition.value -%}
-{%- if product.metafields.sunboy.hero_line != blank and n != blank -%}
-{%- assign c_main = product.metafields.sunboy.color_main.value | default: '#0BB89B' -%}
+{%- liquid
+  comment
+    The flavor shown here: a flavor page (Pages, template "flavor") or, as a fallback, a product.
+  endcomment
+  assign fl = product
+  if template.name == 'page'
+    assign fl = page
+  endif
+-%}
+{%- assign n = fl.metafields.sunboy.nutrition.value -%}
+{%- if fl.metafields.sunboy.hero_line != blank and n != blank -%}
+{%- assign c_main = fl.metafields.sunboy.color_main.value | default: '#0BB89B' -%}
 <section class="color-{{ section.settings.color_scheme }} gradient" id="nutrition" style="--flavor-b: {{ c_main }};">
   <div class="sb-wrap sb-nutri">
     <div class="sb-nutri__grid">
@@ -20,7 +29,7 @@
         </div>
       </div>
       <div>
-        {% render 'sb-nutrition-label', n: n, title: product.title %}
+        {% render 'sb-nutrition-label', n: n, title: fl.title %}
       </div>
     </div>
   </div>
@@ -31,7 +40,7 @@
 {
   "name": "SUNBOY nutrition",
   "settings": [
-    { "type": "paragraph", "content": "Only shows on flavor products. Numbers live in Content → Metaobjects → Nutrition facts." },
+    { "type": "paragraph", "content": "Only shows on flavor pages. Numbers live in Content → Metaobjects → Nutrition facts." },
     { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-5" },
     { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Radical transparency" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Nothing to hide. Literally." },

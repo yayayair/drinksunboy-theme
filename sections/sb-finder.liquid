@@ -19,7 +19,7 @@
         <div class="sb-finder__chips" role="radiogroup" aria-label="Flavor">
           <button type="button" class="sb-chip is-on" data-flavor="" role="radio" aria-checked="true">All flavors</button>
           {%- for block in section.blocks -%}
-            {%- assign f = block.settings.product -%}
+            {%- assign f = block.settings.flavor -%}
             {%- if f == blank -%}{%- continue -%}{%- endif -%}
             <button type="button" class="sb-chip" data-flavor="{{ f.handle | remove_first: 'sunboy-' }}" data-name="{{ f.title | capitalize | escape }}" role="radio" aria-checked="false" style="--chip: {{ f.metafields.sunboy.color_main.value | default: '#523B18' }}" {{ block.shopify_attributes }}>{{ f.title | capitalize }}</button>
           {%- endfor -%}
@@ -486,7 +486,7 @@
     { "type": "text", "id": "mapbox_token", "label": "Mapbox public token (optional)", "info": "Leave blank to use the token stored in the finder service (Vercel → MAPBOX_PUBLIC_TOKEN)." }
   ],
   "blocks": [
-    { "type": "flavor", "name": "Flavor filter", "settings": [ { "type": "product", "id": "product", "label": "Flavor product" } ] }
+    { "type": "flavor", "name": "Flavor filter", "settings": [ { "type": "page", "id": "flavor", "label": "Flavor page" } ] }
   ],
   "presets": [ { "name": "SUNBOY store finder" } ]
 }

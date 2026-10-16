@@ -1,12 +1,21 @@
 {%- comment -%}
-  Flavor page hero (only on flavor products: products with a SUNBOY hero line).
-  Words, colours and nutrition come from the product's SUNBOY metafields.
+  Flavor page hero (only on flavor pages: pages with a SUNBOY hero line).
+  Words, colours and nutrition come from the flavor page's SUNBOY metafields.
   Beer is not sold online, so there is no price or add-to-cart: the CTA goes to Find Us.
 {%- endcomment -%}
-{%- if product.metafields.sunboy.hero_line != blank -%}
 {%- liquid
-  assign slug = product.handle | remove_first: 'sunboy-'
-  assign mf = product.metafields.sunboy
+  comment
+    The flavor shown here: a flavor page (Pages, template "flavor") or, as a fallback, a product.
+  endcomment
+  assign fl = product
+  if template.name == 'page'
+    assign fl = page
+  endif
+-%}
+{%- if fl.metafields.sunboy.hero_line != blank -%}
+{%- liquid
+  assign slug = fl.handle | remove_first: 'sunboy-'
+  assign mf = fl.metafields.sunboy
   assign c_main = mf.color_main.value | default: '#0BB89B'
   assign c_accent = mf.color_accent.value | default: '#F9ED25'
   assign band = 'sb-band-' | append: slug | append: '.webp'
@@ -16,11 +25,11 @@
 <section class="sb-fhero" style="--flavor-a: {{ c_accent }}; --flavor-b: {{ c_main }};">
   <div class="sb-fhero__stage">
     <span class="sb-fhero__pattern" style="background-image:url('{{ band | asset_url }}')"></span>
-    <img class="sb-fhero__can" src="{{ can | asset_url }}" alt="{{ product.title | escape }} can" width="693" height="1800" fetchpriority="high">
+    <img class="sb-fhero__can" src="{{ can | asset_url }}" alt="{{ fl.title | escape }} can" width="693" height="1800" fetchpriority="high">
   </div>
   <div class="sb-fhero__text">
     <p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>
-    <h1 class="sb-display sb-fhero__name">{{ product.title }}</h1>
+    <h1 class="sb-display sb-fhero__name">{{ fl.title }}</h1>
     <p class="sb-fhero__hero">{{ mf.hero_line }}</p>
     {%- if mf.romance != blank -%}<p class="sb-fhero__romance">{{ mf.romance | newline_to_br }}</p>{%- endif -%}
     {%- if mf.tasting_notes != blank or mf.in_the_can != blank or mf.available_in != blank -%}
@@ -37,7 +46,7 @@
       </div>
     {%- endif -%}
     <div class="sb-fhero__ctas">
-      <a class="sb-btn sb-btn--yellow" href="{{ finder }}?flavor={{ slug }}">Find {{ product.title | capitalize }} near you</a>
+      <a class="sb-btn sb-btn--yellow" href="{{ finder }}?flavor={{ slug }}">Find {{ fl.title | capitalize }} near you</a>
       {%- if mf.nutrition != blank -%}<a class="sb-link-arrow" href="#nutrition">Nutrition facts</a>{%- endif -%}
     </div>
   </div>
@@ -48,7 +57,7 @@
 {
   "name": "SUNBOY flavor hero",
   "settings": [
-    { "type": "paragraph", "content": "Only shows on flavor products. Words and colours come from each product's SUNBOY metafields (Products → flavor → Metafields)." },
+    { "type": "paragraph", "content": "Only shows on flavor pages. Words and colours come from each flavor page's metafields (Online Store → Pages → flavor → Metafields)." },
     { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Spiked coconut water · 5% ABV" },
     { "type": "text", "id": "badges", "label": "Badges (comma separated)", "default": "5% ABV, 0g added sugar, Gluten-free, Real coconut water" },
     { "type": "url", "id": "finder_url", "label": "Find Us page" }
