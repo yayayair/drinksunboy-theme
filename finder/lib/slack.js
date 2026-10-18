@@ -20,6 +20,20 @@ export async function api(method, payload) {
   return d;
 }
 
+// Read methods (users.info, conversations.history, conversations.list) don't accept JSON bodies: send them as a form.
+export async function get(method, params) {
+  const form = new URLSearchParams();
+  Object.entries(params || {}).forEach(([k, v]) => { if (v !== undefined && v !== '') form.set(k, String(v)); });
+  const r = await fetch(`https://slack.com/api/${method}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: `Bearer ${TOKEN()}` },
+    body: form
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) throw new Error(`Slack ${method}: ${d.error || r.status}`);
+  return d;
+}
+
 // Slack request signing (v0). Rejects anything older than 5 minutes.
 export function verify(raw, headers) {
   const secret = String(process.env.SLACK_SIGNING_SECRET || '').trim();
@@ -37,7 +51,7 @@ export async function channel() {
   if (chanCache) return chanCache;
   let cursor = '';
   do {
-    const d = await api('conversations.list', { limit: 1000, exclude_archived: true, types: 'public_channel,private_channel', cursor });
+    const d = await get('conversations.list', { limit: 1000, exclude_archived: true, types: 'public_channel,private_channel', cursor });
     const hit = (d.channels || []).find(c => c.name === want);
     if (hit) return (chanCache = hit.id);
     cursor = d.response_metadata?.next_cursor || '';
@@ -137,11 +151,12 @@ const who = new Map();
 export async function approver(userId) {
   const hit = who.get(userId);
   if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit;
-  let out = null;
+  const list = String(process.env.SLACK_APPROVERS || '').split(/[\s,]+/).map(s => s.trim()).filter(Boolean);
+  let out = null, u = {};
+  try { u = (await get('users.info', { user: userId })).user || {}; }
+  catch (e) { console.error('slack approver', e.message); }
+  const name = u.profile?.first_name || u.real_name?.split(' ')[0] || u.name || 'A trade admin';
   try {
-    const u = (await api('users.info', { user: userId })).user || {};
-    const name = u.profile?.first_name || u.real_name?.split(' ')[0] || u.name || 'someone';
-    const list = String(process.env.SLACK_APPROVERS || '').split(',').map(s => s.trim()).filter(Boolean);
     let ok = list.includes(userId);
     const email = u.profile?.email;
     if (!ok && email) {
@@ -149,7 +164,7 @@ export async function approver(userId) {
       ok = d.customers.nodes.some(c => String(c.email).toLowerCase() === email.toLowerCase() && c.tags.map(t => t.toLowerCase()).includes('trade-admin'));
     }
     out = { ok, name, at: Date.now() };
-  } catch (e) { console.error('slack approver', e.message); return { ok: false, name: 'someone' }; }
+  } catch (e) { console.error('slack approver', e.message); return { ok: list.includes(userId), name }; }
   who.set(userId, out);
   if (who.size > 200) who.clear();
   return out;

@@ -56,7 +56,7 @@ async function onMessage(ev) {
   const text = String(ev.text || '').trim();
   const isDeny = DENY.exec(text), isApprove = !isDeny && APPROVE.test(text) && text.split(/\s+/).length <= 4;
   if (!isDeny && !isApprove) return;
-  const h = await slack.api('conversations.history', { channel: ev.channel, latest: ev.thread_ts, inclusive: true, limit: 1 });
+  const h = await slack.get('conversations.history', { channel: ev.channel, latest: ev.thread_ts, inclusive: true, limit: 1 });
   const parent = (h.messages || [])[0];
   if (!parent || !parent.bot_id) return;
   const actions = (parent.blocks || []).find(b => b.block_id === 'trade_decision');
