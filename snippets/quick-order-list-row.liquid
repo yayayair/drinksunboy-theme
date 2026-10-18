@@ -66,7 +66,7 @@
         </dt>
         <dd>
           <s class="variant-item__old-price price price--end">
-            {{ item.compare_at_price | money }}
+            {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{ item.compare_at_price | money }}{% endif %}
           </s>
         </dd>
         <dt class="visually-hidden">
@@ -86,14 +86,14 @@
                 {%- if cart_qty < volume_pricing_array.last.minimum_quantity -%}
                   {%- assign variant_price = variant.price | money -%}
                   <span class="price-per-item--current price">
-                    {{- 'sections.quick_order_list.each' | t: money: variant_price -}}
+                    {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: variant_price -}}{% endif %}
                   </span>
                 {%- else -%}
                   {%- for price_break in volume_pricing_array -%}
                     {%- if cart_qty >= price_break.minimum_quantity -%}
                       {%- assign price_break_price = price_break.price | money -%}
                       <span class="price-per-item--current price">
-                        {{- 'sections.quick_order_list.each' | t: money: price_break_price -}}
+                        {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: price_break_price -}}{% endif %}
                       </span>
                       {%- break -%}
                     {%- endif -%}
@@ -103,7 +103,7 @@
             </price-per-item>
           {%- else -%}
             <span class="price">
-              {{- 'sections.quick_order_list.each' | t: money: item_price -}}
+              {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: item_price -}}{% endif %}
             </span>
           {%- endif -%}
         </dd>
@@ -122,14 +122,14 @@
             {%- if cart_qty < volume_pricing_array.last.minimum_quantity -%}
               {%- assign variant_price = variant.price | money -%}
               <span class="price-per-item--current price">
-                {{- 'sections.quick_order_list.each' | t: money: variant_price -}}
+                {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: variant_price -}}{% endif %}
               </span>
             {%- else -%}
               {%- for price_break in volume_pricing_array -%}
                 {%- if cart_qty >= price_break.minimum_quantity -%}
                   {%- assign price_break_price = price_break.price | money -%}
                   <span class="price-per-item--current price">
-                    {{- 'sections.quick_order_list.each' | t: money: price_break_price -}}
+                    {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: price_break_price -}}{% endif %}
                   </span>
                   {%- break -%}
                 {%- endif -%}
@@ -139,7 +139,7 @@
         </price-per-item>
       {%- else -%}
         <span class="price">
-          {{- 'sections.quick_order_list.each' | t: money: item_price -}}
+          {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: item_price -}}{% endif %}
         </span>
       {%- endif -%}
     {%- endif -%}
@@ -153,7 +153,7 @@
     {%- render 'loading-spinner' -%}
     {% comment %} TODO: enable theme-check once `line_items_for` is accepted as valid filter {% endcomment %}
     {% # theme-check-disable %}
-    <span class="price">{{ cart | line_items_for: item | sum: 'original_line_price' | money }}</span>
+    <span class="price">{% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{ cart | line_items_for: item | sum: 'original_line_price' | money }}{% endif %}</span>
     {% # theme-check-enable %}
   </td>
 
@@ -247,7 +247,7 @@
                     <li>
                       <span>{{ variant.quantity_rule.min }}+</span>
                       {%- assign price = variant.price | money_with_currency -%}
-                      <span>{{ 'sections.quick_order_list.each' | t: money: price }}</span>
+                      <span>{% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{ 'sections.quick_order_list.each' | t: money: price }}{% endif %}</span>
                     </li>
                     {%- for price_break in variant.quantity_price_breaks -%}
                       <li>
@@ -256,7 +256,7 @@
                           <span aria-hidden="true">+</span></span
                         >
                         {%- assign price = price_break.price | money_with_currency -%}
-                        <span> {{ 'sections.quick_order_list.each' | t: money: price }}</span>
+                        <span> {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{ 'sections.quick_order_list.each' | t: money: price }}{% endif %}</span>
                       </li>
                     {%- endfor -%}
                   </ul>
@@ -329,7 +329,7 @@
         </dt>
         <dd>
           <s class="variant-item__old-price price price--end">
-            {{ item.compare_at_price | money }}
+            {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{ item.compare_at_price | money }}{% endif %}
           </s>
         </dd>
         <dt class="visually-hidden">
@@ -349,14 +349,14 @@
                 {%- if cart_qty < volume_pricing_array.last.minimum_quantity -%}
                   {%- assign variant_price = variant.price | money -%}
                   <span class="price-per-item--current price">
-                    {{- 'sections.quick_order_list.each' | t: money: variant_price -}}
+                    {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: variant_price -}}{% endif %}
                   </span>
                 {%- else -%}
                   {%- for price_break in volume_pricing_array -%}
                     {%- if cart_qty >= price_break.minimum_quantity -%}
                       {%- assign price_break_price = price_break.price | money -%}
                       <span class="price-per-item--current price">
-                        {{- 'sections.quick_order_list.each' | t: money: price_break_price -}}
+                        {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: price_break_price -}}{% endif %}
                       </span>
                       {%- break -%}
                     {%- endif -%}
@@ -366,7 +366,7 @@
             </price-per-item>
           {%- else -%}
             <span class="price">
-              {{- 'sections.quick_order_list.each' | t: money: item_price -}}
+              {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: item_price -}}{% endif %}
             </span>
           {%- endif -%}
         </dd>
@@ -385,14 +385,14 @@
             {%- if cart_qty < volume_pricing_array.last.minimum_quantity -%}
               {%- assign variant_price = variant.price | money -%}
               <span class="price-per-item--current price">
-                {{- 'sections.quick_order_list.each' | t: money: variant_price -}}
+                {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: variant_price -}}{% endif %}
               </span>
             {%- else -%}
               {%- for price_break in volume_pricing_array -%}
                 {%- if cart_qty >= price_break.minimum_quantity -%}
                   {%- assign price_break_price = price_break.price | money -%}
                   <span class="price-per-item--current price">
-                    {{- 'sections.quick_order_list.each' | t: money: price_break_price -}}
+                    {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: price_break_price -}}{% endif %}
                   </span>
                   {%- break -%}
                 {%- endif -%}
@@ -402,7 +402,7 @@
         </price-per-item>
       {%- else -%}
         <span class="price">
-          {{- 'sections.quick_order_list.each' | t: money: item_price -}}
+          {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{- 'sections.quick_order_list.each' | t: money: item_price -}}{% endif %}
         </span>
       {%- endif -%}
     {%- endif -%}
@@ -415,7 +415,7 @@
     {%- render 'loading-spinner' -%}
     {% comment %} TODO: enable theme-check once `line_items_for` is accepted as valid filter {% endcomment %}
     {% # theme-check-disable %}
-    <span class="price">{{ cart | line_items_for: item | sum: 'original_line_price' | money }}</span>
+    <span class="price">{% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{ cart | line_items_for: item | sum: 'original_line_price' | money }}{% endif %}</span>
     {% # theme-check-enable %}
   </td>
 </tr>

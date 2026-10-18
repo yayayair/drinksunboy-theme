@@ -7,7 +7,7 @@
 
 <nav class="header__inline-menu">
   <ul class="list-menu list-menu--inline" role="list">
-    {%- for link in section.settings.menu.links -%}
+    {%- for link in section.settings.menu.links -%}{% comment %}start BSS Commerce Hide Content Navbar{% endcomment %}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'subject', subject: link.object, variable: 'navbar' %}{% endcapture %}{% if bss_lock_check contains 'true' %}{% continue %}{% endif %}{% comment %}end BSS Commerce Hide Content Navbar {% endcomment %}
       <li>
         {%- if link.links != blank -%}
           <header-menu>
@@ -31,7 +31,7 @@
                 role="list"
                 tabindex="-1"
               >
-                {%- for childlink in link.links -%}
+                {%- for childlink in link.links -%}{% comment %}start BSS Commerce Hide Content Navbar{% endcomment %}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'subject', subject: childlink.object, variable: 'navbar' %}{% endcapture %}{% if bss_lock_check contains 'true' %}{% continue %}{% endif %}{% comment %}end BSS Commerce Hide Content Navbar {% endcomment %}
                   <li>
                     {%- if childlink.links == blank -%}
                       <a
@@ -57,7 +57,7 @@
                           id="HeaderMenu-SubMenuList-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
                           class="header__submenu list-menu motion-reduce"
                         >
-                          {%- for grandchildlink in childlink.links -%}
+                          {%- for grandchildlink in childlink.links -%}{% comment %}start BSS Commerce Hide Content Navbar{% endcomment %}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'subject', subject: grandchildlink.object, variable: 'navbar' %}{% endcapture %}{% if bss_lock_check contains 'true' %}{% continue %}{% endif %}{% comment %}end BSS Commerce Hide Content Navbar {% endcomment %}
                             <li>
                               <a
                                 id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"

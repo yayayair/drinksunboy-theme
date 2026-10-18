@@ -84,7 +84,8 @@
                   is_modal: is_modal
                 -%}
               {%- else -%}
-                {%- for variant in product.variants -%}
+                {%- for variant in product.variants -%}{%- comment %}BSS Login{% endcomment -%}{% capture var %} {% render 'bss-lock-condition', scope: 'subject', subject: variant, subject_parent: product, bss_lock_action: 'handle-variant-default' %} {% endcapture %} {% if var contains "true" %} {% continue %} {% endif %}{%- comment %}BSS-Login{% endcomment -%}
+
                   {%- render 'quick-order-list-row',
                     item: variant,
                     image: variant.image,
@@ -177,7 +178,7 @@
               <span class="totals__subtotal-value">
                 {% comment %} TODO: enable theme-check once `line_items_for` is accepted as valid filter {% endcomment %}
                 {% # theme-check-disable %}
-                {{ cart | line_items_for: product | sum: 'original_line_price' | money }}
+                {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'price', bss_lock_action: 'bss_hide_price' %} {% endcapture %} {% if bss_lock_check contains 'bss-lock-element' %} {{ bss_lock_check }}  {% else %}{{ cart | line_items_for: product | sum: 'original_line_price' | money }}{% endif %}
                 {% # theme-check-enable %}
               </span>
               <p class="totals__subtotal h5">{{ 'sections.quick_order_list.product_total' | t }}</p>

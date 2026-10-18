@@ -50,9 +50,14 @@
         "heading": "Team Portal",
         "signed_out_text": "POS and merch for RSMs and the SUNBOY team. Paid by SUNBOY; every order is approved by Yair or Sam."
       }
+    },
+    "pf-d8eebc48": {
+      "type": "pf-d8eebc48",
+      "settings": {}
     }
   },
   "order": [
-    "main"
+    "main",
+    "pf-d8eebc48"
   ]
 }
