@@ -11,12 +11,6 @@
   "sections": {
     "hero": {
       "type": "sb-mood",
-      "settings": {
-        "color_scheme": "scheme-1",
-        "columns": "2",
-        "ratio": "4 / 5",
-        "gap": true
-      },
       "blocks": {
         "t1": {
           "type": "tile",
@@ -72,7 +66,13 @@
         "t2",
         "t3",
         "t4"
-      ]
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "columns": "2",
+        "ratio": "4 / 5",
+        "gap": true
+      }
     },
     "statement": {
       "type": "sb-statement",
@@ -88,14 +88,6 @@
     },
     "lineup": {
       "type": "sb-flavor-lineup",
-      "settings": {
-        "color_scheme": "scheme-1",
-        "eyebrow": "A hydrating coconut water with a splash of real fruit juice",
-        "heading": "Meet the lineup",
-        "link_label": "Find SUNBOY near you",
-        "link": "/pages/find-us",
-        "anchor": "flavors"
-      },
       "blocks": {
         "f1": {
           "type": "flavor",
@@ -148,21 +140,19 @@
         "f5",
         "f6",
         "f7"
-      ]
+      ],
+      "settings": {
+        "flavor_only": false,
+        "color_scheme": "scheme-1",
+        "eyebrow": "hydrating coconut water with a splash of real fruit juice",
+        "heading": "Meet the lineup",
+        "link_label": "Find SUNBOY near you",
+        "link": "/pages/find-us",
+        "anchor": "flavors"
+      }
     },
     "find": {
       "type": "sb-find-us",
-      "settings": {
-        "color_scheme": "scheme-2",
-        "eyebrow": "Thousands of stores nationwide",
-        "heading": "Find SUNBOY",
-        "subheading": "Pop in your ZIP and we'll point you to the nearest cooler.",
-        "placeholder": "ZIP, city or address",
-        "button_label": "Search",
-        "finder_url": "/pages/find-us",
-        "art_fallback": "sb-sunman-loungechair.png",
-        "retail_label": "Or grab it at"
-      },
       "blocks": {
         "r1": {
           "type": "retailer",
@@ -184,14 +174,16 @@
           "type": "retailer",
           "settings": {
             "name": "Trader Joe's",
-            "logo": "shopify://shop_images/retailer-trader-joes.png"
+            "logo": "shopify://shop_images/retailer-trader-joes.png",
+            "link": ""
           }
         },
         "r4": {
           "type": "retailer",
           "settings": {
             "name": "Kroger",
-            "logo": "shopify://shop_images/retailer-kroger.png"
+            "logo": "shopify://shop_images/retailer-kroger.png",
+            "link": ""
           }
         },
         "r5": {
@@ -205,31 +197,36 @@
         "r6": {
           "type": "retailer",
           "settings": {
-            "name": "Total Wine & More"
+            "name": "Total Wine & More",
+            "link": ""
           }
         },
         "r7": {
           "type": "retailer",
           "settings": {
-            "name": "Harris Teeter"
+            "name": "Harris Teeter",
+            "link": ""
           }
         },
         "r8": {
           "type": "retailer",
           "settings": {
-            "name": "Lowes Foods"
+            "name": "Lowes Foods",
+            "link": ""
           }
         },
         "r9": {
           "type": "retailer",
           "settings": {
-            "name": "Publix"
+            "name": "Publix",
+            "link": ""
           }
         },
         "r10": {
           "type": "retailer",
           "settings": {
-            "name": "Ralphs"
+            "name": "Ralphs",
+            "link": ""
           }
         }
       },
@@ -244,28 +241,21 @@
         "r8",
         "r9",
         "r10"
-      ]
-    },
-    "origin": {
-      "type": "sb-split",
+      ],
       "settings": {
-        "color_scheme": "scheme-5",
-        "fallback": "",
-        "flip": false,
-        "eyebrow": "Spread joy with coconuts",
-        "heading": "It started with a bike cart on the Brooklyn Bridge.",
-        "body": "<p>In the early 2010s, Luke McKenna and Yair Tygiel built a bicycle-powered coconut cart and started throwing tropical parties in the streets of New York. A decade of coconut cocktails later, they put it in a can.</p>",
-        "button_label": "Read the whole story",
-        "button_link": "/pages/about-us",
-        "image": "shopify://shop_images/sunboy-ian-rooftop.jpg"
+        "color_scheme": "scheme-2",
+        "eyebrow": "Thousands of stores nationwide",
+        "heading": "Find SUNBOY",
+        "subheading": "Pop in your ZIP and we'll point you to the nearest cooler.",
+        "placeholder": "ZIP, city or address",
+        "button_label": "Search",
+        "finder_url": "/pages/find-us",
+        "retail_label": "Or grab it at",
+        "art_fallback": "sb-sunman-loungechair.png"
       }
     },
     "truths": {
       "type": "sb-pillars",
-      "settings": {
-        "color_scheme": "scheme-3",
-        "heading": ""
-      },
       "blocks": {
         "p1": {
           "type": "pillar",
@@ -293,17 +283,28 @@
         "p1",
         "p2",
         "p3"
-      ]
+      ],
+      "settings": {
+        "color_scheme": "scheme-3",
+        "heading": ""
+      }
+    },
+    "origin": {
+      "type": "sb-split",
+      "settings": {
+        "color_scheme": "scheme-5",
+        "image": "shopify://shop_images/sunboy-ian-rooftop.jpg",
+        "fallback": "",
+        "flip": false,
+        "eyebrow": "Spread joy with coconuts",
+        "heading": "It started with a bike cart on the Brooklyn Bridge.",
+        "body": "<p>In the early 2010s, Luke McKenna and Yair Tygiel built a bicycle-powered coconut cart and started throwing tropical parties in the streets of New York. A decade of coconut cocktails later, they put it in a can.</p>",
+        "button_label": "Read the whole story",
+        "button_link": "/pages/about-us"
+      }
     },
     "goods": {
       "type": "sb-goods",
-      "settings": {
-        "color_scheme": "scheme-1",
-        "eyebrow": "SUNBOY goods",
-        "heading": "Gear for golden hour",
-        "link_label": "Shop all",
-        "link": "/collections/sunboy-swag"
-      },
       "blocks": {
         "g1": {
           "type": "item",
@@ -363,15 +364,17 @@
         "g6",
         "g7",
         "g8"
-      ]
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "eyebrow": "SUNBOY goods",
+        "heading": "Gear for golden hour",
+        "link_label": "Shop all",
+        "link": "/collections/sunboy-swag"
+      }
     },
     "press": {
       "type": "sb-press",
-      "settings": {
-        "color_scheme": "scheme-1",
-        "eyebrow": "As seen in",
-        "speed": 50
-      },
       "blocks": {
         "o1": {
           "type": "outlet",
@@ -432,7 +435,12 @@
         "o7",
         "o8"
       ],
-      "disabled": true
+      "disabled": true,
+      "settings": {
+        "color_scheme": "scheme-1",
+        "eyebrow": "As seen in",
+        "speed": 50
+      }
     }
   },
   "order": [
