@@ -304,7 +304,7 @@
       }
     },
     "goods": {
-      "type": "sb-merch",
+      "type": "sb-goods",
       "blocks": {
         "g1": {
           "type": "item",
