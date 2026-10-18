@@ -7,9 +7,8 @@ import { approve, deny } from '../lib/approve.js';
 
 export const config = { api: { bodyParser: false } };
 
+// Reads the exact bytes Slack signed. Never touch req.body first: that would parse (and change) them.
 function readRaw(req) {
-  if (typeof req.body === 'string') return Promise.resolve(req.body);
-  if (Buffer.isBuffer(req.body)) return Promise.resolve(req.body.toString('utf8'));
   return new Promise((ok, fail) => {
     let s = '';
     req.setEncoding('utf8');
