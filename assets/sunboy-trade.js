@@ -39,7 +39,7 @@
   function variantOf(id) { var hit = null; me.catalog.some(function (p) { return p.variants.some(function (v) { if (v.id === id) { hit = { p: p, v: v }; return true; } }); }); return hit; }
 
   function quote() {
-    var lines = [], goods = 0, approval = me.role === 'team';
+    var lines = [], goods = 0, approval = me.role === 'team' || !!(me.settings && me.settings.approveAll);
     Object.keys(cart).forEach(function (id) {
       var h = variantOf(id); if (!h) return;
       var qty = cart[id]; goods += h.v.price * qty; if (h.p.approval) approval = true;
