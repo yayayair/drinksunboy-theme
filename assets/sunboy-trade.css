@@ -124,3 +124,6 @@ a.sb-folder:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(82
 .sb-order__pill.is-no { background: var(--sb-brown); color: #fff; }
 .sb-order__meta { font-size: 1.3rem; opacity: .75; margin: .4rem 0 .6rem; }
 .sb-order__items { font-size: 1.4rem; margin: 0; }
+
+/* Readable field text (16px also stops iPhones zooming in on focus) */
+.sb-trade__checkout input, .sb-trade__checkout select, .sb-trade__checkout textarea, .sb-trade__form input, .sb-trade__form textarea, .sb-tadmin__app input:not([type=checkbox]) { font-size: 1.6rem; padding: 1.1rem 1.3rem; }

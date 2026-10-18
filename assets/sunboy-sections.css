@@ -708,3 +708,7 @@ body[class*="overflow-hidden"] .sb-finder__maptoggle { display: none; }
 .sb-ev__title a, .sb-evpop__title a { color: inherit; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .sb-ev__title a:hover, .sb-evpop__title a:hover { text-decoration-color: var(--sb-yellow); }
 .sb-evpop__where a { color: inherit; }
+
+/* Scrolling bar: same space on both sides of each sun */
+.sb-marquee__item { gap: 1.8rem; padding: .9rem 0 .9rem 1.8rem; }
+.sb-press .sb-marquee__item { padding-left: 3.2rem; }

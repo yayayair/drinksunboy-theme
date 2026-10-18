@@ -35,7 +35,10 @@
         document.documentElement.classList.remove('sb-age-pending');
         document.dispatchEvent(new CustomEvent('sb:age-ok'));
       });
-      document.getElementById('sb-age-no').addEventListener('click', function () { gate.classList.add('is-under'); });
+      document.getElementById('sb-age-no').addEventListener('click', function () {
+        gate.classList.add('is-under');
+        setTimeout(function () { window.location.href = 'https://youtu.be/B9dSYgd5Elk?t=8'; }, 3000);
+      });
       if (document.documentElement.classList.contains('sb-age-pending')) document.getElementById('sb-age-yes').focus();
     })();
   </script>
