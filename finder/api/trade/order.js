@@ -1,9 +1,9 @@
 // POST /api/trade/order  { t, lines: [{ variantId, qty }], addressId | address, po, note, market, reason, purpose }
-// Distributor orders go straight to Rack'd (payment pending, Net 30). Team orders and cartons wait for approval.
+// Every order is posted to Slack #trade-orders. Orders wait there (and on Trade Admin) for approval before Rack'd ships them.
 import { guard, body } from '../../lib/common.js';
 import { verifyToken, loadCustomer } from '../../lib/trade.js';
 import { placeOrder } from '../../lib/order.js';
-import { notifyPending } from '../../lib/notify.js';
+import * as slack from '../../lib/slack.js';
 
 export default async function handler(req, res) {
   if (!guard(req, res)) return;
@@ -17,7 +17,8 @@ export default async function handler(req, res) {
     if (!person || person.role === 'none') return res.status(403).json({ error: 'This account isn’t set up for trade ordering yet.' });
     const r = await placeOrder(person, b);
     if (!r.ok) return res.status(400).json({ error: r.error });
-    if (r.status === 'pending') await notifyPending(person, r).catch(e => console.error('notify', e.message));
+    await slack.postOrder(r.card).catch(e => console.error('slack post', e.message));
+    delete r.card;
     return res.status(200).json(r);
   } catch (e) {
     console.error('trade/order', e.message);

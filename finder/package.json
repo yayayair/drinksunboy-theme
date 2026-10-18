@@ -2,5 +2,10 @@
   "name": "sunboy-finder",
   "private": true,
   "type": "module",
-  "engines": { "node": "24.x" }
+  "engines": {
+    "node": "24.x"
+  },
+  "dependencies": {
+    "@vercel/functions": "1.5.2"
+  }
 }

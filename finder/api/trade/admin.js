@@ -5,7 +5,8 @@
 import { guard, body } from '../../lib/common.js';
 import { verifyToken, loadCustomer } from '../../lib/trade.js';
 import { gql, check, ADMIN_URL } from '../../lib/shopify.js';
-import { complete } from '../../lib/order.js';
+import { approve, deny } from '../../lib/approve.js';
+import * as slack from '../../lib/slack.js';
 import * as qbo from '../../lib/qbo.js';
 import { loadTradeDoc, preview, create, markInvoiced } from '../../lib/invoice.js';
 
@@ -56,30 +57,17 @@ export default async function handler(req, res) {
     }
 
     const id = String(b.id || '');
+    const by = me.firstName || me.name;
     if (b.action === 'approve') {
-      if (!id.includes('/DraftOrder/')) return res.status(400).json({ error: 'bad id' });
-      const doc = await loadTradeDoc(id);
-      if (doc.tags.includes('trade-test')) {
-        const d = await gql(`mutation($id: ID!, $by: [String!]!) { tagsRemove(id: $id, tags: ["needs-approval"]) { userErrors { message } } tagsAdd(id: $id, tags: $by) { userErrors { message } } }`,
-          { id, by: ['approved', `approved-by-${me.firstName.toLowerCase() || 'admin'}`] });
-        check(d.tagsAdd, 'tagsAdd');
-        return res.status(200).json({ ok: true, test: true, message: 'Test order approved. Test orders stay drafts and never ship.' });
-      }
-      const order = await complete(id);
-      const d = await gql(`mutation($id: ID!, $by: [String!]!) { tagsRemove(id: $id, tags: ["needs-approval"]) { userErrors { message } } tagsAdd(id: $id, tags: $by) { userErrors { message } } }`,
-        { id: order.id, by: ['approved', `approved-by-${me.firstName.toLowerCase() || 'admin'}`] });
-      check(d.tagsAdd, 'tagsAdd');
-      return res.status(200).json({ ok: true, name: order.name, message: `${order.name} approved and sent to Rack'd.` });
+      const r = await approve(id, by);
+      if (!r.already) await slack.recordDecision(id, slack.decisionLine('approve', r, by)).catch(e => console.error('slack', e.message));
+      return res.status(r.already ? 409 : 200).json(r.already ? { error: r.message } : r);
     }
     if (b.action === 'reject') {
-      if (!id.includes('/DraftOrder/')) return res.status(400).json({ error: 'bad id' });
       const reason = String(b.reason || '').slice(0, 300);
-      const doc = await loadTradeDoc(id);
-      const note = [doc.note, `Not approved by ${me.name}${reason ? ': ' + reason : ''}`].filter(Boolean).join('\n');
-      const d = await gql(`mutation($id: ID!, $input: DraftOrderInput!) { draftOrderUpdate(id: $id, input: $input) { userErrors { message } } }`,
-        { id, input: { tags: doc.tags.filter(t => t !== 'needs-approval').concat(['rejected', `rejected-by-${me.firstName.toLowerCase() || 'admin'}`]), note } });
-      check(d.draftOrderUpdate, 'draftOrderUpdate');
-      return res.status(200).json({ ok: true, message: 'Marked not approved. The draft is kept for the record.' });
+      const r = await deny(id, by, reason);
+      if (!r.already) await slack.recordDecision(id, slack.decisionLine('deny', r, by, reason)).catch(e => console.error('slack', e.message));
+      return res.status(r.already ? 409 : 200).json(r.already ? { error: r.message } : r);
     }
     if (b.action === 'qbo-search') {
       return res.status(200).json({ customers: await qbo.findCustomers(String(b.q || '').slice(0, 60)) });

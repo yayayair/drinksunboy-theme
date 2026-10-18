@@ -1,7 +1,7 @@
 // Turns a cart into a Shopify draft order with SUNBOY's trade rules:
 //  - prices are SUNBOY cost (the trade product price); "co-op %" is SUNBOY's share, the distributor pays the rest
 //    (co-op 50 → distributor pays half; co-op 100 → SUNBOY pays it all, no invoice)
-//  - team (rsm/internal) orders are 100% SUNBOY-paid and always wait for approval
+//  - every order waits for approval by default (SETTINGS.approveAll); team (rsm/internal) orders are 100% SUNBOY-paid
 //  - items tagged requires-approval (cartons) also wait for approval
 //  - shipping is free when the order's goods total is at least $100 (SETTINGS.freeShipMin), otherwise a flat rate
 //  - orders that owe money are "payment pending, Net 30" and tagged invoice-ready for the QuickBooks queue
@@ -27,7 +27,7 @@ export function price(person, lines, items) {
   const share = round2(goods * (100 - coop) / 100); // what the distributor owes for the goods
   const shipping = covered || goods >= SETTINGS.freeShipMin || !out.length ? 0 : SETTINGS.shipUnder;
   const total = round2(share + shipping);
-  const approval = person.role === 'team' || out.some(l => l.p.approval);
+  const approval = SETTINGS.approveAll || person.role === 'team' || out.some(l => l.p.approval);
   return { lines: out, goods, coop, share, shipping, total, covered, approval, problems };
 }
 
@@ -86,11 +86,21 @@ export async function placeOrder(person, req) {
     draftOrder { id name totalPriceSet { shopMoney { amount } } } userErrors { field message } } }`, { input });
   const draft = check(d.draftOrderCreate, 'draftOrderCreate').draftOrder;
 
+  // What the Slack alert shows.
+  const card = {
+    role: person.role, test: person.test, quote: summary(q), person: { name: person.name, email: person.email },
+    ship: { company: addr.company || [addr.firstName, addr.lastName].filter(Boolean).join(' '), city: addr.city, provinceCode: addr.provinceCode },
+    items: q.lines.map(l => ({ title: l.p.title + (l.v.title ? ` (${l.v.title})` : ''), qty: l.qty, unit: l.v.price })),
+    po: req.po ? String(req.po).slice(0, 60) : '', note: String(req.note || '').slice(0, 1000),
+    market: team ? String(req.market).slice(0, 300) : '', reason: team ? String(req.reason).slice(0, 500) : '', purpose: team ? String(req.purpose || '').slice(0, 300) : ''
+  };
   if (q.approval || person.test) {
-    return { ok: true, status: person.test ? 'test' : 'pending', name: draft.name, draftId: draft.id, quote: summary(q) };
+    return { ok: true, status: person.test ? 'test' : 'pending', name: draft.name, draftId: draft.id, quote: summary(q),
+      card: { ...card, id: draft.id, name: draft.name, needsApproval: true } };
   }
   const order = await complete(draft.id);
-  return { ok: true, status: 'placed', name: order.name, orderId: order.id, quote: summary(q) };
+  return { ok: true, status: 'placed', name: order.name, orderId: order.id, quote: summary(q),
+    card: { ...card, id: order.id, name: order.name, needsApproval: false } };
 }
 
 export async function complete(draftId) {

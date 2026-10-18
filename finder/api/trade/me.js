@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       role: person.role, admin: person.admin, test: person.test,
       name: person.name, firstName: person.firstName, email: person.email, coop: person.coop,
       addresses: person.addresses,
-      settings: { freeShipMin: SETTINGS.freeShipMin, shipUnder: SETTINGS.shipUnder },
+      settings: { freeShipMin: SETTINGS.freeShipMin, shipUnder: SETTINGS.shipUnder, approveAll: SETTINGS.approveAll },
       catalog: catalogFor(person, items),
       history
     });
