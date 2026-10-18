@@ -654,7 +654,7 @@ html.sb-noscroll, html.sb-noscroll body { overflow: hidden; }
 .sb-evstrip[hidden] { display: none; }
 .sb-evstrip__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.4rem; }
 .sb-evstrip__title { font-size: clamp(4rem, 6vw, 7.2rem); }
-.sb-evstrip__row { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(26rem, 1fr)); }
+.sb-evstrip__row { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr)); }
 .sb-evcard { display: flex; gap: 1.4rem; height: 100%; background: var(--sb-cream); color: var(--sb-brown); border-radius: 1.6rem; padding: 1.6rem 1.8rem; text-decoration: none; transition: transform .15s, box-shadow .2s; }
 .sb-evcard:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.12); }
 .sb-evcard.is-today { background: #fff8d6; box-shadow: 0 0 0 3px var(--sb-yellow); }

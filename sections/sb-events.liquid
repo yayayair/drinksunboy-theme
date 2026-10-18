@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
           (st.live ? '<span class="sb-ev__live">' + E.SUN + ' Happening now</span>' : st.today ? '<span class="sb-ev__live">' + E.SUN + ' Today</span>' : '') +
           '<span class="sb-ev__when">' + esc(E.dayLabel(e)) + ' · ' + esc(E.timeRange(e)) + '</span></p>' +
         '<h3 class="sb-ev__title">' + esc(E.headline(e)) + '</h3>' +
-        '<p class="sb-ev__where"><a href="' + esc(E.dirUrl(e)) + '" target="_blank" rel="noopener">' + esc(e.address) + '</a>' + (d !== null ? ' <span class="sb-ev__dist">' + (d < 1 ? 'Right by you' : Math.round(d) + ' mi away') + '</span>' : '') + '</p>' +
+        '<p class="sb-ev__where"><a href="' + esc(E.dirUrl(e)) + '" target="_blank" rel="noopener">' + esc(e.address) + '</a>' + (d !== null && d <= NEAR_MILES ? ' <span class="sb-ev__dist">' + (d < 1 ? 'Right by you' : Math.round(d) + ' mi away') + '</span>' : '') + '</p>' +
         (e.people && e.people.length ? '<div class="sb-ev__people">' + e.people.map(person).join('') + '</div>' : '') +
         '<p class="sb-ev__blurb">' + esc(e.blurb) + '</p>' +
         '<p class="sb-store__actions sb-ev__actions">' +

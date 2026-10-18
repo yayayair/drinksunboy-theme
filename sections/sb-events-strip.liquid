@@ -24,20 +24,17 @@ document.addEventListener('DOMContentLoaded', function () {
   if (!root || !window.SBEvents) return;
   var E = window.SBEvents, esc = E.esc, N = parseInt(root.dataset.count, 10) || 3, NEAR = 250;
   Promise.all([E.load(root.dataset.api), E.where(root.dataset.api)]).then(function (r) {
-    var events = r[0], me = r[1], picked = [], near = false;
+    var events = r[0], me = r[1], picked = [], nearCount = 0;
     if (!events.length) return;
+    // Nearby first (soonest first), then today's events anywhere, then the soonest of the rest.
     if (me) {
-      var close = events.filter(function (e) { return E.miles(me, e) <= NEAR; });
-      if (close.length) { picked = close.slice(0, N); near = true; }
+      picked = events.filter(function (e) { return E.miles(me, e) <= NEAR; }).slice(0, N);
+      nearCount = picked.length;
     }
-    // Today's events anywhere jump the queue, then the soonest.
-    if (picked.length < N) {
-      events.filter(function (e) { return E.status(e).today && picked.indexOf(e) < 0; }).forEach(function (e) { if (picked.length < N) picked.push(e); });
-      events.forEach(function (e) { if (picked.length < N && picked.indexOf(e) < 0) picked.push(e); });
-      picked.sort(function (a, b) { return a.start.localeCompare(b.start); });
-    }
+    events.filter(function (e) { return E.status(e).today; }).forEach(function (e) { if (picked.length < N && picked.indexOf(e) < 0) picked.push(e); });
+    events.forEach(function (e) { if (picked.length < N && picked.indexOf(e) < 0) picked.push(e); });
     var eb = root.querySelector('[data-evstrip-eyebrow]');
-    if (eb && near && me.label) eb.textContent = 'Near ' + me.label.split(',')[0];
+    if (eb && me && me.label && nearCount === picked.length) eb.textContent = 'Near ' + me.label.split(',')[0];
     root.querySelector('[data-evstrip-row]').innerHTML = picked.map(function (e) {
       var st = E.status(e), t = E.dateTile(e);
       return '<li><a class="sb-evcard' + (st.today ? ' is-today' : '') + '" href="' + esc(root.dataset.events) + '#e-' + esc(e.id) + '">' +
