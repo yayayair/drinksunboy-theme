@@ -572,9 +572,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var st = E.status(e);
     return '<div class="sb-evpop">' +
       '<p class="sb-evpop__when">' + (st.today ? E.SUN + ' ' : '') + esc(E.dayLabel(e)) + ' · ' + esc(E.timeRange(e)) + '</p>' +
-      '<h3 class="sb-evpop__title">' + esc(E.headline(e)) + '</h3>' +
-      '<p class="sb-evpop__where">' + esc(e.label) + ' · ' + esc(e.address) + '</p>' +
-      '<p class="sb-evpop__actions"><a href="' + esc(E.dirUrl(e)) + '" target="_blank" rel="noopener">Directions</a><a href="' + esc(EVENTS) + '#e-' + esc(e.id) + '">Details</a></p></div>';
+      '<h3 class="sb-evpop__title">' + (e.url ? '<a href="' + esc(e.url) + '" target="_blank" rel="noopener">' + esc(E.headline(e)) + '</a>' : esc(E.headline(e))) + '</h3>' +
+      '<p class="sb-evpop__where">' + esc(e.label) + ' · <a href="' + esc(E.dirUrl(e)) + '" target="_blank" rel="noopener">' + esc(e.address) + '</a></p>' +
+      '<p class="sb-evpop__actions">' + (e.url ? '<a href="' + esc(e.url) + '" target="_blank" rel="noopener">Event info ↗</a>' : '') + '<a href="' + esc(EVENTS) + '#e-' + esc(e.id) + '">Details</a></p></div>';
   }
   function open(e, fly) {
     if (!map) return;

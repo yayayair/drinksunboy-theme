@@ -696,3 +696,15 @@ html.sb-noscroll, html.sb-noscroll body { overflow: hidden; }
 .sb-key--ev { background: var(--sb-yellow); border: 1.5px solid var(--sb-brown); margin-left: .8rem; }
 .sb-key[hidden], .sb-finder__legend span[hidden] { display: none; }
 @media (max-width: 989px) { .sb-finder__evtoggle { top: 5.4rem; } .sb-finder.is-full .sb-finder__evtoggle { top: calc(max(1.2rem, env(safe-area-inset-top)) + 4.4rem); } }
+/* Map controls stay inside the map, so the open menu drawer covers them (Oct 2026) */
+.sb-finder__mapwrap { isolation: isolate; }
+.sb-finder__legend, .sb-finder__evtoggle, .sb-finder__fs, .sb-finder__fsstatus { z-index: 5 !important; }
+body[class*="overflow-hidden"] .sb-finder__maptoggle { display: none; }
+@media (max-width: 989px) {
+  .sb-finder__legend { bottom: 4.4rem; left: .8rem; padding: .4rem 1rem; font-size: 1.05rem; gap: .4rem; }
+  .sb-finder__legend .sb-key { width: .9rem; height: .9rem; }
+  .sb-finder__legend .sb-key--on, .sb-finder__legend .sb-key--ev { margin-left: .5rem; }
+}
+.sb-ev__title a, .sb-evpop__title a { color: inherit; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.sb-ev__title a:hover, .sb-evpop__title a:hover { text-decoration-color: var(--sb-yellow); }
+.sb-evpop__where a { color: inherit; }

@@ -40,6 +40,15 @@ function person(u) {
   };
 }
 
+// "URL for Event (For SUNBOY Website)" shift field → public link (http/https only).
+function eventUrl(sh) {
+  const f = (sh.customFields || []).find(f => /url|link|website|ticket/i.test(fieldName(f)));
+  let v = f ? strip(fieldValue(f)) : '';
+  if (!v) return '';
+  if (!/^https?:\/\//i.test(v)) v = 'https://' + v.replace(/^\/+/, '');
+  try { const u = new URL(v); return /^https?:$/.test(u.protocol) && u.hostname.includes('.') ? u.href : ''; } catch { return ''; }
+}
+
 function kindOf(jobTitle, title) {
   if (/fest|concert|series|amphi|stadium|night|party|pool|parade|market\b|fair|race|game|show|acl|pride/i.test(title)) return 'event';
   if (/sampl|tasting/i.test(jobTitle)) return 'tasting';
@@ -118,10 +127,11 @@ async function build() {
     const key = [title.toLowerCase(), sh.startTime, address.toLowerCase()].join('|');
     let g = groups.get(key);
     if (!g) {
-      g = { title, job, start: sh.startTime, end: sh.endTime, tz: sh.timezone || 'America/New_York', address, lat: Number(gps.latitude), lng: Number(gps.longitude), users: new Set() };
+      g = { title, job, start: sh.startTime, end: sh.endTime, tz: sh.timezone || 'America/New_York', address, lat: Number(gps.latitude), lng: Number(gps.longitude), users: new Set(), url: '' };
       groups.set(key, g);
     }
     g.end = Math.max(g.end, sh.endTime);
+    if (!g.url) g.url = eventUrl(sh);
     sh.assignedUserIds.forEach(id => g.users.add(id));
   }
 
@@ -137,7 +147,7 @@ async function build() {
       start: new Date(g.start * 1000).toISOString(), end: new Date(g.end * 1000).toISOString(), tz: g.tz,
       address: where.address || g.address, city: where.city, state: where.state,
       lat: Math.round(where.lat * 1e5) / 1e5, lng: Math.round(where.lng * 1e5) / 1e5,
-      people: crew
+      people: crew, url: g.url
     });
   }
   events.sort((a, b) => a.start.localeCompare(b.start));

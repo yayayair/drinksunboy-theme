@@ -37,11 +37,19 @@
             "text": "Free shipping on goods over $50",
             "link": "/collections/sunboy-swag"
           }
+        },
+        "m5": {
+          "type": "message",
+          "settings": {
+            "text": "Catch us at a tasting near you",
+            "link": "/pages/events"
+          }
         }
       },
       "block_order": [
         "m1",
         "m2",
+        "m5",
         "m3",
         "m4"
       ]
