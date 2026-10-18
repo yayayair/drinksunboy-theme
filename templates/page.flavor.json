@@ -86,6 +86,13 @@
             "question": "Will I really thank you tomorrow morning?",
             "answer": "<p>That's the whole idea behind real coconut water and zero added sugar. We can vouch for what's in the can. What you do with it is between you and your Tuesday. Please enjoy responsibly.</p>"
           }
+        },
+        "q8": {
+          "type": "question",
+          "settings": {
+            "question": "Is coconut a tree nut?",
+            "answer": "<p>Nope. Coconut is a fruit (technically a drupe), and since January 2025 the FDA no longer counts it as a tree nut or a major food allergen. Coconut allergies are rare, but if coconut has ever given you trouble, give this one a pass.</p>"
+          }
         }
       },
       "block_order": [
@@ -93,6 +100,7 @@
         "q2",
         "q3",
         "q4",
+        "q8",
         "q5",
         "q6",
         "q7"

@@ -59,10 +59,10 @@
           "settings": {
             "image": "shopify://shop_images/sunboy-ian-cheers.jpg",
             "focus": "center",
-            "eyebrow": "Flip before you sip",
-            "title": "From our palms to yours.",
-            "link_label": "Why it's different",
-            "link": "/#truths",
+            "eyebrow": "Tastings, festivals & pop-ups",
+            "title": "Come drink with us.",
+            "link_label": "See where we'll be",
+            "link": "/pages/events",
             "fallback": ""
           }
         }
@@ -198,7 +198,7 @@
           "type": "retailer",
           "settings": {
             "name": "H-E-B",
-            "logo": "shopify://shop_images/retailer-heb.png",
+            "logo": "shopify://shop_images/retailer-heb-white.png",
             "link": "https://www.heb.com/search?q=sunboy"
           }
         },
@@ -433,18 +433,6 @@
         "o8"
       ],
       "disabled": true
-    },
-    "events": {
-      "type": "sb-events-strip",
-      "settings": {
-        "color_scheme": "scheme-1",
-        "eyebrow": "Come say hi",
-        "heading": "Catch us out there",
-        "button_label": "All events",
-        "count": 3,
-        "events_url": "/pages/events",
-        "api_base": "https://sunboy-finder.vercel.app"
-      }
     }
   },
   "order": [
@@ -452,7 +440,6 @@
     "statement",
     "lineup",
     "find",
-    "events",
     "truths",
     "origin",
     "goods",
