@@ -37,7 +37,10 @@
       });
       document.getElementById('sb-age-no').addEventListener('click', function () {
         gate.classList.add('is-under');
-        setTimeout(function () { window.location.href = 'https://youtu.be/B9dSYgd5Elk?t=8'; }, 3000);
+        // Alternates between two songs each time "Not yet" is tapped on this device.
+        var links = ['https://youtu.be/B9dSYgd5Elk?t=8', 'https://youtu.be/fe4EK4HSPkI?t=69'], n = 0;
+        try { n = parseInt(localStorage.getItem('sbAgeNo') || '0', 10) || 0; localStorage.setItem('sbAgeNo', String(n + 1)); } catch (e) { n = Math.floor(Math.random() * 2); }
+        setTimeout(function () { window.location.href = links[n % 2]; }, 3000);
       });
       if (document.documentElement.classList.contains('sb-age-pending')) document.getElementById('sb-age-yes').focus();
     })();
