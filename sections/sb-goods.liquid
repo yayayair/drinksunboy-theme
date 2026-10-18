@@ -11,6 +11,10 @@
       {%- for block in section.blocks -%}
         {%- assign p = block.settings.product -%}
         {%- if p == blank -%}{%- continue -%}{%- endif -%}
+        {%- comment -%} Public merch only: skip internal-use items and anything not in the merch collection {%- endcomment -%}
+        {%- assign sb_public = false -%}
+        {%- for c in p.collections -%}{%- if c.handle == 'sunboy-swag' -%}{%- assign sb_public = true -%}{%- endif -%}{%- endfor -%}
+        {%- if p.tags contains 'internal-use' or sb_public == false -%}{%- continue -%}{%- endif -%}
         <a class="sb-good" href="{{ p.url }}" {{ block.shopify_attributes }}>
           <div class="sb-good__img">
             {%- assign img = block.settings.image | default: p.featured_image -%}
