@@ -1,5 +1,6 @@
 // POST /api/trade/order  { t, lines: [{ variantId, qty }], addressId | address, po, note, market, reason, purpose }
-// Every order is posted to Slack #trade-orders. Orders wait there (and on Trade Admin) for approval before Rack'd ships them.
+// Every order is posted to Slack #trade-orders. Distributor orders go straight to Rack'd (alert only);
+// team orders and cartons wait there (and on Trade Admin) for approval.
 import { guard, body } from '../../lib/common.js';
 import { verifyToken, loadCustomer } from '../../lib/trade.js';
 import { placeOrder } from '../../lib/order.js';

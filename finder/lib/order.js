@@ -1,7 +1,7 @@
 // Turns a cart into a Shopify draft order with SUNBOY's trade rules:
 //  - prices are SUNBOY cost (the trade product price); "co-op %" is SUNBOY's share, the distributor pays the rest
 //    (co-op 50 → distributor pays half; co-op 100 → SUNBOY pays it all, no invoice)
-//  - every order waits for approval by default (SETTINGS.approveAll); team (rsm/internal) orders are 100% SUNBOY-paid
+//  - team (rsm/internal) orders are 100% SUNBOY-paid and always wait for approval; distributor orders ship right away
 //  - items tagged requires-approval (cartons) also wait for approval
 //  - shipping is free when the order's goods total is at least $100 (SETTINGS.freeShipMin), otherwise a flat rate
 //  - orders that owe money are "payment pending, Net 30" and tagged invoice-ready for the QuickBooks queue
@@ -96,7 +96,7 @@ export async function placeOrder(person, req) {
   };
   if (q.approval || person.test) {
     return { ok: true, status: person.test ? 'test' : 'pending', name: draft.name, draftId: draft.id, quote: summary(q),
-      card: { ...card, id: draft.id, name: draft.name, needsApproval: true } };
+      card: { ...card, id: draft.id, name: draft.name, needsApproval: q.approval } };
   }
   const order = await complete(draft.id);
   return { ok: true, status: 'placed', name: order.name, orderId: order.id, quote: summary(q),

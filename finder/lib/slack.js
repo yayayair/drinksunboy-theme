@@ -75,10 +75,12 @@ export function card(o, decision) {
   if (o.purpose) extra.push(`*What it's for:* ${esc(o.purpose)}`);
   if (o.note) extra.push(`*Note:* ${esc(o.note)}`);
   if (extra.length) blocks.push({ type: 'section', text: { type: 'mrkdwn', text: extra.join('\n').slice(0, 2900) } });
-  if (o.test) blocks.push({ type: 'context', elements: [{ type: 'mrkdwn', text: ':test_tube: Test account: approving only tags the draft. It never ships.' }] });
+  if (o.test && o.needsApproval) blocks.push({ type: 'context', elements: [{ type: 'mrkdwn', text: ':test_tube: Test account: approving only tags the draft. It never ships.' }] });
 
   if (!o.needsApproval) {
-    blocks.push({ type: 'context', elements: [{ type: 'mrkdwn', text: `:package: Sent straight to Rack'd. <${orderUrl(o.id)}|Open in Shopify>` }] });
+    blocks.push({ type: 'context', elements: [{ type: 'mrkdwn', text: o.test
+      ? `:test_tube: Test order: kept as a draft, not sent to Rack'd. <${draftUrl(o.id)}|Open in Shopify>`
+      : `:package: No approval needed. Sent straight to Rack'd. <${orderUrl(o.id)}|Open in Shopify>` }] });
   } else if (decision) {
     blocks.push({ type: 'context', elements: [{ type: 'mrkdwn', text: decision }] });
   } else {

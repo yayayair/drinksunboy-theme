@@ -87,8 +87,8 @@ export function catalogFor(person, items) {
 export const SETTINGS = {
   freeShipMin: Number(process.env.TRADE_FREE_SHIP_MIN || 100),
   shipUnder: Number(process.env.TRADE_SHIP_UNDER ?? 15),
-  // Every trade order waits for approval (Slack #trade-orders or Trade Admin) unless TRADE_APPROVE_ALL=off.
-  approveAll: String(process.env.TRADE_APPROVE_ALL || 'on').toLowerCase() !== 'off',
+  // Distributor orders ship right away (Slack alert only); set TRADE_APPROVE_ALL=on to make every order wait for approval.
+  approveAll: String(process.env.TRADE_APPROVE_ALL || 'off').toLowerCase() === 'on',
   netTermsTemplate: process.env.TRADE_NET_TERMS || 'gid://shopify/PaymentTermsTemplate/4' // Net 30
 };
 
