@@ -1,0 +1,33 @@
+
+{% unless bss_lock_check contains 'Liquid error' %}
+  {% if bss_lock_check contains 'true' %}
+    {%- assign price_without_currency = product.price | money_without_currency -%}
+    {%- assign price_divided = product.price | divided_by: 100.00 -%}
+    {%- assign price_string = '"price":"' | append: price_without_currency | append: '"' -%}
+
+    {% if product.variants.size > 0 %}
+      {% for variant in product.variants %}
+        {%- assign price_variant_without_currency = variant.price | money_without_currency -%}
+        {%- assign price_variant_divided = variant.price | divided_by: 100.00 -%}
+        {%- assign price_variant_string = '"price":"' | append: price_variant_without_currency | append: '"' -%}
+        {%- assign price_variant_string2 = '"price":"' | append: price_variant_divided | append: '"' -%}
+        {%- assign price_variant_string_with_zero_ending = '"price":"' | append: price_variant_divided | append: '0' | append: '"' -%}
+
+        {% assign product_schema = product_schema
+          | replace: price_variant_string, '"price":"Hide Price By BSS"'
+          | replace: price_variant_string2, '"price":"Hide Price By BSS"'
+          | replace: price_variant_string_with_zero_ending, '"price":"Hide Price By BSS"' %}
+      {% endfor %}
+      {% assign new_product_schema = product_schema %}
+    {% endif %}
+
+    {{ new_product_schema
+      | replace: price_without_currency, 'Hide Price By BSS'
+      | replace: price_divided, 'Hide Price By BSS'
+      | replace: price_string, '"price":"Hide Price By BSS"' }}
+  {% else %}
+    {{ product_schema }}
+  {% endif %}
+{%- else -%}
+  {{ product_schema }}
+{%- endunless -%}

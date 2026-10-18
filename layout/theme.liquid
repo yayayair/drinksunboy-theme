@@ -1,6 +1,7 @@
+{%- comment %}BSS Login{% endcomment -%}{% include 'bss-lock' %}{%- comment %}BSS-Login{% endcomment -%}
 <!doctype html>
 <html class="js" lang="{{ request.locale.iso_code }}">
-  <head>
+  <head>{{ 'bss-lock-settings.css' | asset_url | stylesheet_tag }}
     {%- render 'sb-flavor-redirect' -%}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -325,7 +326,7 @@
         document.documentElement.classList.add('shopify-design-mode');
       }
     </script>
-  </head>
+  {%comment%}Bss Hide Section{%endcomment%}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'section', variable: 'hide_section_css' %}{% endcapture %}{{ bss_lock_check }}{%comment%}Bss Hide Section{%endcomment%}</head>
 
   <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
     {%- render 'sb-portal-redirect' -%}
