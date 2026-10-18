@@ -441,10 +441,6 @@
         "eyebrow": "As seen in",
         "speed": 50
       }
-    },
-    "pagefly-home": {
-      "type": "pagefly-home",
-      "settings": {}
     }
   },
   "order": [
@@ -455,7 +451,6 @@
     "truths",
     "origin",
     "goods",
-    "press",
-    "pagefly-home"
+    "press"
   ]
 }

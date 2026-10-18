@@ -136,15 +136,10 @@
         "link_label": "",
         "anchor": "lineup"
       }
-    },
-    "pf-b5ac4275": {
-      "type": "pf-b5ac4275",
-      "settings": {}
     }
   },
   "order": [
     "finder",
-    "lineup",
-    "pf-b5ac4275"
+    "lineup"
   ]
 }

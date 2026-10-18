@@ -38,7 +38,7 @@
         role="list"
       >
         {% assign skip_card_product_styles = false %}
-        {% for recommendation in recommendations.products %}{% comment %}start BSS Commerce Hide Price{% endcomment %}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'subject', subject: recommendation, variable: 'transparent' %}{% endcapture %}{% if bss_lock_check contains 'true' %}{% render 'bss-hide-product-design', section: 'sections/related-products.liquid', subject: recommendation %}{% continue %}{% endif %}{% comment %}end BSS Commerce Hide Price{% endcomment %}{%- if recommendation.metafields.sunboy.hero_line != blank or recommendation.tags contains "trade" -%}{%- continue -%}{%- endif -%}
+        {% for recommendation in recommendations.products %}{%- if recommendation.metafields.sunboy.hero_line != blank or recommendation.tags contains "trade" -%}{%- continue -%}{%- endif -%}
           <li class="grid__item">
             {% render 'card-product',
               card_product: recommendation,

@@ -1,4 +1,4 @@
-{% comment %}start BSS Commerce Hide Price{% endcomment %}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'subject', subject: card_collection, variable: 'transparent' %}{% endcapture %}{% if bss_lock_check contains 'true' %}{% render 'bss-hide-product-design', section: 'snippets/card-collection.liquid', subject: card_collection %}{% continue %}{% endif %}{% comment %}end BSS Commerce Hide Price{% endcomment %}{% comment %}
+{% comment %}
   Renders a collection card
 
   Accepts:

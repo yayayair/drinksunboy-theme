@@ -340,7 +340,7 @@
                 </quick-add-modal>
               {%- else -%}
                 <product-form data-section-id="{{ section.id }}">
-                  {% comment %} BSS Lock Begin Hide Add To Cart {% endcomment %} {% capture bss_lock_check %} {% render 'bss-lock-condition', scope: 'subject', subject: card_product, subject_parent: card_product, variable: 'price', get_content: true, bss_lock_action: 'bss_hide_atc' %} {% endcapture %} {% if bss_lock_check contains 'bss-hide-atc' %} {{ bss_lock_check }} {% endif %} {% comment %} BSS Lock End Hide Add To Cart {% endcomment %}{%- form 'product',
+                  {%- form 'product',
                     card_product,
                     id: product_form_id,
                     class: 'form',

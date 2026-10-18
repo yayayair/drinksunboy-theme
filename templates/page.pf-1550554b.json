@@ -50,14 +50,9 @@
         "heading": "Distributor Portal",
         "signed_out_text": ""
       }
-    },
-    "pf-1550554b": {
-      "type": "pf-1550554b",
-      "settings": {}
     }
   },
   "order": [
-    "main",
-    "pf-1550554b"
+    "main"
   ]
 }

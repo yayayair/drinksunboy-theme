@@ -257,7 +257,7 @@
                 role="list"
               >
                 {%- assign skip_card_product_styles = false -%}
-                {%- for item in search.results -%}{% comment %}start BSS Commerce Hide Price{% endcomment %}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'subject', subject: item, variable: 'transparent' %}{% endcapture %}{% if bss_lock_check contains 'true' %}{% render 'bss-hide-product-design', section: 'sections/main-search.liquid', subject: item %}{% continue %}{% endif %}{% comment %}end BSS Commerce Hide Price{% endcomment %}
+                {%- for item in search.results -%}
                   {%- if item.object_type == 'product' and item.type == 'Beer' -%}{%- continue -%}{%- endif -%}
                   {% assign lazy_load = false %}
                   {%- if forloop.index > 2 -%}

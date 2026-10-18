@@ -157,7 +157,7 @@
                 "
               >
                 {% assign skip_card_product_styles = false %}
-                {%- for product in collection.products -%}{% comment %}start BSS Commerce Hide Price{% endcomment %}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'subject', subject: product, variable: 'transparent' %}{% endcapture %}{% if bss_lock_check contains 'true' %}{% render 'bss-hide-product-design', section: 'sections/main-collection-product-grid.liquid', subject: product %}{% continue %}{% endif %}{% comment %}end BSS Commerce Hide Price{% endcomment %}
+                {%- for product in collection.products -%}
                   {%- comment -%} Cans are never shown or sold on the site. {%- endcomment -%}
                   {%- if product.type == 'Beer' -%}{%- continue -%}{%- endif -%}
                   {% assign lazy_load = false %}
