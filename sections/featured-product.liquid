@@ -1,4 +1,4 @@
-{%- liquid
+{% comment %}start BSS Commerce Hide Price{% endcomment %}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'subject', subject: section.settings.product, variable: 'transparent' %}{% endcapture %}{% if bss_lock_check contains 'true' %}{% render 'bss-hide-product-design', section: 'sections/featured-product.liquid', subject: section.settings.product %}{% continue %}{% endif %}{% comment %}end BSS Commerce Hide Price{% endcomment %}{%- liquid
   assign product = section.settings.product
   if product == null
     assign placeholder = true

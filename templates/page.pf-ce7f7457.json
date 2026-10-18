@@ -24,7 +24,14 @@
         "cta_label": "Holler at us",
         "cta_link": "mailto:holler@drinksunboy.com"
       }
+    },
+    "pf-ce7f7457": {
+      "type": "pf-ce7f7457",
+      "settings": {}
     }
   },
-  "order": ["events"]
+  "order": [
+    "events",
+    "pf-ce7f7457"
+  ]
 }

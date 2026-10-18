@@ -129,7 +129,7 @@
               role="group"
               aria-labelledby="predictive-search-products"
             >
-              {%- for product in predictive_search.resources.products -%}{%- if product.type == 'Beer' -%}{%- continue -%}{%- endif -%}
+              {%- for product in predictive_search.resources.products -%}{% comment %}start BSS Commerce Hide Price{% endcomment %}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'subject', subject: product, variable: 'transparent' %}{% endcapture %}{% if bss_lock_check contains 'true' %}{% render 'bss-hide-product-design', section: 'sections/predictive-search.liquid', subject: product %}{% continue %}{% endif %}{% comment %}end BSS Commerce Hide Price{% endcomment %}{%- if product.type == 'Beer' -%}{%- continue -%}{%- endif -%}
                 <li
                   id="predictive-search-option-product-{{ forloop.index }}"
                   class="predictive-search__list-item"

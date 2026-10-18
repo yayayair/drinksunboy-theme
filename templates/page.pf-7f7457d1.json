@@ -171,12 +171,17 @@
         "handle": "drinksunboy",
         "text": "Parties, new flavors, merch drops and where we're popping up next."
       }
+    },
+    "pf-7f7457d1": {
+      "type": "pf-7f7457d1",
+      "settings": {}
     }
   },
   "order": [
     "hero",
     "story",
     "marquee",
-    "insta"
+    "insta",
+    "pf-7f7457d1"
   ]
 }

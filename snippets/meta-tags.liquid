@@ -27,7 +27,7 @@
 {%- endif -%}
 
 {%- if request.page_type == 'product' -%}
-  <meta property="og:price:amount" content="{{ product.price | money_without_currency | strip_html }}">
+  <meta property="og:price:amount" content="{% comment %}Start Bsscommerce HPOGS{% endcomment %}{% capture bss_lock_check %}{% render 'bss-lock-condition', scope: 'subject', subject: product, subject_parent: product, variable: 'hpogg' %}{% endcapture %}{% unless bss_lock_check contains "Liquid error" %}{% if bss_lock_check contains "true" %}Hide Price By BSS{% else %}{{ product.price | money_without_currency | strip_html }}{% endif %}{% endunless %}{% comment %}End Bsscommerce HPOGS{% endcomment %}">
   <meta property="og:price:currency" content="{{ cart.currency.iso_code }}">
 {%- endif -%}
 
