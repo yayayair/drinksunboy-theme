@@ -1,0 +1,21 @@
+{
+  "sections": {
+    "events": {
+      "type": "sb-events",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "eyebrow": "Catch us out there",
+        "heading": "SUNBOY Events",
+        "sub": "Free tastings, festivals and pop-ups. Come say hi, try the lineup and grab a cold one.",
+        "finder_url": "/pages/find-us",
+        "api_base": "https://sunboy-finder.vercel.app",
+        "cta_scheme": "scheme-1",
+        "cta_heading": "Want SUNBOY at your thing?",
+        "cta_text": "<p>Festivals, fundraisers, block parties, store tastings. Tell us what you've got cooking.</p>",
+        "cta_label": "Holler at us",
+        "cta_link": "mailto:holler@drinksunboy.com"
+      }
+    }
+  },
+  "order": ["events"]
+}

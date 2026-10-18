@@ -1,0 +1,168 @@
+{%- comment -%}
+  SUNBOY events calendar. Live from the Connecteam schedule via the finder service (/api/events):
+  in-store tastings, festivals and activations. People appear only if they opted in on their Connecteam profile.
+  Deep links: #e-<id> scrolls to an event. ?near=1 filters to events near the visitor.
+{%- endcomment -%}
+{%- assign api = section.settings.api_base | default: 'https://sunboy-finder.vercel.app' -%}
+<section class="sb-events" data-sb-events data-api="{{ api }}" data-finder="{{ section.settings.finder_url | default: '/pages/find-us' }}">
+  <div class="sb-events__top color-{{ section.settings.color_scheme }} gradient">
+    <div class="sb-wrap">
+      {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h1 class="sb-display sb-events__title">{{ section.settings.heading }}</h1>
+      {%- if section.settings.sub != blank -%}<p class="sb-events__sub">{{ section.settings.sub }}</p>{%- endif -%}
+      <div class="sb-events__controls">
+        <div class="sb-seg" role="radiogroup" aria-label="Type of event">
+          <button type="button" class="is-on" data-kind="all" role="radio" aria-checked="true">All</button>
+          <button type="button" data-kind="tasting" role="radio" aria-checked="false">Tastings</button>
+          <button type="button" data-kind="event" role="radio" aria-checked="false">Events</button>
+        </div>
+        <label class="sb-events__state">Where
+          <select data-ev-state><option value="">Everywhere</option></select>
+        </label>
+        <button type="button" class="sb-finder__geo" data-ev-near>⌖ <span>Near me</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-wrap sb-events__body">
+    <p class="sb-events__status" data-ev-status aria-live="polite"><span class="sb-finder__spin"></span> Checking the calendar…</p>
+    <div class="sb-events__now" data-ev-now hidden></div>
+    <div data-ev-list></div>
+    <noscript><p>Turn on JavaScript to see where SUNBOY is popping up next.</p></noscript>
+  </div>
+
+  {%- if section.settings.cta_heading != blank -%}
+    <div class="sb-events__cta color-{{ section.settings.cta_scheme }} gradient">
+      <div class="sb-wrap">
+        <h2 class="sb-display sb-events__cta-title">{{ section.settings.cta_heading }}</h2>
+        {%- if section.settings.cta_text != blank -%}<div class="sb-events__cta-text">{{ section.settings.cta_text }}</div>{%- endif -%}
+        {%- if section.settings.cta_label != blank -%}<a class="sb-btn sb-btn--yellow" href="{{ section.settings.cta_link }}">{{ section.settings.cta_label }}</a>{%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
+</section>
+
+<script src="{{ 'sunboy-events.js' | asset_url }}" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var root = document.querySelector('[data-sb-events]');
+  if (!root || !window.SBEvents) return;
+  var E = window.SBEvents, esc = E.esc;
+  var API = root.dataset.api, FINDER = root.dataset.finder;
+  var listEl = root.querySelector('[data-ev-list]'), statusEl = root.querySelector('[data-ev-status]'), nowEl = root.querySelector('[data-ev-now]');
+  var stateSel = root.querySelector('[data-ev-state]'), nearBtn = root.querySelector('[data-ev-near]'), NEAR_LABEL = nearBtn.innerHTML;
+  var NEAR_MILES = 150;
+  var all = [], state = { kind: 'all', st: '', near: false, me: null };
+
+  function person(p) {
+    var img = p.photo ? '<img src="' + esc(p.photo) + '" alt="" loading="lazy" width="56" height="56">' : '<span class="sb-ev__initial">' + esc(p.name.charAt(0)) + '</span>';
+    if (!p.bio) return '<span class="sb-ev__person">' + img + '<b>' + esc(p.name) + '</b></span>';
+    return '<details class="sb-ev__person sb-ev__person--bio"><summary>' + img + '<b>' + esc(p.name) + '</b><span class="sb-ev__more">Bio</span></summary><p>' + esc(p.bio) + '</p></details>';
+  }
+  function card(e) {
+    var st = E.status(e), t = E.dateTile(e), d = state.me ? E.miles(state.me, e) : null;
+    var mapUrl = FINDER + '?' + new URLSearchParams({ lat: e.lat, lng: e.lng, event: e.id });
+    return '<li class="sb-ev' + (st.live ? ' is-live' : st.today ? ' is-today' : '') + '" id="e-' + esc(e.id) + '">' +
+      '<div class="sb-ev__date" aria-hidden="true"><span>' + esc(t.dow) + '</span><b>' + esc(t.day) + '</b><span>' + esc(t.mon) + '</span></div>' +
+      '<div class="sb-ev__main">' +
+        '<p class="sb-ev__meta"><span class="sb-tag' + (e.kind === 'tasting' ? '' : ' sb-tag--event') + '">' + esc(e.label) + '</span>' +
+          (st.live ? '<span class="sb-ev__live">' + E.SUN + ' Happening now</span>' : st.today ? '<span class="sb-ev__live">' + E.SUN + ' Today</span>' : '') +
+          '<span class="sb-ev__when">' + esc(E.dayLabel(e)) + ' · ' + esc(E.timeRange(e)) + '</span></p>' +
+        '<h3 class="sb-ev__title">' + esc(E.headline(e)) + '</h3>' +
+        '<p class="sb-ev__where"><a href="' + esc(E.dirUrl(e)) + '" target="_blank" rel="noopener">' + esc(e.address) + '</a>' + (d !== null ? ' <span class="sb-ev__dist">' + (d < 1 ? 'Right by you' : Math.round(d) + ' mi away') + '</span>' : '') + '</p>' +
+        (e.people && e.people.length ? '<div class="sb-ev__people">' + e.people.map(person).join('') + '</div>' : '') +
+        '<p class="sb-ev__blurb">' + esc(e.blurb) + '</p>' +
+        '<p class="sb-store__actions sb-ev__actions">' +
+          '<a href="' + esc(E.dirUrl(e)) + '" target="_blank" rel="noopener">Directions</a>' +
+          '<span class="sb-ev__cal"><a href="' + E.ics(e) + '" download="sunboy-' + esc(e.id) + '.ics">Add to calendar</a><a href="' + esc(E.gcal(e)) + '" target="_blank" rel="noopener">Google</a></span>' +
+          '<a href="' + esc(mapUrl) + '">See on map</a>' +
+        '</p>' +
+      '</div></li>';
+  }
+  function monthOf(e) { return new Intl.DateTimeFormat('en-US', { timeZone: e.tz, month: 'long', year: 'numeric' }).format(new Date(e.start)); }
+
+  function render() {
+    var list = all.filter(function (e) {
+      if (state.kind !== 'all' && e.kind !== state.kind) return false;
+      if (state.st && e.state !== state.st) return false;
+      if (state.near && state.me && E.miles(state.me, e) > NEAR_MILES) return false;
+      return true;
+    });
+    var live = list.filter(function (e) { return E.status(e).today; });
+    var rest = list;
+    // "Today" spotlight
+    if (live.length) {
+      nowEl.hidden = false;
+      nowEl.innerHTML = '<p class="sb-eyebrow">' + E.SUN + ' Out there today</p><ol class="sb-evlist">' + live.map(card).join('') + '</ol>';
+      rest = list.filter(function (e) { return live.indexOf(e) < 0; });
+    } else { nowEl.hidden = true; nowEl.innerHTML = ''; }
+
+    var html = '', month = '';
+    rest.forEach(function (e) {
+      var m = monthOf(e);
+      if (m !== month) { if (month) html += '</ol>'; html += '<h2 class="sb-evlist__month">' + esc(m) + '</h2><ol class="sb-evlist">'; month = m; }
+      html += card(e);
+    });
+    if (month) html += '</ol>';
+    listEl.innerHTML = html;
+
+    var n = list.length;
+    if (!all.length) statusEl.innerHTML = 'Nothing on the calendar right this second. Follow <a href="https://www.instagram.com/drinksunboy/" target="_blank" rel="noopener">@drinksunboy</a> for pop-ups.';
+    else if (!n) statusEl.innerHTML = 'Nothing matching that yet. ' + (state.near ? 'Nothing within ' + NEAR_MILES + ' miles of you yet. <button type="button" class="sb-linkbtn" data-ev-reset>See everywhere</button>' : '<button type="button" class="sb-linkbtn" data-ev-reset>See all events</button>');
+    else statusEl.innerHTML = '<b>' + n + '</b> ' + (n === 1 ? 'stop' : 'stops') + ' on the SUNBOY calendar' + (state.near ? ' within ' + NEAR_MILES + ' miles of you' : state.st ? ' in ' + esc(stateSel.options[stateSel.selectedIndex].text) : '') + '.';
+  }
+
+  function group(sel, attr, val) {
+    root.querySelectorAll(sel).forEach(function (b) { var on = b.dataset[attr] === val; b.classList.toggle('is-on', on); b.setAttribute('aria-checked', on); });
+  }
+  root.querySelectorAll('[data-kind]').forEach(function (b) {
+    b.addEventListener('click', function () { state.kind = b.dataset.kind; group('[data-kind]', 'kind', state.kind); render(); });
+  });
+  stateSel.addEventListener('change', function () { state.st = stateSel.value; if (state.st) { state.near = false; nearBtn.innerHTML = NEAR_LABEL; } render(); });
+  root.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-ev-reset]')) return;
+    state = { kind: 'all', st: '', near: false, me: state.me }; stateSel.value = ''; group('[data-kind]', 'kind', 'all'); nearBtn.innerHTML = NEAR_LABEL; render();
+  });
+  nearBtn.addEventListener('click', function () {
+    if (state.near) { state.near = false; nearBtn.innerHTML = NEAR_LABEL; render(); return; }
+    if (!navigator.geolocation) { statusEl.textContent = 'This browser can’t share your location. Pick a state instead.'; return; }
+    nearBtn.innerHTML = '<span class="sb-finder__spin"></span> Finding you…';
+    navigator.geolocation.getCurrentPosition(function (p) {
+      state.me = { lat: p.coords.latitude, lng: p.coords.longitude }; state.near = true; state.st = ''; stateSel.value = '';
+      nearBtn.innerHTML = '✓ <span>Near me</span>'; render();
+    }, function () { nearBtn.innerHTML = NEAR_LABEL; statusEl.textContent = 'We couldn’t get your location. Pick a state instead.'; }, { timeout: 12000, maximumAge: 300000 });
+  });
+
+  Promise.all([E.load(API), E.where(API)]).then(function (r) {
+    all = r[0]; if (r[1]) state.me = { lat: r[1].lat, lng: r[1].lng };
+    var states = {}; all.forEach(function (e) { if (e.state) states[e.state] = 1; });
+    Object.keys(states).sort().forEach(function (s) { var o = document.createElement('option'); o.value = s; o.textContent = s; stateSel.appendChild(o); });
+    if (/[?&]near=1/.test(location.search) && state.me) state.near = true;
+    render();
+    E.jsonLd(all);
+    var hit = location.hash && document.getElementById(location.hash.slice(1));
+    if (hit) { hit.classList.add('is-hl'); hit.scrollIntoView({ block: 'center' }); }
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "SUNBOY events",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme (top)", "default": "scheme-2" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Catch us out there" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "SUNBOY Events" },
+    { "type": "text", "id": "sub", "label": "Line under the heading", "default": "Free tastings, festivals and pop-ups. Come say hi, try the lineup and grab a cold one." },
+    { "type": "url", "id": "finder_url", "label": "Find Us page", "info": "Used for 'See on map'." },
+    { "type": "text", "id": "api_base", "label": "Finder service URL", "default": "https://sunboy-finder.vercel.app" },
+    { "type": "header", "content": "Bottom call-out" },
+    { "type": "color_scheme", "id": "cta_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "text", "id": "cta_heading", "label": "Heading", "default": "Want SUNBOY at your thing?" },
+    { "type": "richtext", "id": "cta_text", "label": "Text", "default": "<p>Festivals, fundraisers, block parties, store tastings. Tell us what you've got cooking.</p>" },
+    { "type": "text", "id": "cta_label", "label": "Button", "default": "Holler at us" },
+    { "type": "text", "id": "cta_link", "label": "Button link (web address or mailto:)", "default": "mailto:holler@drinksunboy.com" }
+  ],
+  "presets": [ { "name": "SUNBOY events" } ]
+}
+{% endschema %}

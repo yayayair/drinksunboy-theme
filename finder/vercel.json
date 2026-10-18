@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/api/health", "destination": "/api/site?route=health" },
+    { "source": "/api/config", "destination": "/api/site?route=config" },
+    { "source": "/api/brands", "destination": "/api/site?route=brands" },
+    { "source": "/api/where", "destination": "/api/site?route=where" },
+    { "source": "/api/coverage", "destination": "/api/site?route=coverage" },
+    { "source": "/api/events", "destination": "/api/site?route=events" }
+  ]
+}

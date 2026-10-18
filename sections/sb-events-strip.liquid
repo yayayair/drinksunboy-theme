@@ -1,0 +1,70 @@
+{%- comment -%}
+  Homepage "Catch us out there": the next few SUNBOY events, nearest to the visitor first when we know roughly where they are.
+  Stays hidden until events load, and stays hidden if there are none.
+{%- endcomment -%}
+{%- assign api = section.settings.api_base | default: 'https://sunboy-finder.vercel.app' -%}
+{%- assign events_url = section.settings.events_url | default: '/pages/events' -%}
+<section class="sb-evstrip color-{{ section.settings.color_scheme }} gradient" data-sb-evstrip data-api="{{ api }}" data-events="{{ events_url }}" data-count="{{ section.settings.count }}" hidden>
+  <div class="sb-wrap">
+    <div class="sb-evstrip__head">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow" data-evstrip-eyebrow>{{ section.settings.eyebrow }}</p>{%- endif -%}
+        <h2 class="sb-display sb-evstrip__title">{{ section.settings.heading }}</h2>
+      </div>
+      <a class="sb-btn sb-btn--solid sb-evstrip__all" href="{{ events_url }}">{{ section.settings.button_label }}</a>
+    </div>
+    <ol class="sb-evstrip__row" data-evstrip-row></ol>
+  </div>
+</section>
+
+<script src="{{ 'sunboy-events.js' | asset_url }}" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var root = document.querySelector('[data-sb-evstrip]');
+  if (!root || !window.SBEvents) return;
+  var E = window.SBEvents, esc = E.esc, N = parseInt(root.dataset.count, 10) || 3, NEAR = 250;
+  Promise.all([E.load(root.dataset.api), E.where(root.dataset.api)]).then(function (r) {
+    var events = r[0], me = r[1], picked = [], near = false;
+    if (!events.length) return;
+    if (me) {
+      var close = events.filter(function (e) { return E.miles(me, e) <= NEAR; });
+      if (close.length) { picked = close.slice(0, N); near = true; }
+    }
+    // Today's events anywhere jump the queue, then the soonest.
+    if (picked.length < N) {
+      events.filter(function (e) { return E.status(e).today && picked.indexOf(e) < 0; }).forEach(function (e) { if (picked.length < N) picked.push(e); });
+      events.forEach(function (e) { if (picked.length < N && picked.indexOf(e) < 0) picked.push(e); });
+      picked.sort(function (a, b) { return a.start.localeCompare(b.start); });
+    }
+    var eb = root.querySelector('[data-evstrip-eyebrow]');
+    if (eb && near && me.label) eb.textContent = 'Near ' + me.label.split(',')[0];
+    root.querySelector('[data-evstrip-row]').innerHTML = picked.map(function (e) {
+      var st = E.status(e), t = E.dateTile(e);
+      return '<li><a class="sb-evcard' + (st.today ? ' is-today' : '') + '" href="' + esc(root.dataset.events) + '#e-' + esc(e.id) + '">' +
+        '<span class="sb-evcard__date"><span>' + esc(t.dow) + '</span><b>' + esc(t.day) + '</b><span>' + esc(t.mon) + '</span></span>' +
+        '<span class="sb-evcard__body">' +
+          (st.today ? '<span class="sb-ev__live">' + E.SUN + (st.live ? ' Happening now' : ' Today') + '</span>' : '<span class="sb-evcard__kind">' + esc(e.label) + '</span>') +
+          '<span class="sb-evcard__title">' + esc(E.headline(e)) + '</span>' +
+          '<span class="sb-evcard__where">' + esc(E.place(e)) + ' · ' + esc(E.timeRange(e)) + '</span>' +
+        '</span></a></li>';
+    }).join('');
+    root.hidden = false;
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "SUNBOY events strip",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Come say hi" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Catch us out there" },
+    { "type": "text", "id": "button_label", "label": "Button", "default": "All events" },
+    { "type": "range", "id": "count", "label": "Events to show", "min": 2, "max": 6, "step": 1, "default": 3 },
+    { "type": "url", "id": "events_url", "label": "Events page" },
+    { "type": "text", "id": "api_base", "label": "Finder service URL", "default": "https://sunboy-finder.vercel.app" }
+  ],
+  "presets": [ { "name": "SUNBOY events strip" } ]
+}
+{% endschema %}

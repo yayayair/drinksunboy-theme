@@ -4,7 +4,7 @@
   URL params: ?zip=10003 | ?lat=..&lng=..  &flavor=coconut  &miles=25  &type=on|off
 {%- endcomment -%}
 {{ 'https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css' | stylesheet_tag }}
-<section class="sb-finder" id="sb-finder" data-api="{{ section.settings.api_base | default: 'https://sunboy-finder.vercel.app' }}" data-days="{{ section.settings.days }}" data-pack-classic="{{ 'sb-pack-classic-xs.webp' | asset_url }}" data-pack-refresher="{{ 'sb-pack-refresher-xs.webp' | asset_url }}" data-can="{{ 'sb-mini-can-coconut.webp' | asset_url }}" data-mapbox="{{ section.settings.mapbox_token | escape }}">
+<section class="sb-finder" id="sb-finder" data-api="{{ section.settings.api_base | default: 'https://sunboy-finder.vercel.app' }}" data-days="{{ section.settings.days }}" data-pack-classic="{{ 'sb-pack-classic-xs.webp' | asset_url }}" data-pack-refresher="{{ 'sb-pack-refresher-xs.webp' | asset_url }}" data-can="{{ 'sb-mini-can-coconut.webp' | asset_url }}" data-mapbox="{{ section.settings.mapbox_token | escape }}" data-event-days="{{ section.settings.event_days }}" data-events-url="{{ section.settings.events_url | default: '/pages/events' }}">
   <div class="sb-finder__top color-{{ section.settings.color_scheme }} gradient">
     <div class="sb-wrap">
       {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
@@ -71,11 +71,13 @@
 
   <div class="sb-finder__body" data-sb-body>
     <div class="sb-finder__status" data-sb-status aria-live="polite">{{ section.settings.intro }}</div>
+    <div class="sb-finder__events" data-sb-evbanner hidden></div>
     <div class="sb-finder__grid">
       <ol class="sb-finder__list" data-sb-list></ol>
       <div class="sb-finder__mapwrap" data-sb-mapwrap>
         <div class="sb-finder__map" data-sb-map></div>
-        <div class="sb-finder__legend" aria-hidden="true"><span class="sb-key"></span>Stores <span class="sb-key sb-key--on"></span>Bars &amp; restaurants</div>
+        <div class="sb-finder__legend" aria-hidden="true"><span class="sb-key"></span>Stores <span class="sb-key sb-key--on"></span>Bars &amp; restaurants<span class="sb-key sb-key--ev" data-sb-evkey hidden></span><span data-sb-evkey hidden>Events</span></div>
+        <button type="button" class="sb-finder__evtoggle is-on" data-sb-evtoggle aria-pressed="true" hidden>Events</button>
         <button type="button" class="sb-finder__fs" data-sb-fs aria-label="Full screen map"><span class="sb-fs-open">⤢ Full screen</span><span class="sb-fs-close">✕ Close</span></button>
         <p class="sb-finder__fsstatus" data-sb-fsstatus></p>
       </div>
@@ -383,6 +385,7 @@
       map.touchZoomRotate.disableRotation();
       map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-left');
       map.on('style.load', brandMap);
+      root.sbMap = map; root.dispatchEvent(new CustomEvent('sb:map'));
       map.on('click', function () { closeSheet(); });
       map.on('movestart', function () { clearTimeout(moveT); });
       map.on('moveend', function () { if (auto) return; clearTimeout(moveT); moveT = setTimeout(areaSearch, 700); });
@@ -552,6 +555,93 @@
 </script>
 
 
+<script src="{{ 'sunboy-events.js' | asset_url }}" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  /* SUNBOY events on the Find Us map: pins for the next few days, a pulsing sun on the day, and a banner for events near the area you're looking at. */
+  var root = document.getElementById('sb-finder');
+  if (!root || !window.SBEvents) return;
+  var DAYS = parseInt(root.dataset.eventDays || '7', 10);
+  if (!DAYS) return;
+  var E = window.SBEvents, esc = E.esc, API = root.dataset.api, EVENTS = root.dataset.eventsUrl || '/pages/events';
+  var banner = root.querySelector('[data-sb-evbanner]'), toggle = root.querySelector('[data-sb-evtoggle]');
+  var events = [], pins = {}, popup = null, shown = true, map = null;
+  var focusId = new URLSearchParams(location.search).get('event');
+
+  function pop(e) {
+    var st = E.status(e);
+    return '<div class="sb-evpop">' +
+      '<p class="sb-evpop__when">' + (st.today ? E.SUN + ' ' : '') + esc(E.dayLabel(e)) + ' · ' + esc(E.timeRange(e)) + '</p>' +
+      '<h3 class="sb-evpop__title">' + esc(E.headline(e)) + '</h3>' +
+      '<p class="sb-evpop__where">' + esc(e.label) + ' · ' + esc(e.address) + '</p>' +
+      '<p class="sb-evpop__actions"><a href="' + esc(E.dirUrl(e)) + '" target="_blank" rel="noopener">Directions</a><a href="' + esc(EVENTS) + '#e-' + esc(e.id) + '">Details</a></p></div>';
+  }
+  function open(e, fly) {
+    if (!map) return;
+    if (popup) popup.remove();
+    popup = new mapboxgl.Popup({ offset: 22, closeButton: true, maxWidth: '300px', className: 'sb-evpopup' }).setLngLat([e.lng, e.lat]).setHTML(pop(e)).addTo(map);
+    if (fly) map.flyTo({ center: [e.lng, e.lat], zoom: Math.max(map.getZoom(), 13), duration: 800 });
+  }
+  function drawPins() {
+    if (!map || !events.length) return;
+    events.forEach(function (e) {
+      if (pins[e.id]) return;
+      var st = E.status(e), el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'sb-evpin' + (st.live ? ' is-live' : st.today ? ' is-today' : '');
+      el.innerHTML = '<span>' + E.SUN + '</span>';
+      el.setAttribute('aria-label', 'SUNBOY event: ' + E.headline(e) + ', ' + E.dayLabel(e) + ' ' + E.timeRange(e));
+      el.addEventListener('click', function (ev) { ev.stopPropagation(); open(e); });
+      pins[e.id] = new mapboxgl.Marker({ element: el }).setLngLat([e.lng, e.lat]).addTo(map);
+    });
+    setShown(shown);
+    toggle.hidden = false;
+    root.querySelectorAll('[data-sb-evkey]').forEach(function (k) { k.hidden = false; });
+    updateBanner();
+    if (focusId) {
+      var f = events.filter(function (e) { return e.id === focusId; })[0]; focusId = null;
+      if (f) setTimeout(function () { open(f, true); }, 900);
+    }
+  }
+  function setShown(on) {
+    shown = on;
+    Object.keys(pins).forEach(function (k) { pins[k].getElement().style.display = on ? '' : 'none'; });
+    toggle.classList.toggle('is-on', on); toggle.setAttribute('aria-pressed', on);
+    if (!on && popup) popup.remove();
+    updateBanner();
+  }
+  function updateBanner() {
+    if (!map || !shown) { banner.hidden = true; return; }
+    var c = map.getCenter(), center = { lat: c.lat, lng: c.lng };
+    var near = events.filter(function (e) { return E.miles(center, e) <= 60; }).slice(0, 2);
+    if (!near.length) { banner.hidden = true; return; }
+    banner.innerHTML = near.map(function (e) {
+      var st = E.status(e);
+      return '<button type="button" class="sb-finder__ev' + (st.today ? ' is-today' : '') + '" data-ev="' + esc(e.id) + '">' + E.SUN +
+        '<span><b>' + esc(st.live ? 'Happening now' : E.dayLabel(e)) + ' · ' + esc(E.timeRange(e)) + '</b> ' + esc(E.headline(e)) + ', ' + esc(E.place(e)) + '</span></button>';
+    }).join('');
+    banner.hidden = false;
+  }
+  banner.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-ev]'); if (!b) return;
+    var e = events.filter(function (x) { return x.id === b.dataset.ev; })[0];
+    if (e) { open(e, true); var mw = root.querySelector('[data-sb-mapwrap]'); if (mw && mw.getBoundingClientRect().top < 0) mw.scrollIntoView({ block: 'center' }); }
+  });
+  toggle.addEventListener('click', function () { setShown(!shown); });
+  function ready() {
+    map = root.sbMap; if (!map) return;
+    map.on('moveend', updateBanner);
+    drawPins();
+  }
+  E.load(API).then(function (list) {
+    var now = new Date();
+    events = list.filter(function (e) { var st = E.status(e, now); return !st.over && st.days <= DAYS; });
+    if (focusId) { var f = list.filter(function (e) { return e.id === focusId; })[0]; if (f && events.indexOf(f) < 0) events.push(f); }
+    if (root.sbMap) ready(); else root.addEventListener('sb:map', ready, { once: true });
+  });
+});
+</script>
+
 <script>
 (function () {
   /* Desktop mini search bar for Find Us */
@@ -628,6 +718,9 @@
     { "type": "text", "id": "note", "label": "Small print", "default": "Stores update as shelves restock. Call ahead to check your flavor is in." },
     { "type": "range", "id": "days", "label": "Show spots that stocked SUNBOY in the last (days)", "min": 14, "max": 90, "step": 1, "default": 60 },
     { "type": "text", "id": "api_base", "label": "Finder service URL", "default": "https://sunboy-finder.vercel.app" },
+    { "type": "header", "content": "Events" },
+    { "type": "range", "id": "event_days", "label": "Show events on the map this many days ahead", "min": 0, "max": 30, "step": 1, "default": 7, "info": "0 hides events on the map. Events happening today always pulse." },
+    { "type": "url", "id": "events_url", "label": "Events page" },
     { "type": "text", "id": "mapbox_token", "label": "Mapbox public token (optional)", "info": "Leave blank to use the token stored in the finder service (Vercel → MAPBOX_PUBLIC_TOKEN)." }
   ],
   "blocks": [
