@@ -11,7 +11,7 @@
       {%- for block in section.blocks -%}
         {%- assign p = block.settings.product -%}
         {%- if p == blank -%}{%- continue -%}{%- endif -%}
-        {%- comment -%} Public merch only: skip internal-use items and anything not in the merch collection {%- endcomment -%}
+        {%- comment -%} Public merch only: skips internal-use items and anything outside the merch collection. {%- endcomment -%}
         {%- assign sb_public = false -%}
         {%- for c in p.collections -%}{%- if c.handle == 'sunboy-swag' -%}{%- assign sb_public = true -%}{%- endif -%}{%- endfor -%}
         {%- if p.tags contains 'internal-use' or sb_public == false -%}{%- continue -%}{%- endif -%}
