@@ -47,18 +47,19 @@
         "eyebrow": "8 × 12oz cans · 5% ABV",
         "title": "Classic Variety Pack",
         "short_name": "Classic pack",
-        "tagline": "The four that started it all.",
-        "body": "<p>A tropical fruit platter made for sharing! Our original lineup, and still the fastest way to figure out who you are. Tart Passion Fruit, crisp Pineapple, zesty Tangerine and lush Mango: four real fruits, one real coconut water, and eight chances to find your flavor.</p>",
+        "tagline": "The four that started it all",
+        "body": "<p>A tropical fruit platter made for sharing! Our original lineup, and still the fastest way to figure out what kind of SUNBOY you are. Tart Passion Fruit, crisp Pineapple, zesty Tangerine and lush Mango: four real fruits, all with real coconut water, and eight chances to find your flavor.</p>",
         "details": "2 Passion Fruit · 2 Pineapple · 2 Tangerine · 2 Mango",
         "image_fallback": "sb-pack-classic.webp",
-        "bg": "#0BB89B",
-        "fg": "#FFFFFF",
+        "bg": "#0bb89b",
+        "fg": "#ffffff",
         "finder_url": "/pages/find-us"
       }
     },
     "flip": {
       "type": "sb-flip",
       "settings": {
+        "flavor_only": false,
         "color_scheme": "scheme-3",
         "art_fallback": "sb-sunman-floaty.png",
         "heading": "Flip before you sip.",
@@ -135,10 +136,12 @@
         "f7"
       ],
       "settings": {
+        "flavor_only": false,
         "color_scheme": "scheme-1",
         "eyebrow": "hydrating coconut water with a splash of real fruit juice",
         "heading": "The whole lineup",
         "link_label": "",
+        "link": "",
         "anchor": "lineup"
       }
     }
