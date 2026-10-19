@@ -38,7 +38,7 @@
           "settings": {
             "kicker": "CoCo & Co",
             "heading": "Coconuts make people happy.",
-            "body": "<p>Those street parties grew into CoCo &amp; Co, making custom coconuts for brands and events. The mission was simple then and it still is now: <strong>spread joy with coconuts.</strong></p>",
+            "body": "<p>Those street parties grew into CoCo & Co, making custom coconuts for brands and events. The mission was simple then and it still is now: <strong>spread joy with coconuts.</strong></p>",
             "image": "shopify://shop_images/sunboy-ian-cooler.jpg",
             "bg": "#0bb89b",
             "fg": "#ffffff"
@@ -60,7 +60,7 @@
           "settings": {
             "kicker": "Here comes the sun",
             "heading": "So we put it in a can.",
-            "body": "<p>SUNBOY is real coconut water and real fruit, playfully spiked and sparkled. 5% ABV, zero added sugar, made for parks, beaches, rooftops and every golden hour in between. You'll thank us tomorrow morning.</p>",
+            "body": "<p>SUNBOY is real coconut water and real fruit, playfully spiked and sparkled. 5% ABV, zero added sugar, made for parks, beaches, boats, rooftops, and every golden hour in between. You'll thank us tomorrow morning.</p>",
             "image": "shopify://shop_images/sunboy-ian-night.jpg",
             "bg": "#f79359",
             "fg": "#523b18"
@@ -75,7 +75,7 @@
       ],
       "settings": {
         "close_heading": "Say hi.",
-        "close_body": "<p>Questions, ideas, collabs or coconut confessions: <a href=\"mailto:holler@drinksunboy.com\">holler@drinksunboy.com</a></p>",
+        "close_body": "<p>Questions, ideas, collabs, or coconut confessions: <a href=\"mailto:holler@drinksunboy.com\">holler@drinksunboy.com</a></p>",
         "button_label": "Find SUNBOY near you",
         "button_link": "/pages/find-us",
         "link_label": "Shop the merch",
