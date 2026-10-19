@@ -31,12 +31,9 @@
   >
     {% if recommendations.performed and recommendations.products_count > 0 %}
       <div class="sb-lineup__head sb-related__head">
-        <div class="sb-lineup__head sb-related__head">
-          <h2 class="related-products__heading inline-richtext {{ section.settings.heading_size }}">
-            {{ section.settings.heading }}
-          </h2>
-          <a class="sb-link-arrow" href="/collections/sunboy-swag">Shop all</a>
-        </div>
+        <h2 class="related-products__heading inline-richtext {{ section.settings.heading_size }}">
+          {{ section.settings.heading }}
+        </h2>
         <a class="sb-link-arrow" href="/collections/sunboy-swag">Shop all</a>
       </div>
       <ul
@@ -44,7 +41,7 @@
         role="list"
       >
         {% assign skip_card_product_styles = false %}
-        {% for recommendation in recommendations.products %}{%- if recommendation.metafields.sunboy.hero_line != blank or recommendation.tags contains "trade" -%}{%- continue -%}{%- endif -%}
+        {% for recommendation in recommendations.products %}{%- if recommendation.metafields.sunboy.hero_line != blank or recommendation.tags contains "trade" -%}{%- continue -%}{%- endif -%}{%- assign sb_cols = recommendation.collections | map: 'handle' -%}{%- if recommendation.tags contains 'internal-use' -%}{%- continue -%}{%- endif -%}{%- unless sb_cols contains 'sunboy-swag' -%}{%- continue -%}{%- endunless -%}
           <li class="grid__item">
             {% render 'card-product',
               card_product: recommendation,
