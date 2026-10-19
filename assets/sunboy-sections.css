@@ -716,3 +716,12 @@ body[class*="overflow-hidden"] .sb-finder__maptoggle { display: none; }
 /* Product pages: "You may also like" heading with a Shop all link */
 .sb-related__head { margin-bottom: 2.4rem; align-items: baseline; }
 .sb-related__head .related-products__heading { margin: 0; }
+
+/* Find Us: "you are here" dot (Find My style). Script: assets/sunboy-me.js */
+.sb-me { position: relative; width: 22px; height: 22px; pointer-events: none; }
+.sb-me__acc { position: absolute; left: 50%; top: 50%; width: calc(var(--acc, 0px) * 2); height: calc(var(--acc, 0px) * 2); transform: translate(-50%, -50%); border-radius: 50%; background: rgba(10, 132, 255, .12); border: 1px solid rgba(10, 132, 255, .28); transition: width .25s ease, height .25s ease; }
+.sb-me__halo { position: absolute; inset: 0; border-radius: 50%; background: rgba(10, 132, 255, .4); animation: sb-me-pulse 2.2s ease-out infinite; }
+.sb-me__dot { position: absolute; inset: 2px; border-radius: 50%; background: #0a84ff; border: 3px solid #fff; box-shadow: 0 1px 5px rgba(0, 0, 0, .35); }
+@keyframes sb-me-pulse { 0% { transform: scale(1); opacity: .75; } 70%, 100% { transform: scale(3.2); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sb-me__halo { animation: none; opacity: .25; transform: scale(1.8); } }
+.sb-me-ctrl button { display: grid; place-items: center; color: #0a84ff; }
