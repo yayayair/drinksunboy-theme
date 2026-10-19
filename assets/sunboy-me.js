@@ -59,25 +59,21 @@
   function onMap() { map = root.sbMap; draw(); }
   if (root.sbMap) onMap(); else root.addEventListener('sb:map', onMap, { once: true });
 
-  // Start following only once the browser says yes, so the visitor is never asked twice.
-  var perm = null;
+  // Piggyback on the page's own "Use my location": whenever the page gets a position, show the dot and
+  // keep following. Safari often reports permission as "prompt" even after you tap Allow, so we don't rely on it.
+  var geo = navigator.geolocation, orig = geo.getCurrentPosition.bind(geo);
+  geo.getCurrentPosition = function (ok, err, opts) {
+    return orig(function (p) { update(p); watch(); if (ok) ok(p); }, err, opts);
+  };
+
+  // Arrived from the homepage's "Use my location" (?lat=..&lng=..): show the dot there straight away.
+  var q = new URLSearchParams(location.search), qlat = parseFloat(q.get('lat')), qlng = parseFloat(q.get('lng'));
+  if (isFinite(qlat) && isFinite(qlng)) { me = { lat: qlat, lng: qlng, acc: 0 }; draw(); }
+
+  // Already allowed on this device (Chrome, Firefox, Android): show the dot right away, no prompt.
   if (navigator.permissions && navigator.permissions.query) {
     navigator.permissions.query({ name: 'geolocation' }).then(function (s) {
-      perm = s;
-      if (s.state === 'granted') watch(); // already allowed on this device: show the dot right away
-      s.onchange = function () { if (s.state === 'granted') watch(); };
+      if (s.state === 'granted') watch();
     }).catch(function () {});
   }
-  // "Use my location" (on the page, or in the sticky bar on phones, which taps the same button)
-  root.addEventListener('click', function (e) {
-    if (!e.target.closest('[data-sb-finder-geo]')) return;
-    if (perm) {
-      var tries = 0, t = setInterval(function () {
-        if (perm.state === 'granted') { clearInterval(t); watch(); }
-        else if (perm.state === 'denied' || ++tries > 30) clearInterval(t);
-      }, 1000);
-    } else {
-      setTimeout(watch, 4000); // older browsers without the permissions check
-    }
-  });
 })();
