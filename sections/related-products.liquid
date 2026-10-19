@@ -41,7 +41,8 @@
         role="list"
       >
         {% assign skip_card_product_styles = false %}
-        {% for recommendation in recommendations.products %}{%- if recommendation.metafields.sunboy.hero_line != blank or recommendation.tags contains "trade" -%}{%- continue -%}{%- endif -%}{%- assign sb_cols = recommendation.collections | map: 'handle' -%}{%- if recommendation.tags contains 'internal-use' -%}{%- continue -%}{%- endif -%}{%- unless sb_cols contains 'sunboy-swag' -%}{%- continue -%}{%- endunless -%}
+        {%- assign sb_shown = 0 -%}
+        {% for recommendation in recommendations.products %}{%- if recommendation.metafields.sunboy.hero_line != blank or recommendation.tags contains "trade" -%}{%- continue -%}{%- endif -%}{%- assign sb_cols = recommendation.collections | map: 'handle' -%}{%- if recommendation.tags contains 'internal-use' -%}{%- continue -%}{%- endif -%}{%- unless sb_cols contains 'sunboy-swag' -%}{%- continue -%}{%- endunless -%}{%- if sb_shown >= section.settings.columns_desktop -%}{%- break -%}{%- endif -%}{%- assign sb_shown = sb_shown | plus: 1 -%}
           <li class="grid__item">
             {% render 'card-product',
               card_product: recommendation,
