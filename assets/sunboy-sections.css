@@ -712,3 +712,7 @@ body[class*="overflow-hidden"] .sb-finder__maptoggle { display: none; }
 /* Scrolling bar: same space on both sides of each sun */
 .sb-marquee__item { gap: 1.8rem; padding: .9rem 0 .9rem 1.8rem; }
 .sb-press .sb-marquee__item { padding-left: 3.2rem; }
+
+/* Product pages: "You may also like" heading with a Shop all link */
+.sb-related__head { margin-bottom: 2.4rem; align-items: baseline; }
+.sb-related__head .related-products__heading { margin: 0; }
