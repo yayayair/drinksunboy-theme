@@ -29,18 +29,18 @@
       "settings": {
         "color_scheme": "scheme-5",
         "eyebrow": "Radical transparency",
-        "heading": "Nothing to hide. Literally.",
+        "heading": "Nothing to hide.",
         "body": "<p>We put every number on the can and every number right here. Real coconut water, real fruit, zero added sugar and a clean 5% alcohol base. No artificial flavors, no mystery syrups, no fine print.</p>"
       }
     },
     "flip": {
       "type": "sb-flip",
       "settings": {
+        "flavor_only": true,
         "color_scheme": "scheme-3",
         "art_fallback": "sb-sunman-floaty.png",
         "heading": "Flip before you sip.",
-        "body": "<p>Real fruit juice settles. Give the can a gentle flip before opening and everything comes back together. That is how you know it is real.</p>",
-        "flavor_only": true
+        "body": "<p>Real fruit juice settles. Give the can a gentle flip before opening and everything comes back together. That is how you know it is real.</p>"
       }
     },
     "faq-flavors": {
@@ -50,14 +50,14 @@
           "type": "question",
           "settings": {
             "question": "Wait, why do I flip it?",
-            "answer": "<p>Real fruit juice settles. That's how you know it's real. Give the can a gentle flip before you crack it (gentle, this isn't a cocktail-shaker audition) and everything comes back together.</p>"
+            "answer": "<p>Real fruit juice settles. That's how you know it's real. Give the can a gentle flip before you crack it (not after it's open or you'll spill on your boating attire) and everything comes back together.</p>"
           }
         },
         "q2": {
           "type": "question",
           "settings": {
             "question": "Is this a seltzer?",
-            "answer": "<p>Nope. Not flat, not a seltzer. Real hydrating coconut water and real fruit, playfully spiked and sparkled. Low fizz, no bloat. Think beachside coconut cocktail that fits in your hand.</p>"
+            "answer": "<p>Nope. It's a spiked coconut water - not flat, but also not bubbly like a seltzer. Real hydrating coconut water and real fruit, playfully spiked and sparkled. Low fizz, no bloat. Think beachside coconut cocktail that fits in your hand.</p>"
           }
         },
         "q3": {
@@ -74,32 +74,32 @@
             "answer": "<p>Zero. The sweetness comes from real coconut water and real fruit. Every number is in the nutrition panel above, because we've got nothing to hide.</p>"
           }
         },
+        "q8": {
+          "type": "question",
+          "settings": {
+            "question": "Is coconut a tree nut?",
+            "answer": "<p>Nope. Coconut is a fruit (technically a drupe), and since January 2025 the FDA no longer counts it as a tree nut or a major food allergen. Coconut allergies are rare, but if coconut has ever given you trouble, give this one a pass.</p>"
+          }
+        },
         "q5": {
           "type": "question",
           "settings": {
             "question": "Can I buy it on this website?",
-            "answer": "<p>Not online. Shipping alcohol comes with a whole rulebook. But you'll find SUNBOY in thousands of stores. <a href=\"/pages/find-us\">Find SUNBOY near you</a>.</p>"
+            "answer": "<p>Not online. But you'll find SUNBOY in thousands of stores and there may be local services that deliver straight to your door. <a href=\"/pages/find-us\">Find SUNBOY near you</a>.</p>"
           }
         },
         "q6": {
           "type": "question",
           "settings": {
             "question": "Does it need to stay cold?",
-            "answer": "<p>Not until you're ready for it. Unopened cans are good for 18 months from the born-on date. But trust us: ice cold is the move.</p>"
+            "answer": "<p>Not until you're ready for it. Unopened cans are good for 18 months from the born-on date on the bottom. But trust us: ice cold is the move.</p>"
           }
         },
         "q7": {
           "type": "question",
           "settings": {
             "question": "Will I really thank you tomorrow morning?",
-            "answer": "<p>That's the whole idea behind real coconut water and zero added sugar. We can vouch for what's in the can. What you do with it is between you and your Tuesday. Please enjoy responsibly.</p>"
-          }
-        },
-        "q8": {
-          "type": "question",
-          "settings": {
-            "question": "Is coconut a tree nut?",
-            "answer": "<p>Nope. Coconut is a fruit (technically a drupe), and since January 2025 the FDA no longer counts it as a tree nut or a major food allergen. Coconut allergies are rare, but if coconut has ever given you trouble, give this one a pass.</p>"
+            "answer": "<p>That's the whole idea behind real coconut water and zero added sugar. We can only vouch for what's in the can. What you do with it is between you and your day party. As long as you have a good time, we think you'll thank us tomorrow morning. Please enjoy responsibly.</p>"
           }
         }
       },
@@ -177,13 +177,13 @@
         "f7"
       ],
       "settings": {
+        "flavor_only": true,
         "color_scheme": "scheme-1",
         "eyebrow": "Keep exploring",
         "heading": "The whole lineup",
         "link_label": "Find SUNBOY near you",
         "link": "/pages/find-us",
-        "anchor": "lineup",
-        "flavor_only": true
+        "anchor": "lineup"
       }
     },
     "main": {
