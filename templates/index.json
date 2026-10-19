@@ -17,7 +17,7 @@
           "settings": {
             "image": "shopify://shop_images/sunboy-ian-can-closeup.jpg",
             "focus": "center",
-            "eyebrow": "Real coconut water. Real fruit. Really spiked.",
+            "eyebrow": "Hydrating coconut water. Real fruit. Really spiked.",
             "title": "The world's first spiked coconut water",
             "link_label": "Meet the lineup",
             "link": "/#flavors",
@@ -29,8 +29,8 @@
           "settings": {
             "image": "shopify://shop_images/sunboy-ian-stoop.jpg",
             "focus": "center",
-            "eyebrow": "Most drinks make you choose",
-            "title": "You'll thank us tomorrow morning.",
+            "eyebrow": "Most drinks make you choose. SUNBOY doesn't.",
+            "title": "You'll thank us tomorrow morning",
             "link_label": "Our story",
             "link": "/pages/about-us",
             "fallback": ""
@@ -53,8 +53,8 @@
           "settings": {
             "image": "shopify://shop_images/sunboy-ian-cheers.jpg",
             "focus": "center",
-            "eyebrow": "Tastings, festivals & pop-ups",
-            "title": "Come drink with us.",
+            "eyebrow": "Tastings, festivals, parties & pop-ups",
+            "title": "Come drink with us",
             "link_label": "See where we'll be",
             "link": "/pages/events",
             "fallback": ""
