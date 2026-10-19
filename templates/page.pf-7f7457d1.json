@@ -14,8 +14,8 @@
       "settings": {
         "image": "shopify://shop_images/sunboy-ian-citibike.jpg",
         "eyebrow": "Our story",
-        "heading": "Spread joy with coconuts.",
-        "sub": "From a bike cart in New York to the world’s first spiked coconut water.",
+        "heading": "Spread joy with coconuts",
+        "sub": "From a bike cart in New York to the world’s first canned spiked coconut water",
         "height": 90
       }
     },
@@ -29,8 +29,8 @@
             "heading": "It started with a bike cart on the Brooklyn Bridge.",
             "body": "<p>In the early 2010s, Luke McKenna and Yair Tygiel built a bicycle-powered coconut cart and started throwing tropical parties in the streets of New York. Crack open a coconut in the middle of the city and people stop, smile and start talking.</p>",
             "image": "shopify://shop_images/sunboy-ian-rooftop.jpg",
-            "bg": "#F3EEE2",
-            "fg": "#523B18"
+            "bg": "#f3eee2",
+            "fg": "#523b18"
           }
         },
         "c2": {
@@ -40,8 +40,8 @@
             "heading": "Coconuts make people happy.",
             "body": "<p>Those street parties grew into CoCo &amp; Co, making custom coconuts for brands and events. The mission was simple then and it still is now: <strong>spread joy with coconuts.</strong></p>",
             "image": "shopify://shop_images/sunboy-ian-cooler.jpg",
-            "bg": "#0BB89B",
-            "fg": "#FFFFFF"
+            "bg": "#0bb89b",
+            "fg": "#ffffff"
           }
         },
         "c3": {
@@ -51,8 +51,8 @@
             "heading": "The best mixer was hiding in plain sight.",
             "body": "<p>A decade of coconut cocktails taught us that coconut water is the ultimate mixer: naturally hydrating, low in sugar and calories, and kinder to the morning after.</p>",
             "image": "shopify://shop_images/sunboy-ian-cheers.jpg",
-            "bg": "#F9ED25",
-            "fg": "#523B18"
+            "bg": "#f9ed25",
+            "fg": "#523b18"
           }
         },
         "c4": {
@@ -62,8 +62,8 @@
             "heading": "So we put it in a can.",
             "body": "<p>SUNBOY is real coconut water and real fruit, playfully spiked and sparkled. 5% ABV, zero added sugar, made for parks, beaches, rooftops and every golden hour in between. You'll thank us tomorrow morning.</p>",
             "image": "shopify://shop_images/sunboy-ian-night.jpg",
-            "bg": "#F79359",
-            "fg": "#523B18"
+            "bg": "#f79359",
+            "fg": "#523b18"
           }
         }
       },
@@ -80,8 +80,8 @@
         "button_link": "/pages/find-us",
         "link_label": "Shop the merch",
         "link": "/collections/sunboy-swag",
-        "close_bg": "#523B18",
-        "close_fg": "#FFFFFF"
+        "close_bg": "#523b18",
+        "close_fg": "#ffffff"
       }
     },
     "marquee": {
@@ -90,19 +90,22 @@
         "m1": {
           "type": "message",
           "settings": {
-            "text": "Spread joy with coconuts"
+            "text": "Spread joy with coconuts",
+            "link": ""
           }
         },
         "m2": {
           "type": "message",
           "settings": {
-            "text": "Flip before you sip"
+            "text": "Flip before you sip",
+            "link": ""
           }
         },
         "m3": {
           "type": "message",
           "settings": {
-            "text": "You'll thank us tomorrow morning"
+            "text": "You'll thank us tomorrow morning",
+            "link": ""
           }
         }
       },
@@ -123,37 +126,43 @@
         "p1": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/sunboy-ian-stoop.jpg"
+            "image": "shopify://shop_images/sunboy-ian-stoop.jpg",
+            "link": ""
           }
         },
         "p2": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/sunboy-ian-can-closeup.jpg"
+            "image": "shopify://shop_images/sunboy-ian-can-closeup.jpg",
+            "link": ""
           }
         },
         "p3": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/sunboy-ian-citibike.jpg"
+            "image": "shopify://shop_images/sunboy-ian-citibike.jpg",
+            "link": ""
           }
         },
         "p4": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/sunboy-ian-target.jpg"
+            "image": "shopify://shop_images/sunboy-ian-target.jpg",
+            "link": ""
           }
         },
         "p5": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/sunboy-ian-cheers.jpg"
+            "image": "shopify://shop_images/sunboy-ian-cheers.jpg",
+            "link": ""
           }
         },
         "p6": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/sunboy-ian-cooler.jpg"
+            "image": "shopify://shop_images/sunboy-ian-cooler.jpg",
+            "link": ""
           }
         }
       },
