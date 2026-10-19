@@ -11,6 +11,16 @@
   "name": "t:sections.footer.name",
   "type": "footer",
   "sections": {
+    "newsletter": {
+      "type": "sb-newsletter",
+      "settings": {
+        "color_scheme": "scheme-5",
+        "line": "Join the Anti-Hustle Coconut Club for new flavors, merch drops, parties and where to find us:",
+        "placeholder": "you@drinksunboy.com",
+        "fine": "Must be 21+. Unsubscribe anytime.",
+        "success": "You're in. Welcome to the club."
+      }
+    },
     "footer": {
       "type": "footer",
       "settings": {
@@ -34,16 +44,6 @@
         "color_scheme": "scheme-4",
         "show_mark": true,
         "text": "Please enjoy responsibly. Must be 21+."
-      }
-    },
-    "newsletter": {
-      "type": "sb-newsletter",
-      "settings": {
-        "color_scheme": "scheme-5",
-        "line": "Join the Anti-Hustle Coconut Club for new flavors, merch drops, parties and where to find us:",
-        "placeholder": "you@sunshine.com",
-        "fine": "Must be 21+. Unsubscribe anytime.",
-        "success": "You're in. Welcome to the club."
       }
     }
   },
