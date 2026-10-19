@@ -74,31 +74,6 @@
         "padding_bottom": 12
       }
     },
-    "disclosures": {
-      "type": "disclosures",
-      "settings": {
-        "padding_top": 36,
-        "padding_bottom": 0
-      }
-    },
-    "related-products": {
-      "type": "related-products",
-      "settings": {
-        "heading": "You may also like",
-        "heading_size": "h2",
-        "products_to_show": 10,
-        "columns_desktop": 4,
-        "columns_mobile": "2",
-        "color_scheme": "scheme-1",
-        "image_ratio": "square",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "padding_top": 36,
-        "padding_bottom": 28
-      }
-    },
     "faq-goods": {
       "type": "sb-faq",
       "blocks": {
@@ -106,14 +81,14 @@
           "type": "question",
           "settings": {
             "question": "How much is shipping?",
-            "answer": "<p>Free on orders over $50. Under that, you'll see the shipping cost at checkout before you pay a cent.</p>"
+            "answer": "<p>Free on orders over $50. Under that, you'll see the shipping cost at checkout.</p>"
           }
         },
         "q2": {
           "type": "question",
           "settings": {
             "question": "When will my order arrive?",
-            "answer": "<p>We pack it up at our warehouse and send it your way. You'll get a tracking link as soon as it's on the move.</p>"
+            "answer": "<p>We pack orders at our warehouse daily and send them on their way. You'll get a tracking link as soon as it's on the move.</p>"
           }
         },
         "q3": {
@@ -151,6 +126,35 @@
         "eyebrow": "Good questions",
         "heading": "Asked & answered",
         "intro": ""
+      }
+    },
+    "disclosures": {
+      "type": "disclosures",
+      "settings": {
+        "heading": "Disclosures",
+        "heading_size": "h2",
+        "open_by_default": false,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 0
+      }
+    },
+    "related-products": {
+      "type": "related-products",
+      "settings": {
+        "heading": "You may also like",
+        "heading_size": "h2",
+        "products_to_show": 10,
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "color_scheme": "scheme-1",
+        "image_ratio": "square",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "padding_top": 36,
+        "padding_bottom": 28
       }
     }
   },
