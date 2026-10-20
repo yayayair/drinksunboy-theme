@@ -381,9 +381,9 @@
     if (!map) {
       mapboxgl.accessToken = root.dataset.mapbox;
       quiet();
-      map = new mapboxgl.Map({ container: el, style: 'mapbox://styles/mapbox/light-v11', center: [state.lng || -73.99, state.lat || 40.73], zoom: 12, scrollZoom: false, dragRotate: false, pitchWithRotate: false, touchPitch: false, cooperativeGestures: false, attributionControl: true });
-      map.touchZoomRotate.disableRotation();
-      map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-left');
+      map = new mapboxgl.Map({ container: el, style: 'mapbox://styles/mapbox/light-v11', center: [state.lng || -73.99, state.lat || 40.73], zoom: 12, scrollZoom: false, dragRotate: true, pitchWithRotate: false, touchPitch: false, cooperativeGestures: false, attributionControl: true });
+      // Two-finger twist rotates the map (right-click drag on desktop); the compass button turns it back to north.
+      map.addControl(new mapboxgl.NavigationControl({ showCompass: true, visualizePitch: false }), 'top-left');
       map.on('style.load', brandMap);
       root.sbMap = map; root.dispatchEvent(new CustomEvent('sb:map'));
       map.on('click', function () { closeSheet(); });
