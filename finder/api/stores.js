@@ -1,7 +1,9 @@
 // GET /api/stores?zip=12345 | lat=..&lng=.. [&flavor=coconut] [&miles=25] [&days=60] [&type=on|off]
+// Stores come from VIP/SRS (who bought SUNBOY recently); each store's pin and street are then taken from Google Maps.
 import { guard, clientIp, isZip, num, titleCase } from '../lib/common.js';
 import { vip, brands } from '../lib/vip.js';
 import { brandsFor, FLAVORS } from '../lib/flavors.js';
+import { placeStores } from '../lib/places.js';
 
 const cache = new Map();
 
@@ -54,8 +56,10 @@ export default async function handler(req, res) {
     let stores = all.filter(s => s.daysAgo === null || s.daysAgo <= days);
     let widened = false;
     if (stores.length < 5 && all.length > stores.length) { stores = all; widened = true; }
+    // Pins and addresses from Google Maps where Google clearly knows the store (VIP's coordinates are approximate).
+    const shown = await placeStores(stores.slice(0, 60));
     const body = {
-      stores: stores.slice(0, 60), total: stores.length, widened, days, miles, flavor, type,
+      stores: shown, total: stores.length, widened, days, miles, flavor, type,
       online: (d.onlineVendor || []).map(v => ({ name: v.dba, url: v.url }))
     };
     cache.set(key, { at: Date.now(), body });
