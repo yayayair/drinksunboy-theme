@@ -20,9 +20,8 @@ function km(a, b) {
   return 2 * R * Math.asin(Math.sqrt(x));
 }
 
-async function search(key, textQuery, bias) {
+async function search(key, textQuery) {
   const body = { textQuery, maxResultCount: 1, regionCode: 'us' };
-  if (bias) body.locationBias = { circle: { center: { latitude: bias.lat, longitude: bias.lng }, radius: 2000 } };
   const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': key, 'X-Goog-FieldMask': 'places.displayName,places.location,places.addressComponents,places.formattedAddress,places.types' },
@@ -41,23 +40,27 @@ async function placeOne(key, s) {
   if (hit && Date.now() - hit.at < TTL) return hit.v;
   const vipPt = Number.isFinite(s.lat) && Number.isFinite(s.lng) ? { lat: s.lat, lng: s.lng } : null;
   const addr = `${s.street}, ${s.city}, ${s.state} ${s.zip}`;
+  // Google's answer has to be in the same ZIP as VIP's address (or, failing that, close to VIP's pin).
+  // VIP's pins can be miles off, so its pin alone isn't a reason to reject Google.
+  const sameArea = (p, pt) => String(part(p, 'postal_code')).slice(0, 5) === String(s.zip).slice(0, 5) || (vipPt && km(vipPt, pt) <= MAX_MOVE_KM);
   let v = null;
   try {
     // 1) the business itself
-    const p = await search(key, `${s.name}, ${addr}`, vipPt);
+    const p = await search(key, `${s.name}, ${addr}`);
     const pt = p?.location && { lat: p.location.latitude, lng: p.location.longitude };
     const sameNumber = p && num(s.street) && num(s.street) === num(part(p, 'street_number'));
-    if (pt && (!vipPt || km(vipPt, pt) <= MAX_MOVE_KM) && (sameName(s.name, p.displayName?.text) || sameNumber)) {
+    if (pt && sameArea(p, pt) && (sameName(s.name, p.displayName?.text) || sameNumber)) {
       const street = [part(p, 'street_number'), part(p, 'route', true)].filter(Boolean).join(' ');
       v = { ...pt, src: 'google-place',
         ...(street && sameNumber ? { street } : {}),
         ...(sameName(s.name, p.displayName?.text) ? { gname: p.displayName.text } : {}) };
     } else {
       // 2) not found as a business: at least put the pin on the street address
-      const a = await search(key, addr, vipPt);
+      const a = await search(key, addr);
       const apt = a?.location && { lat: a.location.latitude, lng: a.location.longitude };
-      if (apt && (!vipPt || km(vipPt, apt) <= MAX_MOVE_KM) && num(s.street) && num(s.street) === num(part(a, 'street_number'))) v = { ...apt, src: 'google-address' };
+      if (apt && sameArea(a, apt) && num(s.street) && num(s.street) === num(part(a, 'street_number'))) v = { ...apt, src: 'google-address' };
     }
+    if (!v) console.log('places: kept VIP pin for', JSON.stringify({ name: s.name, addr, vip: vipPt, google: p ? { name: p.displayName?.text, zip: part(p, 'postal_code'), num: part(p, 'street_number'), at: pt } : null }));
   } catch (e) { console.error('places', e.message); return null; } // don't cache failures
   cache.set(id, { at: Date.now(), v });
   if (cache.size > 20000) cache.clear();
