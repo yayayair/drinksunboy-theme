@@ -35,8 +35,9 @@
     {%- if mf.tasting_notes != blank or mf.in_the_can != blank or mf.available_in != blank -%}
       <dl class="sb-fhero__facts">
         {%- if mf.tasting_notes != blank -%}<div class="sb-fhero__fact"><dt>Tasting notes</dt><dd>{{ mf.tasting_notes }}</dd></div>{%- endif -%}
-        {%- if mf.in_the_can != blank -%}<div class="sb-fhero__fact"><dt>In the can</dt><dd>{{ mf.in_the_can }}</dd></div>{%- endif -%}
-        {%- if mf.available_in != blank -%}<div class="sb-fhero__fact"><dt>Available in</dt><dd>{{ mf.available_in | replace: 'Classic Variety 8pk', '<a href="/pages/classic-variety-pack">Classic Variety 8pk</a>' | replace: 'Refresher Variety 8pk', '<a href="/pages/refresher-variety-pack">Refresher Variety 8pk</a>' }}</dd></div>{%- endif -%}
+        {%- comment -%} Each "·" item stays on one line, so "0g added sugar" never splits into "0g" / "added sugar". {%- endcomment -%}
+        {%- if mf.in_the_can != blank -%}{%- assign sb_parts = mf.in_the_can | split: ' · ' -%}<div class="sb-fhero__fact"><dt>In the can</dt><dd>{%- for x in sb_parts -%}<span class="sb-keep">{{ x | strip }}</span>{%- unless forloop.last %} · {% endunless -%}{%- endfor -%}</dd></div>{%- endif -%}
+        {%- if mf.available_in != blank -%}{%- assign sb_parts = mf.available_in | split: ' · ' -%}<div class="sb-fhero__fact"><dt>Available in</dt><dd>{%- for x in sb_parts -%}<span class="sb-keep">{{ x | strip | replace: 'Classic Variety 8pk', '<a href="/pages/classic-variety-pack">Classic Variety 8pk</a>' | replace: 'Refresher Variety 8pk', '<a href="/pages/refresher-variety-pack">Refresher Variety 8pk</a>' }}</span>{%- unless forloop.last %} · {% endunless -%}{%- endfor -%}</dd></div>{%- endif -%}
       </dl>
     {%- endif -%}
     {%- if section.settings.badges != blank -%}

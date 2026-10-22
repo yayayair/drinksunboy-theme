@@ -725,3 +725,6 @@ body[class*="overflow-hidden"] .sb-finder__maptoggle { display: none; }
 @keyframes sb-me-pulse { 0% { transform: scale(1); opacity: .75; } 70%, 100% { transform: scale(3.2); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .sb-me__halo { animation: none; opacity: .25; transform: scale(1.8); } }
 .sb-me-ctrl button { display: grid; place-items: center; color: #0a84ff; }
+
+/* Keep each "·" item on one line ("0g added sugar" never splits) */
+.sb-keep { white-space: nowrap; }
