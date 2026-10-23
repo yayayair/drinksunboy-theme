@@ -1,18 +1,19 @@
-// Puts each store where Google Maps has it. VIP's own coordinates are often approximate (street or ZIP level),
-// so pins could land a block or more away. For every store we ask Google Places for that business at that
-// address and, when Google's answer is clearly the same place, use Google's pin and address.
-// Results are cached per store, so Google is asked about each store only now and then.
-const TTL = 30 * 24 * 3600 * 1000, MAX_MOVE_KM = 3;
-const cache = new Map();
+// Puts each store where its street address really is. VIP's own coordinates are often approximate
+// (sometimes miles off), so every store's address is looked up once with Google's Geocoding API
+// (the cheap one) and the answer is saved for good in a small file in Vercel Blob storage.
+// After that, the same store never costs another Google lookup.
+//
+// Saved file: finder/store-locations.json  →  { "<name|street|zip>": { lat, lng, at } | { none: 1, at } }
+import { get, put } from '@vercel/blob';
+import { waitUntil } from '@vercel/functions';
 
-const words = n => String(n || '').toLowerCase().replace(/&|\+/g, ' and ').replace(/['’`.]/g, '').split(/[^a-z0-9]+/)
-  .filter(w => w.length > 1 && !/^(the|and|of|at|store|inc|llc|nyc|ny|co|company|shop|market|deli|bar|restaurant)$/.test(w));
-function sameName(a, b) {
-  const A = words(a), B = words(b);
-  if (!A.length || !B.length) return false;
-  const hit = A.filter(w => B.includes(w) || B.some(x => x.length > 3 && (x.startsWith(w) || w.startsWith(x)))).length;
-  return hit / A.length >= 0.5;
-}
+const FILE = 'finder/store-locations.json';
+const RETRY_MISS_MS = 30 * 24 * 3600 * 1000;   // a store Google couldn't place is retried after 30 days
+const MAX_MOVE_KM = 3;
+
+let saved = null, loading = null, fresh = {}, saving = null, deniedUntil = 0;
+
+const idOf = s => `${s.name}|${s.street}|${s.zip}`.toLowerCase();
 const num = s => (String(s || '').match(/^\s*(\d+[a-z]?)/i) || [])[1] || '';
 function km(a, b) {
   const R = 6371, dLat = (b.lat - a.lat) * Math.PI / 180, dLng = (b.lng - a.lng) * Math.PI / 180;
@@ -20,75 +21,104 @@ function km(a, b) {
   return 2 * R * Math.asin(Math.sqrt(x));
 }
 
-async function search(key, textQuery) {
-  const body = { textQuery, maxResultCount: 1, regionCode: 'us' };
-  const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': key, 'X-Goog-FieldMask': 'places.displayName,places.location,places.addressComponents,places.formattedAddress,places.types' },
-    body: JSON.stringify(body)
-  });
-  if (!r.ok) throw new Error(`places ${r.status}`);
-  return ((await r.json()).places || [])[0] || null;
-}
-
-const part = (p, type, short) => { const c = (p.addressComponents || []).find(c => (c.types || []).includes(type)); return c ? (short ? c.shortText : c.longText) : ''; };
-
-// Returns { lat, lng, street?, city?, zip?, gname?, src } or null to keep VIP's data.
-async function placeOne(key, s) {
-  const id = `${s.name}|${s.street}|${s.zip}`.toLowerCase();
-  const hit = cache.get(id);
-  if (hit && Date.now() - hit.at < TTL) return hit.v;
-  const vipPt = Number.isFinite(s.lat) && Number.isFinite(s.lng) ? { lat: s.lat, lng: s.lng } : null;
-  const addr = `${s.street}, ${s.city}, ${s.state} ${s.zip}`;
-  // Google's answer has to be in the same ZIP as VIP's address (or, failing that, close to VIP's pin).
-  // VIP's pins can be miles off, so its pin alone isn't a reason to reject Google.
-  const sameArea = (p, pt) => String(part(p, 'postal_code')).slice(0, 5) === String(s.zip).slice(0, 5) || (vipPt && km(vipPt, pt) <= MAX_MOVE_KM);
-  let v = null;
+async function readFile() {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return {};
   try {
-    // 1) the business itself
-    const p = await search(key, `${s.name}, ${addr}`);
-    const pt = p?.location && { lat: p.location.latitude, lng: p.location.longitude };
-    const sameNumber = p && num(s.street) && num(s.street) === num(part(p, 'street_number'));
-    if (pt && sameArea(p, pt) && (sameName(s.name, p.displayName?.text) || sameNumber)) {
-      const street = [part(p, 'street_number'), part(p, 'route', true)].filter(Boolean).join(' ');
-      v = { ...pt, src: 'google-place',
-        ...(street && sameNumber ? { street } : {}),
-        ...(sameName(s.name, p.displayName?.text) ? { gname: p.displayName.text } : {}) };
-    } else {
-      // 2) not found as a business: at least put the pin on the street address
-      const a = await search(key, addr);
-      const apt = a?.location && { lat: a.location.latitude, lng: a.location.longitude };
-      if (apt && sameArea(a, apt) && num(s.street) && num(s.street) === num(part(a, 'street_number'))) v = { ...apt, src: 'google-address' };
-    }
-    if (!v) console.log('places: kept VIP pin for', JSON.stringify({ name: s.name, addr, vip: vipPt, google: p ? { name: p.displayName?.text, zip: part(p, 'postal_code'), num: part(p, 'street_number'), at: pt } : null }));
-  } catch (e) { console.error('places', e.message); return null; } // don't cache failures
-  cache.set(id, { at: Date.now(), v });
-  if (cache.size > 20000) cache.clear();
-  return v;
+    const r = await get(FILE, { access: 'public', useCache: false });
+    if (!r || r.statusCode !== 200) return {};
+    return JSON.parse(await new Response(r.stream).text()) || {};
+  } catch (e) {
+    if (!/not.?found/i.test(e.message || e.name || '')) console.error('places load', e.message);
+    return {};
+  }
+}
+async function load() {
+  if (saved) return saved;
+  if (!loading) loading = readFile().then(d => (saved = d)).finally(() => { loading = null; });
+  return loading;
 }
 
-// Corrects a list of stores in place (in parallel, a few at a time). Never fails the search.
+// Merge what this instance learned into the saved file (re-reading first, so other instances' work is kept).
+async function save() {
+  if (!process.env.BLOB_READ_WRITE_TOKEN || !Object.keys(fresh).length) return;
+  const batch = fresh; fresh = {};
+  try {
+    const latest = await readFile();
+    const merged = { ...latest, ...batch };
+    await put(FILE, JSON.stringify(merged), { access: 'public', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', cacheControlMaxAge: 60 });
+    saved = merged;
+  } catch (e) {
+    console.error('places save', e.message);
+    fresh = { ...batch, ...fresh }; // try again next time
+  }
+}
+function scheduleSave() {
+  if (saving) return;
+  saving = save().finally(() => { saving = null; });
+  try { waitUntil(saving); } catch {}
+}
+
+const comp = (r, type) => (r.address_components || []).find(c => (c.types || []).includes(type));
+
+// One Geocoding API call per store, ever. Returns { lat, lng } or { none: 1 }; null = try again later.
+async function geocode(key, s) {
+  if (Date.now() < deniedUntil) return null;
+  const addr = `${s.street}, ${s.city}, ${s.state} ${s.zip}`;
+  const r = await fetch('https://maps.googleapis.com/maps/api/geocode/json?' + new URLSearchParams({ address: addr, components: 'country:US', key }));
+  const d = await r.json().catch(() => ({}));
+  if (d.status === 'REQUEST_DENIED' || d.status === 'OVER_DAILY_LIMIT' || d.status === 'OVER_QUERY_LIMIT') {
+    deniedUntil = Date.now() + 10 * 60 * 1000;
+    console.error('geocode', d.status, String(d.error_message || '').slice(0, 160));
+    return null;
+  }
+  if (d.status === 'ZERO_RESULTS') return { none: 1 };
+  if (d.status !== 'OK' || !d.results?.[0]) return null;
+  const g = d.results[0];
+  const pt = { lat: g.geometry.location.lat, lng: g.geometry.location.lng };
+  const vipPt = Number.isFinite(s.lat) && Number.isFinite(s.lng) ? { lat: s.lat, lng: s.lng } : null;
+  const sameZip = String(comp(g, 'postal_code')?.short_name || '').slice(0, 5) === String(s.zip).slice(0, 5);
+  const sameNumber = !num(s.street) || num(s.street) === num(comp(g, 'street_number')?.short_name);
+  const precise = g.geometry.location_type !== 'APPROXIMATE'; // APPROXIMATE = just the town or ZIP, no better than VIP
+  if (precise && sameNumber && (sameZip || (vipPt && km(vipPt, pt) <= MAX_MOVE_KM))) return pt;
+  console.log('places: kept VIP pin for', JSON.stringify({ name: s.name, addr, got: g.formatted_address, type: g.geometry.location_type }));
+  return { none: 1 };
+}
+
+// Corrects a list of stores in place. Never fails or noticeably slows a search.
 export async function placeStores(stores) {
   const key = process.env.GOOGLE_PLACES_API_KEY;
-  if (!key || !stores.length) return stores;
-  let i = 0;
-  const worker = async () => {
-    while (i < stores.length) {
-      const s = stores[i++];
-      const v = await placeOne(key, s);
-      if (!v) continue;
-      s.vipLat = s.lat; s.vipLng = s.lng;
-      s.lat = Math.round(v.lat * 1e6) / 1e6; s.lng = Math.round(v.lng * 1e6) / 1e6;
-      if (v.street) s.street = v.street;
-      if (v.gname) s.gname = v.gname;
-      s.located = v.src;
-    }
-  };
-  await Promise.race([
-    Promise.all(Array.from({ length: 12 }, worker)),
-    new Promise(r => setTimeout(r, 6000)) // never hold a search up for long; unplaced stores keep VIP's pin
-  ]);
+  if (!stores.length) return stores;
+  const known = await load();
+  const now = Date.now();
+  const todo = [];
+  for (const s of stores) {
+    const v = fresh[idOf(s)] || known[idOf(s)];
+    if (v && !v.none) apply(s, v);
+    else if (!v || (v.none && now - v.at > RETRY_MISS_MS)) todo.push(s);
+  }
+  if (key && todo.length) {
+    let i = 0;
+    const worker = async () => {
+      while (i < todo.length) {
+        const s = todo[i++];
+        try {
+          const v = await geocode(key, s);
+          if (!v) continue;
+          fresh[idOf(s)] = { ...v, at: now };
+          if (!v.none) apply(s, v);
+        } catch (e) { console.error('geocode', e.message); }
+      }
+    };
+    await Promise.race([Promise.all(Array.from({ length: 10 }, worker)), new Promise(r => setTimeout(r, 6000))]);
+    scheduleSave();
+  }
   return stores;
+}
+
+function apply(s, v) {
+  s.vipLat = s.lat; s.vipLng = s.lng;
+  s.lat = Math.round(v.lat * 1e6) / 1e6; s.lng = Math.round(v.lng * 1e6) / 1e6;
+  s.located = 'google';
 }
 
 export { km };

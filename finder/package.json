@@ -6,6 +6,7 @@
     "node": "24.x"
   },
   "dependencies": {
-    "@vercel/functions": "1.5.2"
+    "@vercel/functions": "1.5.2",
+    "@vercel/blob": "2.8.1"
   }
 }
