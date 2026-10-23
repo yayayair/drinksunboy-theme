@@ -1,9 +1,9 @@
-// Puts each store where its street address really is. VIP's own coordinates are often approximate
-// (sometimes miles off), so every store's address is looked up once with Google's Geocoding API
-// (the cheap one) and the answer is saved for good in a small file in Vercel Blob storage.
-// After that, the same store never costs another Google lookup.
+// Puts each store where Google Maps has it, with Google's spelling of its name and street. VIP's own
+// coordinates are often approximate (sometimes miles off). Each store is looked up on Google Places ONCE,
+// and the answer is saved for good in a small file in Vercel Blob storage, so the same store never costs
+// another Google lookup. (Without this, every search re-asked Google about every store: that was the $242.)
 //
-// Saved file: finder/store-locations.json  →  { "<name|street|zip>": { lat, lng, at } | { none: 1, at } }
+// Saved file: finder/store-locations.json  →  { "<name|street|zip>": { lat, lng, street?, gname?, at } | { none: 1, at } }
 import { get, put } from '@vercel/blob';
 import { waitUntil } from '@vercel/functions';
 
@@ -58,29 +58,50 @@ function scheduleSave() {
   try { waitUntil(saving); } catch {}
 }
 
-const comp = (r, type) => (r.address_components || []).find(c => (c.types || []).includes(type));
+const part = (p, type, short) => { const c = (p.addressComponents || []).find(c => (c.types || []).includes(type)); return c ? (short ? c.shortText : c.longText) : ''; };
+const words = n => String(n || '').toLowerCase().replace(/&|\+/g, ' and ').replace(/['’`.]/g, '').split(/[^a-z0-9]+/)
+  .filter(w => w.length > 1 && !/^(the|and|of|at|store|inc|llc|nyc|ny|co|company|shop|market|deli|bar|restaurant)$/.test(w));
+function sameName(a, b) {
+  const A = words(a), B = words(b);
+  if (!A.length || !B.length) return false;
+  return A.filter(w => B.includes(w) || B.some(x => x.length > 3 && (x.startsWith(w) || w.startsWith(x)))).length / A.length >= 0.5;
+}
 
-// One Geocoding API call per store, ever. Returns { lat, lng } or { none: 1 }; null = try again later.
+async function search(key, textQuery) {
+  const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': key, 'X-Goog-FieldMask': 'places.displayName,places.location,places.addressComponents' },
+    body: JSON.stringify({ textQuery, maxResultCount: 1, regionCode: 'us' })
+  });
+  if (r.status === 403 || r.status === 429) { deniedUntil = Date.now() + 10 * 60 * 1000; console.error('places', r.status); return undefined; }
+  if (!r.ok) throw new Error(`places ${r.status}`);
+  return ((await r.json()).places || [])[0] || null;
+}
+
+// One Google Places lookup per store, ever (two if Google doesn't know the business and we fall back to the
+// street address). Returns { lat, lng, street?, gname? } or { none: 1 }; null = couldn't ask Google, try later.
 async function geocode(key, s) {
   if (Date.now() < deniedUntil) return null;
   const addr = `${s.street}, ${s.city}, ${s.state} ${s.zip}`;
-  const r = await fetch('https://maps.googleapis.com/maps/api/geocode/json?' + new URLSearchParams({ address: addr, components: 'country:US', key }));
-  const d = await r.json().catch(() => ({}));
-  if (d.status === 'REQUEST_DENIED' || d.status === 'OVER_DAILY_LIMIT' || d.status === 'OVER_QUERY_LIMIT') {
-    deniedUntil = Date.now() + 10 * 60 * 1000;
-    console.error('geocode', d.status, String(d.error_message || '').slice(0, 160));
-    return null;
-  }
-  if (d.status === 'ZERO_RESULTS') return { none: 1 };
-  if (d.status !== 'OK' || !d.results?.[0]) return null;
-  const g = d.results[0];
-  const pt = { lat: g.geometry.location.lat, lng: g.geometry.location.lng };
   const vipPt = Number.isFinite(s.lat) && Number.isFinite(s.lng) ? { lat: s.lat, lng: s.lng } : null;
-  const sameZip = String(comp(g, 'postal_code')?.short_name || '').slice(0, 5) === String(s.zip).slice(0, 5);
-  const sameNumber = !num(s.street) || num(s.street) === num(comp(g, 'street_number')?.short_name);
-  const precise = g.geometry.location_type !== 'APPROXIMATE'; // APPROXIMATE = just the town or ZIP, no better than VIP
-  if (precise && sameNumber && (sameZip || (vipPt && km(vipPt, pt) <= MAX_MOVE_KM))) return pt;
-  console.log('places: kept VIP pin for', JSON.stringify({ name: s.name, addr, got: g.formatted_address, type: g.geometry.location_type }));
+  const at = p => p?.location && { lat: p.location.latitude, lng: p.location.longitude };
+  const sameArea = (p, pt) => String(part(p, 'postal_code')).slice(0, 5) === String(s.zip).slice(0, 5) || (vipPt && km(vipPt, pt) <= MAX_MOVE_KM);
+  const sameNumber = p => num(s.street) && num(s.street) === num(part(p, 'street_number'));
+
+  // 1) the business itself: Google's pin, street and proper name
+  const p = await search(key, `${s.name}, ${addr}`);
+  if (p === undefined) return null;
+  const pt = at(p), named = p && sameName(s.name, p.displayName?.text);
+  if (pt && sameArea(p, pt) && (named || sameNumber(p))) {
+    const street = [part(p, 'street_number'), part(p, 'route', true)].filter(Boolean).join(' ');
+    return { ...pt, ...(street && sameNumber(p) ? { street } : {}), ...(named ? { gname: p.displayName.text } : {}) };
+  }
+  // 2) not found as a business: at least put the pin on the street address
+  const a = await search(key, addr);
+  if (a === undefined) return null;
+  const apt = at(a);
+  if (apt && sameArea(a, apt) && sameNumber(a)) return apt;
+  console.log('places: kept VIP pin for', JSON.stringify({ name: s.name, addr, google: p?.displayName?.text || null }));
   return { none: 1 };
 }
 
@@ -118,6 +139,8 @@ export async function placeStores(stores) {
 function apply(s, v) {
   s.vipLat = s.lat; s.vipLng = s.lng;
   s.lat = Math.round(v.lat * 1e6) / 1e6; s.lng = Math.round(v.lng * 1e6) / 1e6;
+  if (v.street) s.street = v.street;
+  if (v.gname) s.gname = v.gname;
   s.located = 'google';
 }
 
