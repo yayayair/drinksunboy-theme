@@ -107,7 +107,7 @@
   var mobile = window.matchMedia('(max-width: 989px)');
   var state = { zip: '', q: '', lat: null, lng: null, flavor: '', miles: 25, type: 'all', data: null, stores: [], sel: null, area: 0, place: '', selKey: null, selStore: null, origin: null };
   var auto = false, autoT, moveT;
-  var map, markers = {}, byKey = {}, hoursCache = {}, gnames = {};
+  var map, markers = {}, byKey = {}, hoursCache = {}, hoursWait = {}, gnames = {};
   var params = new URLSearchParams(location.search);
   var COLORS = {}, NAMES = {};
   root.querySelectorAll('.sb-chip[data-flavor]').forEach(function (c) { if (c.dataset.flavor) { COLORS[c.dataset.flavor] = c.style.getPropertyValue('--chip'); NAMES[c.dataset.flavor] = c.dataset.name; } });
@@ -223,7 +223,6 @@
     listEl.innerHTML = stores.map(function (s, i) { return '<li class="sb-store" id="store-' + i + '" data-i="' + i + '">' + card(s, i) + '</li>'; }).join('');
     online(d.online || []);
     drawMap(stores, keepView);
-    watchHours();
     if (selIdx > -1) select(selIdx, 'restore');
   }
 
@@ -233,21 +232,25 @@
     onlineEl.innerHTML = '<p class="sb-eyebrow">Or get it delivered</p>' + list.map(function (v) { return '<a class="sb-btn" href="' + esc(v.url) + '" target="_blank" rel="noopener">' + esc(v.name) + '</a>'; }).join('');
   }
 
-  // Hours: fetched only when a card is seen (keeps Google costs tiny; cached for a day).
+  // Hours: fetched only when someone picks a store (tap a card or a pin), never for the whole list.
+  // Google charges for every hours lookup, so this keeps the cost to stores people actually look at.
   function hoursLine(h) {
-    if (!h) return '&nbsp;';
+    if (!h) return '<span class="sb-store__hint">Tap for today’s hours</span>';
     if (h.closed) return 'May be closed. Call ahead.';
     var line = today(h); return line ? '<b>Today</b> ' + esc(line) : '';
   }
   function loadHours(i, done) {
     var s = state.stores[i]; if (!s) return;
     if (hoursCache[s.key]) { done(hoursCache[s.key]); return; }
+    // one request per store even if the card and the phone sheet both ask at once
+    if (hoursWait[s.key]) { hoursWait[s.key].push(done); return; }
+    hoursWait[s.key] = [done];
     var q = new URLSearchParams({ name: s.name, address: s.street + ', ' + s.city + ', ' + s.state + ' ' + s.zip, lat: s.lat, lng: s.lng, v: 2 });
     fetch(API + '/api/hours?' + q).then(function (r) { return r.json(); }).then(function (h) {
       hoursCache[s.key] = h;
       if (h.name && sameStore(s.name, h.name)) s.gname = gnames[s.key] = h.name;
-      done(h);
-    }).catch(function () {});
+      (hoursWait[s.key] || []).forEach(function (fn) { fn(h); });
+    }).catch(function () {}).then(function () { delete hoursWait[s.key]; });
   }
   // Google's listing name is usually the cleanest ("Craft + Carry" vs VIP's "CRAFT & CARRY R").
   // Only use it when most of the words match, so a wrong Google hit never renames a store.
@@ -265,17 +268,6 @@
     if (nm && s && s.gname) nm.textContent = s.gname;
     var hl = el.querySelector('[data-hours]'); if (hl) hl.innerHTML = hoursLine(h);
     if (h.mapsUrl) el.querySelectorAll('[data-dir]').forEach(function (a) { a.href = h.mapsUrl; });
-  }
-  var io;
-  function watchHours() {
-    if (io) io.disconnect();
-    io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) return; io.unobserve(e.target);
-        loadHours(+e.target.dataset.i, function (h) { paintHours(e.target, h); });
-      });
-    }, { rootMargin: '200px' });
-    listEl.querySelectorAll('.sb-store').forEach(function (li) { io.observe(li); });
   }
   function today(h) {
     if (!h.week || !h.week.length) return '';
@@ -304,6 +296,7 @@
     var m = markers[i], li = document.getElementById('store-' + i);
     if (m) { var el = m.getElement(); el.style.zIndex = 5; el.classList.add('is-sel'); }
     if (li) li.classList.add('is-sel');
+    if (li && from !== 'restore') loadHours(i, function (h) { if (state.sel === i) paintHours(li, h); });
     if (from === 'restore') {
       if (!peekEl.hidden) sheetBody.innerHTML = '<div class="sb-store is-sel" data-i="' + i + '">' + card(state.stores[i], i) + '</div>';
     } else if (from === 'pin') {

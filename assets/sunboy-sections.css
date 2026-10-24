@@ -728,3 +728,6 @@ body[class*="overflow-hidden"] .sb-finder__maptoggle { display: none; }
 
 /* Keep each "·" item on one line ("0g added sugar" never splits) */
 .sb-keep { white-space: nowrap; }
+
+/* Find Us: hint shown until a store is picked and its hours are loaded */
+.sb-store__hint { opacity: .6; font-size: .92em; }
