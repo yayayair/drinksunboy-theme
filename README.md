@@ -111,6 +111,7 @@ Page templates live in `templates/`. A page uses the template named by its "Them
 - `sunboy-trade.css` / `.js`: trade shop.
 - `sunboy-trade-admin.js`: Trade Admin.
 - `sunboy-events.js`: shared events helpers.
+- `sunboy-inquiry.js`: sends the trade-account request and contact forms to Slack (falls back to the normal Shopify email if the service is down).
 - `sb-*.webp/png`: cans, bands, packs and Sunman illustrations.
 
 Colour schemes (Customize → Theme settings → Colors): 1 white/brown, 2 teal, 3 yellow, 4 brown, 5 cream.
@@ -136,6 +137,8 @@ A distributor's co-op % lives in the customer metafield "coop_percent" (default 
    - The Slack message updates either way. The **Trade Admin** page does the same job.
 5. **Invoicing:** orders that owe money show up on Trade Admin as "ready to invoice". **Create invoice** makes an *unsent* QuickBooks invoice, and only when clicked. Nothing here ever emails a customer.
 
+**New distributor requests** (form on the Distributor Shop page) post in **#trade-orders** with **Approve / Decline**. Approve adds them in Shopify as a customer tagged `trade` (50% co-op). Nobody is emailed: tell them they can sign in. Contact-form messages post there too, with **Mark handled**.
+
 Product tags that matter:
 - `trade`: shows in the trade shop.
 - `distributor-only` / `team-only`: limits who sees it.
@@ -155,6 +158,7 @@ A handful of small web endpoints on Vercel. The site calls them from the browser
 | `/api/trade/me`, `/api/trade/order` | Trade shop: who's signed in, their catalog and past orders; placing orders |
 | `/api/trade/admin` | Trade Admin: approvals, QuickBooks invoices |
 | `/api/qbo/callback` | QuickBooks sign-in return |
+| `/api/inquiry` | Website forms that need a follow-up → Slack card |
 | `/api/slack` | Slack button clicks, the Deny pop-up and thread replies |
 | `/api/health` | Quick "is everything configured" check |
 
@@ -169,7 +173,7 @@ Code layout:
 |---|---|
 | Shopify | `SHOPIFY_CLIENT_ID`, `SHOPIFY_CLIENT_SECRET` |
 | Trade shop | `TRADE_SIGNING_KEY` (sign-in link between site and service), `TRADE_FREE_SHIP_MIN` (100), `TRADE_SHIP_UNDER` (15), `TRADE_APPROVE_ALL` (unset = only team/cartons need approval; `on` = every order) |
-| Slack | `SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET`, `SLACK_APPROVERS` (member IDs), `SLACK_CHANNEL` (optional, default trade-orders) |
+| Slack | `SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET`, `SLACK_APPROVERS` (member IDs), `SLACK_CHANNEL` (optional, default trade-orders), `SLACK_INBOX_CHANNEL` (optional: send website messages to a different channel) |
 | Find Us | `VIP_CUST_ID`, `VIP_SHARED_CODE`, `GOOGLE_PLACES_API_KEY`, `MAPBOX_PUBLIC_TOKEN` |
 | Events | `CONNECTEAM_API_KEY` |
 | QuickBooks | `QBO_CLIENT_ID`, `QBO_CLIENT_SECRET` |

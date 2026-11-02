@@ -5,6 +5,7 @@
     { "source": "/api/brands", "destination": "/api/site?route=brands" },
     { "source": "/api/where", "destination": "/api/site?route=where" },
     { "source": "/api/coverage", "destination": "/api/site?route=coverage" },
-    { "source": "/api/events", "destination": "/api/site?route=events" }
+    { "source": "/api/events", "destination": "/api/site?route=events" },
+    { "source": "/api/inquiry", "destination": "/api/site?route=inquiry" }
   ]
 }

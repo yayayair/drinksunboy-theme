@@ -4,6 +4,7 @@
 import { waitUntil } from '@vercel/functions';
 import * as slack from '../lib/slack.js';
 import { approve, deny } from '../lib/approve.js';
+import { decideInquiry } from '../lib/inbox.js';
 
 export const config = { api: { bodyParser: false } };
 
@@ -48,7 +49,7 @@ async function decide(action, id, who, reason, where) {
 }
 
 const nope = (channel, ts, user) => slack.api('chat.postEphemeral', { channel, user, thread_ts: ts,
-  text: 'Only trade admins (Yair and Sam) can approve or deny trade orders.' }).catch(() => {});
+  text: 'Only trade admins (Yair and Sam) can act on these.' }).catch(() => {});
 
 // Thread reply on an order message: "approve" or "deny: reason".
 async function onMessage(ev) {
@@ -59,6 +60,18 @@ async function onMessage(ev) {
   const h = await slack.get('conversations.history', { channel: ev.channel, latest: ev.thread_ts, inclusive: true, limit: 1 });
   const parent = (h.messages || [])[0];
   if (!parent || !parent.bot_id) return;
+  const inq = (parent.blocks || []).find(b => b.block_id === 'inq_actions');
+  if (inq) {
+    const me = await slack.approver(ev.user);
+    if (!me.ok) return nope(ev.channel, ev.thread_ts, ev.user);
+    const btn = id => inq.elements.find(e => e.action_id === id);
+    const act = isDeny ? (btn('inq_decline') ? 'decline' : 'done') : (btn('inq_approve') ? 'approve' : 'done');
+    const value = (btn('inq_' + act) || {}).value || '';
+    return decideInquiry(act, value, me.name, { channel: ev.channel, ts: ev.thread_ts }, parent.blocks);
+  }
+  if ((parent.blocks || []).some(b => b.block_id === 'inq_note') || /^(Trade account request|Website message)/.test(parent.text || '')) {
+    return slack.api('chat.postMessage', { channel: ev.channel, thread_ts: ev.thread_ts, text: ':information_source: This one has already been taken care of.' });
+  }
   const actions = (parent.blocks || []).find(b => b.block_id === 'trade_decision');
   const id = actions?.elements?.find(e => e.action_id === 'approve')?.value;
   if (!id) {
@@ -92,6 +105,12 @@ export default async function handler(req, res) {
   if (data.type === 'block_actions') {
     const a = (data.actions || [])[0] || {};
     const channel = data.channel?.id, ts = data.message?.ts, user = data.user?.id;
+    if (/^inq_(approve|decline|done)$/.test(a.action_id)) {
+      const me = await slack.approver(user);
+      if (!me.ok) { waitUntil(nope(channel, ts, user)); return res.status(200).end(); }
+      waitUntil(decideInquiry(a.action_id.slice(4), a.value, me.name, { channel, ts }, data.message?.blocks).catch(e => console.error('inquiry', e.message)));
+      return res.status(200).end();
+    }
     if (a.action_id !== 'approve' && a.action_id !== 'deny') return res.status(200).end();
     const me = await slack.approver(user);
     if (!me.ok) { waitUntil(nope(channel, ts, user)); return res.status(200).end(); }

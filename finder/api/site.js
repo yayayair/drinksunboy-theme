@@ -6,8 +6,9 @@ import brands from '../routes/brands.js';
 import where from '../routes/where.js';
 import coverage from '../routes/coverage.js';
 import events from '../routes/events.js';
+import inquiry from '../routes/inquiry.js';
 
-const ROUTES = { health, config, brands, where, coverage, events };
+const ROUTES = { health, config, brands, where, coverage, events, inquiry };
 
 export default function handler(req, res) {
   const q = req.query || {};
