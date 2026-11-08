@@ -235,6 +235,10 @@
     if (target && target.classList.contains('sb-job')) {
       setTimeout(function () { target.scrollIntoView({ block: 'start' }); }, 50);
     }
+    window.addEventListener('hashchange', function () {
+      var t = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+      if (t && t.classList.contains('sb-job')) { setOpen(t, true); t.scrollIntoView({ block: 'start' }); }
+    });
     var bar = root.querySelector('.sb-careers__filters');
     if (bar) {
       bar.hidden = false;
