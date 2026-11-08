@@ -26,6 +26,13 @@
             "link": ""
           }
         },
+        "m6": {
+          "type": "message",
+          "settings": {
+            "text": "We're hiring: join the coconut crew",
+            "link": "/pages/careers"
+          }
+        },
         "m2": {
           "type": "message",
           "settings": {
@@ -57,6 +64,7 @@
       },
       "block_order": [
         "m1",
+        "m6",
         "m2",
         "m5",
         "m3",
