@@ -137,6 +137,20 @@
                   {%- endif -%}
                 </li>
               {%- endfor -%}
+              {%- for link in section.settings.sb_right_menu.links -%}
+                <li>
+                  <a
+                    id="HeaderDrawer-right-{{ link.handle }}"
+                    href="{{ link.url }}"
+                    class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
+                    {% if link.current %}
+                      aria-current="page"
+                    {% endif %}
+                  >
+                    {{ link.title | escape }}
+                  </a>
+                </li>
+              {%- endfor -%}
             </ul>
           </nav>
           <div class="menu-drawer__utility-links">

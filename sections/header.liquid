@@ -281,6 +281,19 @@
           </localization-form>
         {%- endif -%}
       </div>
+      {%- if section.settings.sb_right_menu != blank -%}
+        <nav class="sb-header-right small-hide medium-hide" aria-label="{{ section.settings.sb_right_menu.title | escape }}">
+          <ul class="list-menu list-menu--inline" role="list">
+            {%- for link in section.settings.sb_right_menu.links -%}
+              <li>
+                <a href="{{ link.url }}" class="header__menu-item list-menu__item link link--text focus-inset"{% if link.current %} aria-current="page"{% endif %}>
+                  <span{% if link.current %} class="header__active-menu-item"{% endif %}>{{ link.title | escape }}</span>
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {%- endif -%}
       {% render 'header-search', input_id: 'Search-In-Modal' %}
 
       {%- liquid
@@ -601,6 +614,12 @@
       "id": "menu",
       "default": "main-menu",
       "label": "t:sections.header.settings.menu.label"
+    },
+    {
+      "type": "link_list",
+      "id": "sb_right_menu",
+      "label": "Right-side links (beside search)",
+      "info": "Shown next to the search icon on desktop, and at the end of the mobile menu."
     },
     {
       "type": "select",

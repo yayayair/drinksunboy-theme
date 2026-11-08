@@ -807,3 +807,8 @@ body[class*="overflow-hidden"] .sb-finder__maptoggle { display: none; }
 .sb-careers__general { padding-block: 6.4rem; }
 .sb-careers__general-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2.8rem; }
 .sb-careers__eeo { font-size: 1.4rem; line-height: 1.5; padding-block: 3.2rem; margin: 0; opacity: .85; }
+
+/* Header: secondary links beside the search icon (header setting "Right-side links") */
+.sb-header-right { display: flex; align-items: center; margin-right: .4rem; }
+.sb-header-right ul { display: flex; flex-wrap: nowrap; margin: 0; padding: 0; }
+.sb-header-right .header__menu-item { white-space: nowrap; }
