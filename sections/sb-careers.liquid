@@ -1,0 +1,310 @@
+{%- comment -%}
+  Careers page. Roles come from Shopify admin → Content → Metaobjects → Job posting.
+  Every entry with Status = Open shows here, ordered by Sort order (lowest first).
+  Closed roles are hidden. With no open roles, the page shows a "no open roles" note
+  and the general application button.
+  Apply buttons open the ClickUp form with the role pre-selected.
+  Link straight to one role with /pages/careers#<entry handle>, e.g. #rsm-texas.
+{%- endcomment -%}
+{%- liquid
+  assign form_url = section.settings.form_url
+  if form_url contains '?'
+    assign sep = '&'
+  else
+    assign sep = '?'
+  endif
+  assign param = section.settings.form_param | url_encode | replace: '+', '%20'
+
+  assign count = 0
+  assign teams = ''
+  for job in shop.metaobjects.sunboy_job.values
+    if job.status.value == 'Open'
+      assign count = count | plus: 1
+      assign t = job.team.value | strip
+      if t != blank
+        assign key = '|' | append: t | append: '|'
+        assign seen_check = '|' | append: teams | append: '|'
+        unless seen_check contains key
+          if teams == ''
+            assign teams = t
+          else
+            assign teams = teams | append: '|' | append: t
+          endif
+        endunless
+      endif
+    endif
+  endfor
+  assign team_list = teams | split: '|'
+  assign general_option = section.settings.general_option | url_encode | replace: '+', '%20'
+  assign general_url = form_url | append: sep | append: param | append: '=' | append: general_option
+-%}
+
+<div class="sb-careers">
+
+  <section class="color-{{ section.settings.hero_scheme }} gradient sb-careers__hero">
+    <div class="sb-wrap sb-careers__hero-in">
+      <div class="sb-careers__hero-text">
+        {%- if section.settings.eyebrow != blank -%}<p class="sb-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+        <h1 class="sb-display sb-careers__title">{{ section.settings.heading }}</h1>
+        {%- if section.settings.intro != blank -%}<div class="sb-careers__intro">{{ section.settings.intro }}</div>{%- endif -%}
+        <p class="sb-careers__ctas">
+          {%- if count > 0 -%}
+            <a class="sb-btn sb-btn--yellow" href="#roles">See {{ count }} open {% if count == 1 %}role{% else %}roles{% endif %}</a>
+          {%- else -%}
+            <a class="sb-btn sb-btn--yellow" href="#roles">Work with us</a>
+          {%- endif -%}
+          {%- if section.settings.story_link != blank -%}<a class="sb-link-arrow" href="{{ section.settings.story_link }}">Our story</a>{%- endif -%}
+        </p>
+      </div>
+      <div class="sb-careers__art">
+        {%- if section.settings.image != blank -%}
+          {{ section.settings.image | image_url: width: 1400 | image_tag: sizes: '(min-width: 990px) 45vw, 90vw', widths: '500, 800, 1100, 1400', alt: '' }}
+        {%- elsif section.settings.fallback != blank -%}
+          <img src="{{ section.settings.fallback | asset_url }}" alt="" width="800" height="800">
+        {%- endif -%}
+      </div>
+    </div>
+  </section>
+
+  {%- assign has_perks = false -%}
+  {%- for block in section.blocks -%}{%- if block.type == 'perk' -%}{%- assign has_perks = true -%}{%- endif -%}{%- endfor -%}
+  {%- if has_perks -%}
+  <section class="color-{{ section.settings.why_scheme }} gradient sb-careers__why">
+    <div class="sb-wrap">
+      {%- if section.settings.why_heading != blank -%}<h2 class="sb-display sb-careers__h2">{{ section.settings.why_heading }}</h2>{%- endif -%}
+      <div class="sb-careers__perks">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'perk' -%}
+          <div class="sb-careers__perk" {{ block.shopify_attributes }}>
+            <h3 class="sb-careers__perk-title">{{ block.settings.title }}</h3>
+            <p>{{ block.settings.text }}</p>
+          </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+  {%- endif -%}
+
+  <section id="roles" class="color-{{ section.settings.roles_scheme }} gradient sb-careers__roles">
+    <div class="sb-wrap sb-careers__narrow">
+      <div class="sb-careers__roles-head">
+        <div>
+          <h2 class="sb-display sb-careers__h2">{{ section.settings.roles_heading }}</h2>
+          {%- if section.settings.roles_note != blank -%}<p class="sb-careers__note">{{ section.settings.roles_note }}</p>{%- endif -%}
+        </div>
+        {%- if team_list.size > 1 -%}
+        <div class="sb-careers__filters" role="group" aria-label="Filter roles by team" hidden>
+          <button type="button" class="sb-careers__filter is-on" data-team="" aria-pressed="true">All <span>{{ count }}</span></button>
+          {%- for t in team_list -%}
+            {%- assign tc = 0 -%}
+            {%- for job in shop.metaobjects.sunboy_job.values -%}
+              {%- assign jt = job.team.value | strip -%}
+              {%- if job.status.value == 'Open' and jt == t -%}{%- assign tc = tc | plus: 1 -%}{%- endif -%}
+            {%- endfor -%}
+            <button type="button" class="sb-careers__filter" data-team="{{ t | handle }}" aria-pressed="false">{{ t }} <span>{{ tc }}</span></button>
+          {%- endfor -%}
+        </div>
+        {%- endif -%}
+      </div>
+
+      {%- if count == 0 -%}
+        <div class="sb-careers__empty">
+          <h3 class="sb-careers__job-title">{{ section.settings.empty_heading }}</h3>
+          <p>{{ section.settings.empty_text }}</p>
+          <a class="sb-btn sb-btn--yellow" href="{{ general_url }}" target="_blank" rel="noopener">{{ section.settings.general_button }}</a>
+        </div>
+      {%- else -%}
+        <div class="sb-careers__list">
+          {%- for n in (0..100) -%}
+            {%- for job in shop.metaobjects.sunboy_job.values -%}
+              {%- if job.status.value != 'Open' -%}{%- continue -%}{%- endif -%}
+              {%- assign s = job.sort_order.value | default: 100 -%}
+              {%- if s > 100 -%}{%- assign s = 100 -%}{%- endif -%}
+              {%- if s < 0 -%}{%- assign s = 0 -%}{%- endif -%}
+              {%- if s != n -%}{%- continue -%}{%- endif -%}
+              {%- liquid
+                assign handle = job.system.handle
+                assign option = job.form_option.value | default: job.title.value
+                assign apply_url = form_url | append: sep | append: param | append: '=' | append: '__OPT__'
+                assign option_enc = option | url_encode | replace: '+', '%20'
+                assign apply_url = apply_url | replace: '__OPT__', option_enc
+                assign jt = job.team.value | strip
+              -%}
+              <article class="sb-job" id="{{ handle }}" data-team="{{ jt | handle }}">
+                <div class="sb-job__head">
+                  <div class="sb-job__main">
+                    <p class="sb-job__tags">
+                      {%- if jt != blank -%}<span class="sb-job__tag">{{ jt }}</span>{%- endif -%}
+                      {%- if job.employment_type.value != blank -%}<span class="sb-job__tag">{{ job.employment_type.value }}</span>{%- endif -%}
+                    </p>
+                    <h3 class="sb-job__title">{{ job.title.value }}</h3>
+                    <p class="sb-job__meta">
+                      {{- job.location.value -}}
+                      {%- if job.location.value != blank and job.pay_summary.value != blank %} · {% endif -%}
+                      {{- job.pay_summary.value -}}
+                    </p>
+                  </div>
+                  <div class="sb-job__actions">
+                    <button type="button" class="sb-job__toggle" aria-expanded="true" aria-controls="{{ handle }}-details">
+                      <span class="sb-job__toggle-label">Details</span>
+                      <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <a class="sb-btn sb-btn--yellow sb-job__apply" href="{{ apply_url }}" target="_blank" rel="noopener">Apply<span class="visually-hidden">: {{ job.title.value }} (opens in a new tab)</span></a>
+                  </div>
+                </div>
+                <div class="sb-job__body" id="{{ handle }}-details">
+                  {%- if job.summary.value != blank -%}<p class="sb-job__summary">{{ job.summary.value | newline_to_br }}</p>{%- endif -%}
+                  {%- if job.description != blank -%}<div class="sb-job__desc">{{ job.description | metafield_tag }}</div>{%- endif -%}
+                  <p class="sb-job__facts">
+                    {%- if job.reports_to.value != blank -%}<span>Reports to the {{ job.reports_to.value }}</span>{%- endif -%}
+                    {%- if job.target_start.value != blank -%}<span>Target start: {{ job.target_start.value }}</span>{%- endif -%}
+                  </p>
+                  <p class="sb-job__foot">
+                    <a class="sb-btn sb-btn--solid" href="{{ apply_url }}" target="_blank" rel="noopener">Apply for this role<span class="visually-hidden"> (opens in a new tab)</span></a>
+                    {%- if job.posting_url.value != blank -%}<a class="sb-link-arrow" href="{{ job.posting_url.value }}" target="_blank" rel="noopener">Full posting</a>{%- endif -%}
+                  </p>
+                </div>
+              </article>
+            {%- endfor -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </section>
+
+  {%- assign has_steps = false -%}
+  {%- for block in section.blocks -%}{%- if block.type == 'step' -%}{%- assign has_steps = true -%}{%- endif -%}{%- endfor -%}
+  {%- if has_steps -%}
+  <section class="color-{{ section.settings.roles_scheme }} gradient sb-careers__process">
+    <div class="sb-wrap sb-careers__narrow">
+      {%- if section.settings.steps_heading != blank -%}<h2 class="sb-display sb-careers__h2">{{ section.settings.steps_heading }}</h2>{%- endif -%}
+      <ol class="sb-careers__steps">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'step' -%}
+          <li class="sb-careers__step" {{ block.shopify_attributes }}>
+            <h3 class="sb-careers__step-title">{{ block.settings.title }}</h3>
+            <p>{{ block.settings.text }}</p>
+          </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ol>
+    </div>
+  </section>
+  {%- endif -%}
+
+  {%- if count > 0 and section.settings.general_heading != blank -%}
+  <section class="color-{{ section.settings.cta_scheme }} gradient sb-careers__general">
+    <div class="sb-wrap sb-careers__narrow sb-careers__general-in">
+      <div>
+        <h2 class="sb-display sb-careers__h2">{{ section.settings.general_heading }}</h2>
+        {%- if section.settings.general_text != blank -%}<p class="sb-careers__note">{{ section.settings.general_text }}</p>{%- endif -%}
+      </div>
+      <a class="sb-btn sb-btn--solid" href="{{ general_url }}" target="_blank" rel="noopener">{{ section.settings.general_button }}<span class="visually-hidden"> (opens in a new tab)</span></a>
+    </div>
+  </section>
+  {%- endif -%}
+
+  {%- if section.settings.eeo != blank -%}
+  <section class="color-{{ section.settings.roles_scheme }} gradient">
+    <div class="sb-wrap sb-careers__narrow"><p class="sb-careers__eeo">{{ section.settings.eeo }}</p></div>
+  </section>
+  {%- endif -%}
+</div>
+
+<script>
+  (function () {
+    var root = document.getElementById('roles');
+    if (!root) return;
+    var jobs = Array.prototype.slice.call(root.querySelectorAll('.sb-job'));
+    function setOpen(job, open) {
+      var btn = job.querySelector('.sb-job__toggle');
+      var body = job.querySelector('.sb-job__body');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      body.hidden = !open;
+      job.classList.toggle('is-open', open);
+      btn.querySelector('.sb-job__toggle-label').textContent = open ? 'Hide details' : 'Details';
+    }
+    var target = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+    jobs.forEach(function (job) {
+      setOpen(job, job === target);
+      job.querySelector('.sb-job__toggle').addEventListener('click', function () {
+        setOpen(job, job.querySelector('.sb-job__toggle').getAttribute('aria-expanded') !== 'true');
+      });
+    });
+    if (target && target.classList.contains('sb-job')) {
+      setTimeout(function () { target.scrollIntoView({ block: 'start' }); }, 50);
+    }
+    var bar = root.querySelector('.sb-careers__filters');
+    if (bar) {
+      bar.hidden = false;
+      var btns = Array.prototype.slice.call(bar.querySelectorAll('button'));
+      btns.forEach(function (b) {
+        b.addEventListener('click', function () {
+          var team = b.getAttribute('data-team');
+          btns.forEach(function (x) { var on = x === b; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+          jobs.forEach(function (job) { job.hidden = !!team && job.getAttribute('data-team') !== team; });
+        });
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "SUNBOY careers",
+  "settings": [
+    { "type": "header", "content": "Application form" },
+    { "type": "url", "id": "form_url", "label": "ClickUp form link", "default": "https://forms.clickup.com/36099107/f/12dn13-3597/4NRTQSCSDCJCKOCQBJ" },
+    { "type": "text", "id": "form_param", "label": "Role question on the form", "info": "Must match the form's role question exactly, so Apply buttons pre-select the role.", "default": "Which role are you applying for?" },
+    { "type": "text", "id": "general_option", "label": "General application option", "info": "The dropdown option used by the general application button.", "default": "General application" },
+
+    { "type": "header", "content": "Top" },
+    { "type": "color_scheme", "id": "hero_scheme", "label": "Colour scheme", "default": "scheme-2" },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "default": "Careers at SUNBOY" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Help us spread joy with coconuts" },
+    { "type": "richtext", "id": "intro", "label": "Intro", "default": "<p>SUNBOY is the world's first ready-to-drink spiked coconut water, sold in Target, Kroger, Whole Foods, H-E-B, Publix and more through 40+ distributor partners. We're growing fast and building the team to match.</p>" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "fallback", "label": "Fallback theme image", "default": "sb-sunman-surfing.png" },
+    { "type": "url", "id": "story_link", "label": "Our story link", "default": "/pages/about-us" },
+
+    { "type": "header", "content": "Why SUNBOY" },
+    { "type": "color_scheme", "id": "why_scheme", "label": "Colour scheme", "default": "scheme-4" },
+    { "type": "text", "id": "why_heading", "label": "Heading", "default": "Why SUNBOY" },
+
+    { "type": "header", "content": "Open roles" },
+    { "type": "color_scheme", "id": "roles_scheme", "label": "Colour scheme", "default": "scheme-5" },
+    { "type": "text", "id": "roles_heading", "label": "Heading", "default": "Open roles" },
+    { "type": "text", "id": "roles_note", "label": "Note", "default": "You must be 21 or older to apply." },
+    { "type": "text", "id": "empty_heading", "label": "No open roles: heading", "default": "No open roles right now" },
+    { "type": "text", "id": "empty_text", "label": "No open roles: text", "default": "We're always glad to meet great people. Send a general application and we'll reach out when something fits." },
+    { "type": "text", "id": "steps_heading", "label": "Hiring steps heading", "default": "How hiring works" },
+
+    { "type": "header", "content": "General application" },
+    { "type": "color_scheme", "id": "cta_scheme", "label": "Colour scheme", "default": "scheme-3" },
+    { "type": "text", "id": "general_heading", "label": "Heading", "default": "Don't see your role?" },
+    { "type": "text", "id": "general_text", "label": "Text", "default": "We still want to hear from great people. Tell us what you'd bring to SUNBOY." },
+    { "type": "text", "id": "general_button", "label": "Button", "default": "Send a general application" },
+    { "type": "textarea", "id": "eeo", "label": "Equal opportunity note", "default": "SUNBOY is an equal opportunity employer. We're committed to diversity and inclusion and to making SUNBOY a fun, supportive workplace for everyone. You must be 21 or older to apply." }
+  ],
+  "blocks": [
+    {
+      "type": "perk",
+      "name": "Why SUNBOY point",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Real ownership" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Incentive equity on most roles, plus a bonus target on every salaried role." }
+      ]
+    },
+    {
+      "type": "step",
+      "name": "Hiring step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Apply" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "A short form: your details, resume, and why SUNBOY." }
+      ]
+    }
+  ],
+  "presets": [ { "name": "SUNBOY careers" } ]
+}
+{% endschema %}
