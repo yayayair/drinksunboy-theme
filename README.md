@@ -55,7 +55,7 @@ Page templates live in `templates/`. A page uses the template named by its "Them
 - Header (`sections/header-group.json`): announcement messages + the scrolling yellow bar (`sb-marquee`).
 - Footer (`footer-group.json`): newsletter signup + footer + legal line. The small links (Privacy Policy, Accessibility, Careers, Distributor Shop, Contact) are in code: `sections/footer.liquid`.
 - Header links come from two menus (Shopify admin → Content → Menus):
-  - **Main menu** (left of the logo): Our Story · Find Us · Events · Careers. About five short links fit on one line.
+  - **Main menu** (left of the logo): Home · Find Us · Events · Our Story · Careers. Five short links is about the limit for one line.
   - **Header right** (beside the search icon, desktop): Merch · Distributor Shop. Rendered from `snippets/header-search.liquid` because Shopify's GitHub sync skips edits to `sections/header.liquid`.
   - On phones, both menus appear in the slide-out menu (main menu first).
 - Age gate, signup popup: `snippets/sb-age-gate.liquid`, `sb-signup-popup.liquid`. Turn them on/off and edit their words in Customize → Theme settings → "SUNBOY age gate & signup".
