@@ -13,7 +13,7 @@
         "step-4": { "type": "step", "settings": { "title": "Offer", "text": "Welcome to the coconut crew." } }
       },
       "block_order": ["perk-1", "perk-2", "perk-3", "perk-4", "step-1", "step-2", "step-3", "step-4"],
-      "settings": {}
+      "settings": { "story_link": "/pages/about-us" }
     }
   },
   "order": ["careers"]
