@@ -37,6 +37,7 @@ Page templates live in `templates/`. A page uses the template named by its "Them
 | **Our Story** (/pages/about-us) | `page.pf-7f7457d1.json` | Story opener → pinned-photo chapters → scrolling bar → Instagram strip |
 | **Distributor Shop** | `page.pf-1550554b.json` | Trade shop (`sb-trade`) |
 | **RSM / Team Portal** | `page.pf-d8eebc48.json` | Trade shop in team mode (`sb-trade`) |
+| **Careers** (/pages/careers) | `page.careers.json` | Careers page (`sb-careers`): top → why SUNBOY → open roles → hiring steps → general application |
 | **Trade Admin** (hidden) | `page.trade-admin.json` | Approvals + QuickBooks invoicing (`sb-trade-admin`) |
 | **Your Account** (/pages/account) | `page.contact.json` | Orders + profile (`sb-account`) |
 | **Accessibility, plain pages** | `page.contact.json` / `page.json` | Page text (+ contact form) |
@@ -69,6 +70,8 @@ Page templates live in `templates/`. A page uses the template named by its "Them
 | Distributor/Team portal wording, buttons, order messages | Code: `assets/sunboy-trade.js` (ask Claude) |
 | Event descriptions ("Free tastings in store…") | Code: `finder/lib/events.js` (ask Claude) |
 | Slack order messages | Code: `finder/lib/slack.js` (ask Claude) |
+| Job postings (Careers page) | Shopify admin → Content → Metaobjects → **Job posting** |
+| Careers page headings, why-SUNBOY points, hiring steps, form link | **Customize** → Careers page |
 
 ---
 
@@ -96,6 +99,7 @@ Page templates live in `templates/`. A page uses the template named by its "Them
 - `sb-trade`: distributor + team shop.
 - `sb-trade-admin`: approvals and invoices.
 - `sb-account`: account page.
+- `sb-careers`: Careers page. Lists every Job posting set to Open.
 - `sb-newsletter`, `sb-legal`: footer signup and legal line.
 
 **Snippets** (`snippets/`)
@@ -115,6 +119,20 @@ Page templates live in `templates/`. A page uses the template named by its "Them
 - `sb-*.webp/png`: cans, bands, packs and Sunman illustrations.
 
 Colour schemes (Customize → Theme settings → Colors): 1 white/brown, 2 teal, 3 yellow, 4 brown, 5 cream.
+
+---
+
+## Careers: adding or closing a role
+
+Roles live in Shopify admin → Content → Metaobjects → **Job posting**. The Careers page lists every entry whose **Status** is Open, ordered by **Sort order** (lowest first).
+
+- **Add a role:** Add entry. Fill in Title, Status (Open), Team, Type, Location, Pay (short), Reports to, Summary and Full description (paste the post's role, responsibilities, ideal candidate, requirements and compensation). Target start and Full posting link are optional.
+- **Close a role:** set Status to Closed. It disappears from the page; the entry stays for next time.
+- **Teams:** the filter buttons come from the Team field. A team with no open roles drops out.
+- **Nothing open:** the page shows "No open roles right now" with the general application button.
+- **Apply buttons** open the ClickUp form with the role pre-selected. The form's dropdown option must match the role's Title, or put the exact dropdown wording in **Application form option** (e.g. "Regional Sales Manager - Texas").
+- **Add a new role to the ClickUp form's role dropdown too**, or its Apply button opens the form with no role selected.
+- **Link to one role:** /pages/careers#<entry handle>, e.g. /pages/careers#rsm-texas opens that role.
 
 ---
 
