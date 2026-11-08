@@ -7,6 +7,24 @@
   Usage:
   {% render 'header-search', input_id: 'My-Id'%}
 {% endcomment %}
+{%- comment -%}
+  SUNBOY: links beside the search icon (desktop). They come from the menu
+  "Header right" (Content → Menus, handle header-right). The same links are
+  added to the end of the mobile menu in header-drawer.liquid.
+{%- endcomment -%}
+{%- if input_id == 'Search-In-Modal' and linklists['header-right'].links.size > 0 -%}
+  <nav class="sb-header-right small-hide medium-hide" aria-label="More">
+    <ul class="list-menu list-menu--inline" role="list">
+      {%- for link in linklists['header-right'].links -%}
+        <li>
+          <a href="{{ link.url }}" class="header__menu-item list-menu__item link link--text focus-inset"{% if link.current %} aria-current="page"{% endif %}>
+            <span{% if link.current %} class="header__active-menu-item"{% endif %}>{{ link.title | escape }}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+{%- endif -%}
 
 <details-modal class="header__search">
   <details>

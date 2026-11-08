@@ -137,7 +137,7 @@
                   {%- endif -%}
                 </li>
               {%- endfor -%}
-              {%- for link in section.settings.sb_right_menu.links -%}
+              {%- for link in linklists['header-right'].links -%}
                 <li>
                   <a
                     id="HeaderDrawer-right-{{ link.handle }}"

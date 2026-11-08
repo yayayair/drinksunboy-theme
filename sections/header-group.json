@@ -78,7 +78,6 @@
         "menu_color_scheme": "scheme-2",
         "logo_position": "middle-center",
         "menu": "main-menu",
-        "sb_right_menu": "header-right",
         "menu_type_desktop": "dropdown",
         "sticky_header_type": "on-scroll-up",
         "show_line_separator": false,
