@@ -136,7 +136,7 @@ Roles live in Shopify admin → Content → Metaobjects → **Job posting**. The
 - **Nothing open:** the page shows "No open roles right now" with the general application button.
 - **Apply buttons** open the ClickUp form with the role pre-selected. The form's dropdown option must match the role's Title, or put the exact dropdown wording in **Application form option** (e.g. "Regional Sales Manager - Texas").
 - **Add a new role to the ClickUp form's role dropdown too**, or its Apply button opens the form with no role selected.
-- **Link to one role:** /pages/careers#<entry handle>, e.g. /pages/careers#rsm-texas opens that role.
+- **Link to one role:** /pages/careers#<entry handle>, e.g. /pages/careers#rsm-texas opens that role. The link icon next to each Apply button copies this link (on phones it opens the share sheet).
 
 ---
 
