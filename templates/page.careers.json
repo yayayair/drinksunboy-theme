@@ -1,20 +1,111 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "careers": {
       "type": "sb-careers",
       "blocks": {
-        "perk-1": { "type": "perk", "settings": { "title": "Real ownership", "text": "Incentive equity on most roles, plus a bonus target on every salaried role." } },
-        "perk-2": { "type": "perk", "settings": { "title": "Build something", "text": "A fun, scrappy, supportive team where every hire shapes what SUNBOY becomes." } },
-        "perk-3": { "type": "perk", "settings": { "title": "Taken care of", "text": "Health insurance and benefits, plus a car allowance and travel budget for field roles." } },
-        "perk-4": { "type": "perk", "settings": { "title": "And yes", "text": "All the spiked coconut water your heart desires." } },
-        "step-1": { "type": "step", "settings": { "title": "Apply", "text": "A short form: your details, resume, and why SUNBOY." } },
-        "step-2": { "type": "step", "settings": { "title": "We review", "text": "Our team reviews applications on a rolling basis." } },
-        "step-3": { "type": "step", "settings": { "title": "Interviews", "text": "Conversations with the people you'd work with." } },
-        "step-4": { "type": "step", "settings": { "title": "Offer", "text": "Welcome to the coconut crew." } }
+        "perk-1": {
+          "type": "perk",
+          "settings": {
+            "title": "Real ownership",
+            "text": "Incentive equity and bonus targets on most salaried roles."
+          }
+        },
+        "perk-2": {
+          "type": "perk",
+          "settings": {
+            "title": "Build something",
+            "text": "A fun, supportive team where every hire shapes what SUNBOY becomes."
+          }
+        },
+        "perk-3": {
+          "type": "perk",
+          "settings": {
+            "title": "Taken care of",
+            "text": "Health insurance, benefits, and a travel allowance for field roles."
+          }
+        },
+        "perk-4": {
+          "type": "perk",
+          "settings": {
+            "title": "And yes",
+            "text": "All the spiked coconut water your heart desires."
+          }
+        },
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Apply",
+            "text": "A short form: your details, resume, and why SUNBOY."
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "We review",
+            "text": "Our team reviews applications on a rolling basis."
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Interviews",
+            "text": "Conversations with the people you'd work with."
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Offer",
+            "text": "Welcome to the coconut crew."
+          }
+        }
       },
-      "block_order": ["perk-1", "perk-2", "perk-3", "perk-4", "step-1", "step-2", "step-3", "step-4"],
-      "settings": { "story_link": "/pages/about-us" }
+      "block_order": [
+        "perk-1",
+        "perk-2",
+        "perk-3",
+        "perk-4",
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4"
+      ],
+      "settings": {
+        "form_url": "https://forms.clickup.com/36099107/f/12dn13-3597/4NRTQSCSDCJCKOCQBJ",
+        "form_param": "Which role are you applying for?",
+        "general_option": "General application",
+        "hero_scheme": "",
+        "eyebrow": "Careers at SUNBOY",
+        "heading": "Help us spread joy with coconuts",
+        "intro": "<p>SUNBOY is the world's first ready-to-drink spiked coconut water, sold in Target, Kroger, Whole Foods, H-E-B, Publix and more through 40+ distributor partners. We're growing fast and building the team to match.</p>",
+        "fallback": "sb-sunman-surfing.png",
+        "story_link": "/pages/about-us",
+        "why_scheme": "",
+        "why_heading": "Why SUNBOY",
+        "roles_scheme": "",
+        "roles_heading": "Open roles",
+        "roles_note": "You must be 21 or older to apply.",
+        "empty_heading": "No open roles right now",
+        "empty_text": "We're always glad to meet great people. Send a general application and we'll reach out when something fits.",
+        "steps_heading": "How hiring works",
+        "cta_scheme": "",
+        "general_heading": "Don't see your role?",
+        "general_text": "We still want to hear from great people. Tell us what you'd bring to SUNBOY.",
+        "general_button": "Send a general application",
+        "eeo": "SUNBOY is an equal opportunity employer. We're committed to diversity and inclusion and to making SUNBOY a fun, supportive workplace for everyone. You must be 21 or older to apply."
+      }
     }
   },
-  "order": ["careers"]
+  "order": [
+    "careers"
+  ]
 }
