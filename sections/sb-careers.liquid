@@ -151,6 +151,10 @@
                       <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
                     </button>
                     <a class="sb-btn sb-btn--yellow sb-job__apply" href="{{ apply_url }}" target="_blank" rel="noopener">Apply<span class="visually-hidden">: {{ job.title.value }} (opens in a new tab)</span></a>
+                    <button type="button" class="sb-job__share" data-share-url="{{ shop.url }}{{ page.url | default: '/pages/careers' }}#{{ handle }}" data-share-title="{{ job.title.value | escape }} at SUNBOY" aria-label="Copy link to {{ job.title.value | escape }}" title="Copy link to this role">
+                      <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3.54-3.54a5 5 0 0 0-7.07-7.07l-1.77 1.77"/><path d="M14 11a5 5 0 0 0-7.07 0l-3.54 3.54a5 5 0 0 0 7.07 7.07l1.77-1.77"/></svg>
+                      <span class="sb-job__share-msg" role="status" aria-live="polite"></span>
+                    </button>
                   </div>
                 </div>
                 <div class="sb-job__body" id="{{ handle }}-details">
@@ -238,6 +242,34 @@
     window.addEventListener('hashchange', function () {
       var t = location.hash ? document.getElementById(location.hash.slice(1)) : null;
       if (t && t.classList.contains('sb-job')) { setOpen(t, true); t.scrollIntoView({ block: 'start' }); }
+    });
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+      return new Promise(function (resolve, reject) {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy') ? resolve() : reject(); } catch (e) { reject(e); }
+        document.body.removeChild(ta);
+      });
+    }
+    Array.prototype.slice.call(root.querySelectorAll('.sb-job__share')).forEach(function (btn) {
+      var msg = btn.querySelector('.sb-job__share-msg');
+      var timer;
+      function say(text) {
+        msg.textContent = text; btn.classList.add('is-shown');
+        clearTimeout(timer);
+        timer = setTimeout(function () { btn.classList.remove('is-shown'); msg.textContent = ''; }, 2000);
+      }
+      btn.addEventListener('click', function () {
+        var url = btn.getAttribute('data-share-url');
+        var touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+        if (touch && navigator.share) {
+          navigator.share({ title: btn.getAttribute('data-share-title'), url: url }).catch(function () {});
+          return;
+        }
+        copyText(url).then(function () { say('Link copied'); }, function () { say(url); });
+      });
     });
     var bar = root.querySelector('.sb-careers__filters');
     if (bar) {
