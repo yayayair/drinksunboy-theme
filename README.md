@@ -130,9 +130,10 @@ Colour schemes (Customize → Theme settings → Colors): 1 white/brown, 2 teal,
 
 Roles live in Shopify admin → Content → Metaobjects → **Job posting**. The Careers page lists every entry whose **Status** is Open, ordered by **Sort order** (lowest first).
 
-- **Add a role:** Add entry. Fill in Title, Status (Open), Team, Type, Location, Pay (short), Reports to, Summary and Full description (paste the post's role, responsibilities, ideal candidate, requirements and compensation). Target start and Full posting link are optional.
+- **Add a role:** Add entry. Fill in Title, Status (Open), Team, Type, Location, Pay (short), Reports to, Summary and Full description (paste the post's role, responsibilities, ideal candidate, requirements and compensation). Start date and Full posting link are optional.
 - **Close a role:** set Status to Closed. It disappears from the page; the entry stays for next time.
 - **Teams:** the filter buttons come from the Team field. A team with no open roles drops out.
+- **Start date** shows on each role card ("Starts Jan 11, 2027"). Visitors can sort by Featured (your Sort order) or Start date (soonest first; roles with no date go last).
 - **Nothing open:** the page shows "No open roles right now" with the general application button.
 - **Apply buttons** open the ClickUp form with the role pre-selected. The form's dropdown option must match the role's Title, or put the exact dropdown wording in **Application form option** (e.g. "Regional Sales Manager - Texas").
 - **Add a new role to the ClickUp form's role dropdown too**, or its Apply button opens the form with no role selected.
