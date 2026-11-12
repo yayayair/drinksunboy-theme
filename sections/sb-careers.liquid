@@ -107,15 +107,6 @@
           {%- endfor -%}
         </div>
         {%- endif -%}
-        {%- if count > 1 -%}
-        <div class="sb-careers__sort" hidden>
-          <label for="sb-careers-sort">Sort by</label>
-          <select id="sb-careers-sort">
-            <option value="order">Featured</option>
-            <option value="start">Start date</option>
-          </select>
-        </div>
-        {%- endif -%}
         </div>
       </div>
 
@@ -151,7 +142,7 @@
                   assign start_label = blank
                 endif
               -%}
-              <article class="sb-job" id="{{ handle }}" data-team="{{ jt | handle }}" data-order="{{ idx }}" data-start="{{ start_iso }}">
+              <article class="sb-job" id="{{ handle }}" data-team="{{ jt | handle }}">
                 <div class="sb-job__head">
                   <div class="sb-job__main">
                     <p class="sb-job__tags">
@@ -296,23 +287,6 @@
         copyText(url).then(function () { say('Link copied'); }, function () { say(url); });
       });
     });
-    var sortWrap = root.querySelector('.sb-careers__sort');
-    var list = root.querySelector('.sb-careers__list');
-    if (sortWrap && list) {
-      sortWrap.hidden = false;
-      var sel = sortWrap.querySelector('select');
-      sel.addEventListener('change', function () {
-        var byStart = sel.value === 'start';
-        jobs.slice().sort(function (a, b) {
-          var oa = +a.getAttribute('data-order'), ob = +b.getAttribute('data-order');
-          if (byStart) {
-            var sa = a.getAttribute('data-start'), sb = b.getAttribute('data-start');
-            if (sa !== sb) return sa < sb ? -1 : 1;
-          }
-          return oa - ob;
-        }).forEach(function (job) { list.appendChild(job); });
-      });
-    }
     var bar = root.querySelector('.sb-careers__filters');
     if (bar) {
       bar.hidden = false;
