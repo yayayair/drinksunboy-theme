@@ -93,6 +93,7 @@
           <h2 class="sb-display sb-careers__h2">{{ section.settings.roles_heading }}</h2>
           {%- if section.settings.roles_note != blank -%}<p class="sb-careers__note">{{ section.settings.roles_note }}</p>{%- endif -%}
         </div>
+        <div class="sb-careers__controls">
         {%- if team_list.size > 1 -%}
         <div class="sb-careers__filters" role="group" aria-label="Filter roles by team" hidden>
           <button type="button" class="sb-careers__filter is-on" data-team="" aria-pressed="true">All <span>{{ count }}</span></button>
@@ -106,6 +107,16 @@
           {%- endfor -%}
         </div>
         {%- endif -%}
+        {%- if count > 1 -%}
+        <div class="sb-careers__sort" hidden>
+          <label for="sb-careers-sort">Sort by</label>
+          <select id="sb-careers-sort">
+            <option value="order">Featured</option>
+            <option value="start">Start date</option>
+          </select>
+        </div>
+        {%- endif -%}
+        </div>
       </div>
 
       {%- if count == 0 -%}
@@ -116,6 +127,7 @@
         </div>
       {%- else -%}
         <div class="sb-careers__list">
+          {%- assign idx = 0 -%}
           {%- for n in (0..100) -%}
             {%- for job in shop.metaobjects.sunboy_job.values -%}
               {%- if job.status.value != 'Open' -%}{%- continue -%}{%- endif -%}
@@ -130,8 +142,16 @@
                 assign option_enc = option | url_encode | replace: '+', '%20'
                 assign apply_url = apply_url | replace: '__OPT__', option_enc
                 assign jt = job.team.value | strip
+                assign idx = idx | plus: 1
+                if job.start_date.value != blank
+                  assign start_iso = job.start_date.value | date: '%Y-%m-%d'
+                  assign start_label = job.start_date.value | date: '%b %-d, %Y'
+                else
+                  assign start_iso = '9999-12-31'
+                  assign start_label = blank
+                endif
               -%}
-              <article class="sb-job" id="{{ handle }}" data-team="{{ jt | handle }}">
+              <article class="sb-job" id="{{ handle }}" data-team="{{ jt | handle }}" data-order="{{ idx }}" data-start="{{ start_iso }}">
                 <div class="sb-job__head">
                   <div class="sb-job__main">
                     <p class="sb-job__tags">
@@ -143,6 +163,11 @@
                       {{- job.location.value -}}
                       {%- if job.location.value != blank and job.pay_summary.value != blank %} · {% endif -%}
                       {{- job.pay_summary.value -}}
+                    
+                      {%- if start_label != blank -%}
+                        {%- if job.location.value != blank or job.pay_summary.value != blank %} · {% endif -%}
+                        Starts {{ start_label }}
+                      {%- endif -%}
                     </p>
                   </div>
                   <div class="sb-job__actions">
@@ -162,7 +187,7 @@
                   {%- if job.description != blank -%}<div class="sb-job__desc">{{ job.description | metafield_tag }}</div>{%- endif -%}
                   <p class="sb-job__facts">
                     {%- if job.reports_to.value != blank -%}<span>Reports to the {{ job.reports_to.value }}</span>{%- endif -%}
-                    {%- if job.target_start.value != blank -%}<span>Target start: {{ job.target_start.value }}</span>{%- endif -%}
+                    {%- if start_label != blank -%}<span>Target start: {{ start_label }}</span>{%- endif -%}
                   </p>
                   <p class="sb-job__foot">
                     <a class="sb-btn sb-btn--solid" href="{{ apply_url }}" target="_blank" rel="noopener">Apply for this role<span class="visually-hidden"> (opens in a new tab)</span></a>
@@ -271,6 +296,23 @@
         copyText(url).then(function () { say('Link copied'); }, function () { say(url); });
       });
     });
+    var sortWrap = root.querySelector('.sb-careers__sort');
+    var list = root.querySelector('.sb-careers__list');
+    if (sortWrap && list) {
+      sortWrap.hidden = false;
+      var sel = sortWrap.querySelector('select');
+      sel.addEventListener('change', function () {
+        var byStart = sel.value === 'start';
+        jobs.slice().sort(function (a, b) {
+          var oa = +a.getAttribute('data-order'), ob = +b.getAttribute('data-order');
+          if (byStart) {
+            var sa = a.getAttribute('data-start'), sb = b.getAttribute('data-start');
+            if (sa !== sb) return sa < sb ? -1 : 1;
+          }
+          return oa - ob;
+        }).forEach(function (job) { list.appendChild(job); });
+      });
+    }
     var bar = root.querySelector('.sb-careers__filters');
     if (bar) {
       bar.hidden = false;

@@ -819,3 +819,10 @@ body[class*="overflow-hidden"] .sb-finder__maptoggle { display: none; }
 .sb-job__share-msg { position: absolute; bottom: calc(100% + .8rem); right: 0; white-space: nowrap; background: var(--sb-brown); color: #fff; font: 700 1.2rem/1 var(--font-body-family); letter-spacing: .08em; text-transform: uppercase; padding: .8rem 1rem; border-radius: .8rem; opacity: 0; pointer-events: none; transition: opacity .15s; }
 .sb-job__share-msg:empty { display: none; }
 .sb-job__share.is-shown .sb-job__share-msg { opacity: 1; }
+
+/* Careers: filter + sort controls */
+.sb-careers__controls { display: flex; flex-wrap: wrap; align-items: center; gap: 1.2rem 2rem; }
+.sb-careers__sort { display: flex; align-items: center; gap: 1rem; }
+.sb-careers__sort[hidden] { display: none; }
+.sb-careers__sort label { font: 700 1.3rem/1 var(--font-body-family); letter-spacing: .12em; text-transform: uppercase; color: var(--sb-brown); }
+.sb-careers__sort select { min-height: 4.4rem; padding: 0 3.6rem 0 1.6rem; border-radius: 999px; border: 2px solid var(--sb-brown); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23523B18' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 1.4rem center; color: var(--sb-brown); font: 700 1.4rem/1 var(--font-body-family); letter-spacing: .06em; appearance: none; -webkit-appearance: none; cursor: pointer; }
